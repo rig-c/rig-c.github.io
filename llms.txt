@@ -2,6 +2,8 @@
 
 > AI-authored 2D character rigging and animation toolchain, verified before a byte is written. Takes one character painting decomposed into RGBA layers (via See-through) and compiles Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and self-contained browser/engine models (`skeleton.model.json`), gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile).
 
+Made by firejune (https://github.com/firejune). Source and packages: https://github.com/rig-c.
+
 All pages on https://rig-c.org are served as static semantic HTML (`/<path>/`) with a clean Markdown mirror (`/<path>/index.md`). No JavaScript execution is required to fetch or parse any page.
 
 ## Pages
