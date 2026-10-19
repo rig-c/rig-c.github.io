@@ -70,7 +70,8 @@ function main(): void {
       errors.push(`[${route}] Expected exactly 1 <h1>, found ${h1Matches.length}`);
     }
 
-    if (/\sstyle\s*=/i.test(html)) {
+    // Code samples may show a style attribute as text; the page's own markup may not carry one.
+    if (/\sstyle\s*=/i.test(html.replace(/<pre>[\s\S]*?<\/pre>/g, ''))) {
       errors.push(`[${route}] Found forbidden inline style= attribute`);
     }
 

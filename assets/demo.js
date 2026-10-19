@@ -4,17 +4,18 @@
 // the demo's own status line — the rest of the page never depends on this script.
 const PLAY_URL = 'https://cdn.jsdelivr.net/npm/@rig-c/play@1.12.0/dist/index.js';
 
-const root = document.getElementById('live-demo');
-if (root) init(root);
+for (const root of document.querySelectorAll('.live-demo')) init(root);
 
 function init(section) {
   const sha = section.dataset.sha;
   const base = `https://cdn.jsdelivr.net/gh/rig-c/parts-examples@${sha}/family`;
   const repo = `https://github.com/rig-c/parts-examples/tree/${sha}/family`;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const $ = (id) => section.querySelector(`#${id}`);
+  const $ = (id) => section.querySelector(`[data-part="${id}"]`) ?? section.querySelector(`#${id}`);
+  // A page may fix the rig (data-character / data-outfit) instead of offering the selects.
+  const fixed = (el, value) => el ?? { value, disabled: false, selectedOptions: [{ textContent: section.dataset.label ?? value }], addEventListener() {} };
   const ui = {
-    character: $('demo-character'), outfit: $('demo-outfit'), motion: $('demo-motion'),
+    character: fixed($('demo-character'), section.dataset.character), outfit: fixed($('demo-outfit'), section.dataset.outfit), motion: $('demo-motion'), mode: $('demo-mode'),
     play: $('demo-play'), bones: $('demo-bones'), mesh: $('demo-mesh'),
     start: $('demo-start'), stage: $('demo-stage'), overlay: $('demo-overlay'),
     status: $('demo-status'), source: $('demo-source'),
@@ -32,7 +33,7 @@ function init(section) {
 
   const dir = (c, o) => (o === 'office' ? c : `outfits/${o}/${c}`);
   const config = (c, o) => (o === 'office' ? `${c}/config.json` : `outfits/${o}/${c}/authoring/config.json`);
-  const label = () => `${ui.character.selectedOptions[0].textContent}, ${ui.outfit.value}`;
+  const label = () => section.dataset.label ?? `${ui.character.selectedOptions[0].textContent}, ${ui.outfit.value}`;
 
   function status(text, kind = '') {
     ui.status.textContent = text;
@@ -40,7 +41,7 @@ function init(section) {
   }
 
   function setControls(enabled) {
-    for (const el of [ui.character, ui.outfit, ui.motion, ui.play, ui.bones, ui.mesh]) el.disabled = !enabled;
+    for (const el of [ui.character, ui.outfit, ui.motion, ui.mode, ui.play, ui.bones, ui.mesh]) if (el) el.disabled = !enabled;
   }
 
   function syncButtons() {
@@ -71,7 +72,7 @@ function init(section) {
     const box = current.assets.stage ?? current.player.bounds();
     const w = ui.stage.clientWidth;
     const h = ui.stage.clientHeight;
-    const scale = 0.94 * Math.min(w / box.width, h / box.height);
+    const scale = Number(section.dataset.fit ?? 0.94) * Math.min(w / box.width, h / box.height);
     const left = (w - box.width * scale) / 2 - box.x * scale;
     const top = (h - box.height * scale) / 2 + (box.y + box.height) * scale;
     current.view = { box, scale, left, top };
@@ -164,7 +165,7 @@ function init(section) {
     try {
       let bones = [];
       const assets = await lib.loadModel({
-        modelUrl: `${base}/${dir(c, o)}/out/check/build/skeleton.model.json`,
+        modelUrl: section.dataset.modelUrl ?? `${base}/${dir(c, o)}/out/check/build/skeleton.model.json`,
         crossOrigin: 'anonymous',
         setsUrl: null,
         fetch: async (input, init) => {
@@ -188,7 +189,7 @@ function init(section) {
       }
       const el = document.createElement('div');
       ui.stage.insertBefore(el, ui.overlay);
-      const player = new lib.RigPlayer(el, assets);
+      const player = new lib.RigPlayer(el, assets, ui.mode ? { mode: ui.mode.value } : {});
       const names = assets.animations.map((a) => a.name);
       const motion = names.includes(keepMotion) ? keepMotion : names[0];
       current = { player, assets, el, bones };
@@ -199,10 +200,10 @@ function init(section) {
       fit();
       player.frame(0);
       drawOverlay();
-      showSource(c, o);
-      const backend = player.renderer.meshBackendActive ?? 'canvas';
+      if (!section.dataset.modelUrl) showSource(c, o);
+      const backend = player.mode === 'canvas' ? 'everything in one canvas (canvas mode)' : `meshes drawn with ${player.renderer.meshBackendActive ?? 'canvas'} (DOM mode)`;
       const motions = names.length === 1 ? `its one motion, ${names[0]}` : `${names.length} motions`;
-      status(`Live: ${label()} — ${motions}, meshes drawn with ${backend}.${playing ? '' : ' Paused; press Play.'}`, 'ready');
+      status(`Live: ${label()} — ${motions}, ${backend}.${playing ? '' : ' Paused; press Play.'}`, 'ready');
     } catch (err) {
       if (id !== request) return;
       status(`The live demo could not load ${label()}: ${err.message}. The recorded preview above shows the same rigs.`, 'error');
@@ -232,6 +233,7 @@ function init(section) {
   ui.start.addEventListener('click', start);
   ui.character.addEventListener('change', load);
   ui.outfit.addEventListener('change', load);
+  if (ui.mode) ui.mode.addEventListener('change', load);
   ui.motion.addEventListener('change', () => {
     if (!current) return;
     current.player.play(ui.motion.value);

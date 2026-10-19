@@ -117,62 +117,100 @@
         <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Review</li></ol></nav>
         <div class="pkg-bar"><span class="pkg"><code>@rig-c/review</code> <span class="ver">0.2.1</span></span><a href="https://github.com/rig-c/review">github.com/rig-c/review</a><a href="https://www.npmjs.com/package/@rig-c/review">npm</a></div>
         <article>
-<h1 id="review">Review</h1>
-<p>Review is the human inspection gate in the rig-c toolchain. A person opens an agent's rig output in one local workspace, checks it, and saves feedback that the agent can read back.</p>
-<h2 id="what-it-is">What it is</h2>
-<p><code>@rig-c/review</code> is a CLI, <code>rig-review</code>, that serves a browser workspace on <code>127.0.0.1</code>. It plays a compiled model through <code>@rig-c/play</code>, shows local image, video and pose-sequence references beside it, and records the person's review decision and feedback.</p>
-<h2 id="when-to-use-it">When to use it</h2>
-<p>Use it after a <a href="/docs/core/">Core</a> build, when a person needs to look at the result before it goes on. The agent does not have to build a new viewer for each rig.</p>
-<p>Do not use it to fix the rig. Motion is view, annotate and export only: it never retimes, authors keys or writes <code>motion.json</code>. It does not edit meshes, weights or source art. It also does not replace Core's compiler gate; <code>check</code> validates the delivery contract and model envelope, not visual quality. To ship a rig into a game, use <a href="/docs/play/">Play</a> or an <a href="/docs/adapters/">engine adapter</a>.</p>
-<h2 id="what-it-solves">What it solves</h2>
-<p>An agent can produce a rig, but a person has to judge it. Without a shared tool, that judgment ends up as loose notes that point at nothing exact. Review ties each piece of feedback to the exact bytes that were reviewed, and to a frame interval and a bone or slot target. The agent then retrieves it with one command. If the input changes, the old approval does not carry over.</p>
-<h2 id="what-you-get">What you get</h2>
-<ul>
-<li>A <strong>review status</strong>: <code>approved</code>, <code>changes-requested</code> or <code>pending</code>. Opening never approves.</li>
-<li><strong>Feedback</strong> items with an inclusive frame interval, a bone/slot/rig target, a defect/quality category and a one-line summary.</li>
-<li>A <code>reviewedSource</code> record: package revision, viewer/runtime versions, and SHA-256 plus path for the reviewed rig and motion.</li>
-<li>JSON and issue-ready Markdown exports (<code>--format issue</code>).</li>
-<li><strong>Frame strip</strong> exports as PNG or JSON, with a <code>.png.json</code> provenance sidecar.</li>
-</ul>
-<h2 id="how-it-works">How it works</h2>
-<ol>
-<li>Install it beside the agent and run <code>open</code> on the output folder. It recognizes <code>skeleton.model.json</code> at the root or under <code>build/</code>, plus <code>motion.json</code>, <code>report.json</code>, source videos and pose sequences. It reads them without changing them.</li>
-<li><code>open</code> hashes the folder, starts or reuses a background loopback instance, prints its URL and exits. It never opens a browser and binds only <code>127.0.0.1</code>.</li>
-<li>The person inspects playback, parts and references, then explicitly saves a status and feedback. Feedback is stored under <code>~/.local/state/rig-c-review/</code>, outside the delivered files.</li>
-<li>The agent runs <code>feedback</code> on the same folder to read the session JSON. Changed content starts a fresh pending session.</li>
-<li>Optionally, <code>compare</code> seeks two outputs against one reference video with a single playhead.</li>
-</ol>
+<h1 id="rig-creview">@rig-c/review</h1>
+<p class="mod-role">A local inspection page for a person: open what an agent built, find what looks wrong, pin it to a frame and a slot, and hand it back as an issue.</p>
+<figure class="mod-hero">
+  <img src="/assets/docs/review-screen.jpg" alt="The rig-review page: the left column lists checkpoints and source files, the centre shows Character 1's shirt part zoomed in with a dashed selection box, the right column lists all 17 slots with topwear selected, and the Feedback panel below shows one saved defect on slot topwear" width="1600" height="1000">
+  <figcaption>Character 1's build from before the shoulder repair, open in <code>rig-review</code> 0.2.1: <code>topwear</code> soloed and zoomed, one defect saved against it, the review submitted as <em>changes requested</em>.</figcaption>
+</figure>
+<p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
+<nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol><li><a href="/docs/parts/"><strong>Parts</strong><span>split into parts</span></a></li><li><a href="/docs/pose/"><strong>Pose</strong><span>given a motion</span></a></li><li><a href="/docs/core/"><strong>Core</strong><span>checked</span></a></li><li><a href="/docs/review/" aria-current="step"><strong>Review</strong><span>looked at</span></a></li><li><a href="/docs/play/"><strong>Play</strong><span>played</span></a></li></ol></nav>
+<p>The checks that keep a broken rig off the disk are structural: a shoulder that renders flat passes all of them. Someone has to look — and what they find has to reach whoever fixes it as something more precise than a screenshot. Review runs on your machine (<code>127.0.0.1</code> only), plays the build with the same <code>@rig-c/play</code> runtime a site would use, and records feedback bound to a frame range, a slot or bone, and the exact camera, without touching the files it was given.</p>
+<h2 id="one-problem-from-seeing-it-to-the-fix">One problem, from seeing it to the fix</h2>
+<p>Character 1's shirt once had a flat, indented shoulder: an earlier preparation script had cut away cloth that the hair covers in the still and uncovers when it moves. The family suite records that repair in <a href="https://github.com/rig-c/parts-examples/blob/main/family/roa/SHOULDER_REPAIR.md">its shoulder-repair note</a>. Here it is replayed in Review on the build from before the repair.</p>
+<div class="case">
+<h3 id="1-open-the-build-and-look-where-the-motion-would-reveal-it">1. Open the build, and look where the motion would reveal it</h3>
+<p><code>rig-review open &lt;dir&gt;</code> checks the folder and prints a loopback URL. In the whole rig the back hair covers the spot, so the reviewer pauses the idle, picks <code>topwear</code> in the parts list, ticks <em>Solo selected slot</em> and zooms in.</p>
+<figure class="figure-wide">
+  <img src="/assets/docs/review-in-context.jpg" alt="The whole rig at the same zoom: the back hair covers the shoulder" width="1200" height="750" loading="lazy">
+  <figcaption>The same camera with every slot drawn — the hair hides what the solo view shows.</figcaption>
+</figure>
+</div>
+<div class="case">
+<h3 id="2-pin-it-and-submit">2. Pin it, and submit</h3>
+<p><em>Use slot for feedback</em>, then a category, a frame range and one line of summary; <em>Submit review</em> with status <em>Changes requested</em>. The export is plain JSON (or issue-ready Markdown):</p>
+<pre><code class="language-json">{
+  &quot;schema&quot;: &quot;rig-review-feedback/1&quot;,
+  &quot;reviewedSource&quot;: {
+    &quot;viewerVersion&quot;: &quot;0.2.1&quot;, &quot;runtimeVersion&quot;: &quot;1.12.0&quot;,
+    &quot;rig&quot;: { &quot;path&quot;: &quot;build/skeleton.model.json&quot;, &quot;sha256&quot;: &quot;28490ee9e2c7fa8a…&quot; }
+  },
+  &quot;status&quot;: &quot;changes-requested&quot;,
+  &quot;feedback&quot;: [{
+    &quot;frameStart&quot;: 15, &quot;frameEnd&quot;: 15,
+    &quot;target&quot;: { &quot;kind&quot;: &quot;slot&quot;, &quot;name&quot;: &quot;topwear&quot; },
+    &quot;category&quot;: &quot;defect&quot;,
+    &quot;summary&quot;: &quot;Screen-left shoulder top of topwear is flat and indented (cloth alpha cut); exposed when hair moves aside&quot;,
+    &quot;context&quot;: { &quot;animation&quot;: &quot;idle&quot;, &quot;time&quot;: 1.25, &quot;frame&quot;: null,
+                 &quot;camera&quot;: { &quot;zoom&quot;: 7.3586, &quot;x&quot;: -112.72, &quot;y&quot;: 1792.86, &quot;coordinateSystem&quot;: &quot;world-y-up&quot; } }
+  }]
+}
+</code></pre>
+<p>The rig's hash, the viewer and runtime versions and the saved camera mean anyone holding the issue can reopen exactly this view. <code>&quot;frame&quot;: null</code> is honest: this build declares no frame clock, so Review shows <code>rate unknown</code>, and the 15 is a number the reviewer entered (1.25 s at the check sampler's 12 fps).</p>
+</div>
+<div class="case">
+<h3 id="3-the-fix-happens-upstream-the-rebuilt-rig-comes-back">3. The fix happens upstream; the rebuilt rig comes back</h3>
+<p>Review changes nothing in the package — the repair was made in the authoring workflow: a guarded stage restored the original shirt cloth in that area and widened five outline vertices, then the rig was rebuilt and checked through the ordinary gates. Reopened in Review with the same view:</p>
+<figure class="figure-wide">
+  <img src="/assets/docs/review-before-after.jpg" alt="Two close-ups of the shoulder: left, flat with a step; right, a smooth rounded shoulder" width="1296" height="400" loading="lazy">
+  <figcaption>Left: before the repair, as pinned. Right: the current build, same time, slot and camera.</figcaption>
+</figure>
+</div>
+<p>Review also lines a build up against reference footage — side by side, synchronized cameras, frame strips — which is how a retargeted motion like the <a href="/docs/pose/">Pose</a> page's wave gets judged against what it was meant to copy.</p>
+<section class="tech" aria-label="Technical details">
+<h2 id="install">Install</h2>
 <pre><code class="language-sh">npm i -D @rig-c/review
 npx rig-review open /absolute/path/to/output
 </code></pre>
-<p>It runs under Bun 1.3.0 or later. The CLI is the supported surface; no importable API is promised.</p>
-<h2 id="key-concepts">Key concepts</h2>
+<p>Runs under Bun 1.3.0 or later, which must be on <code>PATH</code>; <code>open</code> prints a loopback URL and exits (README §&quot;Start&quot;).</p>
+<h2 id="inputs-and-outputs">Inputs and outputs</h2>
+<table>
+<thead>
+<tr><th>In</th><th>Out</th></tr>
+</thead>
+<tbody>
+<tr><td>An output folder: <code>skeleton.model.json</code> (root or <code>build/</code>), <code>motion.json</code>, <code>report.json</code>, <code>skeleton.json</code>/<code>.skel</code>/<code>.atlas</code></td><td>A loopback inspection page (<code>127.0.0.1</code> only)</td></tr>
+<tr><td>Source references: videos (<code>.mp4</code>, <code>.webm</code>, <code>.mov</code>), strip/contact/sheet images, <code>*pose*.json</code> sequences</td><td>Saved review session: status, checkpoint outcomes and feedback, under <code>~/.local/state/rig-c-review/</code></td></tr>
+<tr><td>(optional) a curated <code>review.json</code> with checkpoints, references and angle axes</td><td>Feedback export as JSON or issue-ready Markdown (<code>feedback --format issue</code>)</td></tr>
+<tr><td>For <code>compare</code>: two outputs and one local reference video</td><td>Frame strips as PNG (plus a <code>.png.json</code> provenance sidecar) or JSON</td></tr>
+</tbody>
+</table>
+<h2 id="limits">Limits</h2>
 <ul>
-<li><strong>Output folder</strong>: an existing agent output opened as-is, with no manifest required.</li>
-<li><strong><code>review.json</code></strong>: an optional curated manifest with named checkpoints, references and angle axes.</li>
-<li><strong>Checkpoint</strong>: a named inspection point in a curated package, with its own outcome and notes.</li>
-<li><strong>Producer clock</strong>: <code>fps</code> plus <code>frame0</code>, or exact <code>frameTimes[]</code>, declared in the report. Without it the UI shows <code>rate unknown</code>.</li>
-<li><strong>Reference binding</strong>: the name and byte hash of a selected external video, bound into sessions and exports.</li>
-<li><strong>Write capability</strong>: a per-instance secret carried in the URL's <code>#cap=</code> fragment. A link without it opens read-only.</li>
+<li><strong>&quot;Motion is view, annotate and export only.&quot;</strong> It never retimes, authors keys, or writes <code>motion.json</code> (README, intro).</li>
+<li><strong>No modeling touch-up yet</strong>: it &quot;does not edit meshes, weights or source art&quot; (README, intro).</li>
+<li><strong><code>check</code> validates the delivery contract and model envelope</strong>, not the upstream compiler gate or visual quality; a raw <code>skeleton.json</code> can be inspected but not played (README §&quot;Existing output handoff&quot;).</li>
+<li><strong>No frame rate is inferred</strong>: without a declared clock the page shows <code>rate unknown</code>, and strip PNGs need the report's exact <code>frameTimes</code> (README §&quot;Existing output handoff&quot;, §&quot;Frame strip export&quot;).</li>
+<li><strong>Never publishes an issue automatically</strong>; saving or exporting feedback modifies no model (README §&quot;Feedback ownership&quot;).</li>
+<li><strong>Maturity</strong>: &quot;the CLI is the supported surface, and no importable API is promised yet&quot; (README §&quot;Start&quot;; the README still says 0.1.x while npm is at 0.2.1).</li>
 </ul>
 <h2 id="go-deeper">Go deeper</h2>
 <ul>
-<li><a href="https://github.com/rig-c/review#start">README: Start</a></li>
-<li><a href="https://github.com/rig-c/review#feedback-ownership">README: Feedback ownership</a></li>
-<li><a href="https://github.com/rig-c/review#compare-two-outputs">README: Compare two outputs</a></li>
-<li><a href="https://github.com/rig-c/review#frame-strip-export">README: Frame strip export</a></li>
-<li><a href="https://github.com/rig-c/review#managed-front-and-write-capability">README: Managed front and write capability</a></li>
-<li><a href="https://github.com/rig-c/review#control-the-current-inspection-page">README: Control the current inspection page</a></li>
-<li><a href="https://github.com/rig-c/review/blob/main/docs/REVIEW_PACKAGE.md">docs/REVIEW_PACKAGE.md</a> (package format and HTTP contract)</li>
-<li><a href="https://github.com/rig-c/review/blob/main/docs/DESIGN.md">docs/DESIGN.md</a> (product boundary and direction)</li>
-<li><a href="https://github.com/rig-c/review/blob/main/CHANGELOG.md">CHANGELOG</a></li>
-<li><a href="https://www.npmjs.com/package/@rig-c/review">npm: @rig-c/review</a></li>
+<li><a href="https://github.com/rig-c/review#place-in-the-toolchain">Place in the toolchain</a></li>
+<li><a href="https://github.com/rig-c/review#existing-output-handoff">Existing output handoff</a></li>
+<li><a href="https://github.com/rig-c/review#compare-two-outputs">Compare two outputs</a></li>
+<li><a href="https://github.com/rig-c/review#feedback-ownership">Feedback ownership</a></li>
+<li><a href="https://github.com/rig-c/review#one-command-owner-handoff">One-command owner handoff</a></li>
+<li><a href="https://github.com/rig-c/review/blob/main/docs/REVIEW_PACKAGE.md">docs/REVIEW_PACKAGE.md</a> — the <code>review.json</code> package and folder adapter (<a href="https://github.com/rig-c/review/blob/main/docs/REVIEW_PACKAGE.md#two-package-comparison">two-package comparison</a>)</li>
+<li><a href="https://github.com/rig-c/review/blob/main/docs/DESIGN.md">docs/DESIGN.md</a> — the runnable foundation vs. future modeling touch-up</li>
+<li><a href="https://www.npmjs.com/package/@rig-c/review">npm</a> · <a href="https://github.com/rig-c/review/blob/main/CHANGELOG.md">CHANGELOG</a></li>
 </ul>
+</section>
 
         </article>
         <nav aria-label="Docs pages" class="pager"><a href="/docs/core/" rel="prev"><span>Previous</span>Core</a><a href="/docs/play/" rel="next"><span>Next</span>Play</a></nav>
       </main>
-      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#one-problem-from-seeing-it-to-the-fix">One problem, from seeing it to the fix</a></li><li><a href="#install">Install</a></li><li><a href="#inputs-and-outputs">Inputs and outputs</a></li><li><a href="#limits">Limits</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
     </div>
     <footer class="site-footer">
       <div class="footer-inner">

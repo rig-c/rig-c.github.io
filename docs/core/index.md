@@ -1,59 +1,134 @@
-# rig-c core: the rig compiler
+# rig-c core (`rigc`)
 
-rigc turns loose part PNGs and two small JSON files into Spine 4.3 skeleton data. It checks the result against a list of named assertions first, and writes nothing if any of them fails.
+<p class="mod-role">The compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data out — and nothing written unless every named check passes.</p>
 
-## What it is
+<div class="triptych" role="group" aria-label="One mistake, its refusal, and the fix">
+<figure><figcaption><span class="label fail">1 · The mistake</span> one weight on one neck vertex</figcaption>
+<pre><code class="language-diff">                 "bone": "chest",
+                 "x": -112,
+                 "y": 315,
+-                "weight": 0.32227
++                "weight": 0.42227</code></pre></figure>
+<figure><figcaption><span class="label fail">2 · The refusal</span> named, with the value found</figcaption>
+<pre><code>  <span class="v-fail">FAIL</span>  A20_MESH_WEIGHTS_COHERENT: mesh "neck"
+        vertex 0 weights sum to 1.1000
+        (see rigc guide A20_MESH_WEIGHTS_COHERENT)
+  ..    52 assertions: 21 measured
+        (20 passed, 1 failed), 17 skipped
+rigc: 1 assertion(s) failed — nothing written
+exit=1</code></pre></figure>
+<figure><figcaption><span class="label pass">3 · After the fix</span> the same command, green</figcaption>
+<pre><code>  ..    52 assertions: 21 measured
+        (21 passed, 0 failed), 17 skipped,
+        14 not in profile "spine"
+rigc: wrote build/skeleton.json
+rigc: wrote build/skeleton.atlas
+rigc: wrote build/skeleton.model.json
+exit=0</code></pre></figure>
+</div>
 
-rigc is a rig compiler: a rig spec and a motion spec in, skeleton data out. It was built so AI agents can author rigs and check their own work, and it ships as an agent skill. On npm it is `rig-c`; `@rig-c/core` is the same package under the toolchain's scope, and the command it installs is `rigc`.
+<p class="mod-skip">Real output from Character 1's rig, <code>rig-c</code> 2.61.0 (long lines wrapped). Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
-## When to use it
+*This page follows Character 1 from the Family set: here it is checked. Every module works on its own; this order is one path, not a requirement.*
 
-Use it when you want Spine skeleton data generated from a spec and checked before it is written. The output loads in any Spine runtime and imports into the Spine editor, so the intended hand-off is: an AI drafts, a human refines in the editor.
+An agent authoring a rig cannot tell whether it succeeded, because Spine's JSON parser accepts a lot of nonsense silently: a constraint in the 4.2 shape simply vanishes, a `size:` that disagrees with the PNG collapses every UV, a four-number curve array yields NaN. Each of these loads clean, plays, and is wrong. `rigc` makes the failure legible: every refusal names its rule and the value it found, ends with the command that explains it, and leaves nothing on disk.
 
-Reach for a neighbour instead when:
+## Three mistakes an agent makes, on one rig
 
-- you start from one painting rather than finished part PNGs: [@rig-c/parts](/docs/parts/) produces the parts and rig specs, verified through rig-c;
-- you have a body-18 pose sequence to put on a rig: [@rig-c/pose](/docs/pose/) writes the bone keys in rigc's motion format;
-- you want to play the result in a browser without a Spine runtime: [@rig-c/play](/docs/play/) plays the `skeleton.model.json` that `rigc build` writes;
-- a person needs to look at a build and leave feedback: [@rig-c/review](/docs/review/).
+Each case starts from a fresh copy of Character 1's `rig.json`, `motion.json` and its 17 part images, built with `bunx rig-c@2.61.0 build --rig rig.json --motion motion.json --images images --out build`.
 
-## What it solves
+<div class="case">
 
-An agent authoring a rig cannot tell whether it succeeded, because Spine's JSON parser accepts a lot of nonsense silently. A constraint in the 4.2 shape simply vanishes. A `size:` that disagrees with the PNG collapses every UV. A four-number curve array yields NaN. Each of these loads clean, plays, and is wrong. rigc makes the failure legible: every failure is named by rule, and nothing reaches disk.
+### <span class="label fail">compile</span> A slot names a bone that does not exist
 
-## What you get
-
-- `skeleton.json` and `skeleton.atlas` in the Spine 4.3 format.
-- `skeleton.model.json`, rigc's own compiled model, written beside them.
-- A gate report, which names the profile it ran; `--report` also writes it as JSON.
-- On failure: one line per failed rule, ending with `(see rigc guide <RULE>)`, and no files.
-
-## How it works
-
-1. **Measure the art.** rigc reads the PNGs themselves instead of trusting sizes you typed, so the skeleton and the atlas cannot drift apart.
-2. **Compile two specs.** The rig spec (`rigc-rig/1`) holds structure: bones, slots in draw order, skins. The motion spec (`rigc-motion/1`) holds time: animations, tracks, keys.
-3. **Gate.** The compiled rig is checked against named assertions. The default profile, `spine`, runs the 36 validity rules: is this valid Spine 4.3 that any runtime plays correctly? `--profile rig-play` runs all 50; the extra 14 are one renderer's and one canvas budget's policy, which is why they are opt-in.
-4. **Write, or refuse.** Only a green gate writes `--out`.
-5. **Look at it.** A green gate says nothing about the picture, so `render`, `inspect` and `check` show and compare what was built.
-
-The published package links no Spine runtime. Install `@esotericsoftware/spine-core` beside it and the same `rigc` also runs the round trip through Spine's own parser, plus the commands that need it: `validate`, `preview`, `vote`, `bench` and `bonedist`. The Spine Runtimes License Agreement applies to that dependency wherever it is installed.
-
-rigc runs on Bun 1.2.0 or later.
-
-```bash
-bun add -d rig-c
-bun rigc build --rig rig.json --motion motion.json --out build/
-bun rigc render --candidate build/
+```diff
+     {
+       "name": "face",
+-      "bone": "head",
++      "bone": "haed",
+       "attachment": "face"
 ```
 
-## Key concepts
+```
+rigc compile error: rig.json: slot "face" names bone "haed", which this rig does not declare (see rigc guide CE_RIG_SLOT_BONE_UNKNOWN)
+exit=1
+```
 
-- **Rig spec** — the structure file: bones, the slots array (the setup draw order) and skins.
-- **Motion spec** — the time file, aimed at the rig by name.
-- **Named assertions** — the rules the gate runs; each failure names its rule.
-- **Profile** — which rulebook the gate checks against: `spine` (default) or `rig-play`.
-- **`A00_ROUNDTRIP_PARSE`** — Spine's own parse; it runs only where spine-core is installed and reports SKIP elsewhere.
-- **`ingest`** — `build` run backwards: a Spine 4.3 `skeleton.json` in, the two specs that rebuild it byte for byte out.
+`rigc guide CE_RIG_SLOT_BONE_UNKNOWN` prints that rule's row from the authoring guide, fix included: *Name a declared bone in slot.bone.* No `build/` directory exists afterwards.
+
+</div>
+
+<div class="case">
+
+### <span class="label fail">compile</span> An image the rig names was renamed on disk
+
+`mv images/hair_front.png images/hair-front.png`, with `rig.json` still naming `hair_front.png`:
+
+```
+rigc compile error: image "hair_front.png" is not on disk at images/hair_front.png (see rigc guide CE_COMPILE_IMAGE_MISSING)
+exit=1
+```
+
+The guide's fix: *Supply the PNG at the named images path or correct the image name.*
+
+</div>
+
+<div class="case">
+
+### <span class="label fail">gate</span> One vertex's weights do not sum to 1
+
+This one compiles; the gate measures it and refuses — the case at the top of this page. Its guide row covers *a weighted vertex with no bone, a negative weight, a bone index out of range, or weights that do not sum to 1*.
+
+</div>
+
+Put each value back and the same command passes, writing files byte-identical to the clean build. The two compile refusals stop before the gate runs, so they print no assertion summary; the third is a gate `FAIL` with one.
+
+## Passing is structural; looking is separate
+
+A green gate says the data is valid Spine 4.3 that plays without errors — in core's own words, *a rig with its head off its torso passes the gate*. So rigc also draws what it built, with no reference needed:
+
+<div class="compare">
+  <figure><img src="/assets/docs/core-render-contact.jpg" alt="A contact sheet of Character 1's idle: 41 small frames of the full figure" width="401" height="775" loading="lazy"><figcaption><code>rigc render --candidate build --animation idle</code> — <code>idle 41 frame(s), 3.333s + contact.png</code></figcaption></figure>
+  <figure><img src="/assets/docs/core-inspect-weights.jpg" alt="The neck mesh over dimmed art, coloured by how much each vertex follows the chest bone: blue near the head, red near the chest, with the triangle edges drawn" width="443" height="512" loading="lazy"><figcaption><code>rigc inspect … --show art,weights:chest,mesh --zoom slot:neck</code> — the neck mesh after the fix, coloured by its chest weight</figcaption></figure>
+</div>
+
+When a person needs to judge the motion against footage and hand back notes, that is [Review](/docs/review/).
+
+## How the gate decides
+
+1. **Measure the art.** rigc reads the PNGs themselves instead of trusting sizes you typed, so the skeleton and the atlas cannot drift apart.
+2. **Compile two specs.** The rig spec (`rigc-rig/1`) holds structure — bones, slots in draw order, skins. The motion spec (`rigc-motion/1`) holds time — animations, tracks, keys.
+3. **Gate.** The default profile, `spine`, runs the 36 validity rules: *is this valid Spine 4.3 that any runtime plays correctly?* `--profile rig-play` runs all 50; the extra 14 are one renderer's and one canvas budget's policy, which is why they are opt-in. Every report names its profile and lists, on `PROF` lines, the rules it left out.
+4. **Write, or refuse.** Only a green gate writes `--out`.
+
+The published package links no Spine runtime, so `A00_ROUNDTRIP_PARSE` — Spine's own parse — reports SKIP. Install `@esotericsoftware/spine-core` beside it and the same `rigc` runs that round trip too, plus `validate`, `preview`, `vote`, `bench` and `bonedist`.
+
+**Key terms.** *Rig spec* — bones, the slots array (the setup draw order) and skins. *Motion spec* — the time file, aimed at the rig by name. *Named assertion* — a rule the gate runs; each failure names it. *Profile* — the rulebook: `spine` (default) or `rig-play`. *`ingest`* — `build` run backwards: a Spine 4.3 `skeleton.json` in, the two specs that rebuild it byte for byte out.
+
+## Install
+
+```sh
+bun add -d rig-c
+bun rigc build --rig rig.json --motion motion.json --out build/
+```
+
+rigc runs on Bun 1.2.0 or later. The npm package is `rig-c`; `@rig-c/core` is the same package under the scope, and the command is `rigc`. Licensing by playback path: [Licensing](/docs/licensing/).
+
+## Inputs and outputs
+
+| In | Out |
+| --- | --- |
+| Part PNGs | `skeleton.json` + `skeleton.atlas` — Spine 4.3 data |
+| A rig spec (`rig.json`) | `skeleton.model.json` — rig-c's own compiled model, for [Play](/docs/play/) |
+| A motion spec (`motion.json`) | the gate report (`--report` also writes it as JSON) |
+| — | on a refusal: the named lines, and nothing on disk |
+
+## Limits
+
+- **The gate is structural.** It does not judge the picture; `render` and `inspect` are for looking.
+- **The round trip needs spine-core.** Without it, `A00_ROUNDTRIP_PARSE` is SKIP and `validate`, `preview`, `vote`, `bench`, `bonedist` do not run.
+- **Packing is opt-in and narrow** — `--pack` and `--atlas-in` do no trimming, rotation or scaling.
+- **It emits Spine's format.** What a product may do with that data, and with a Spine Runtime, is in [Licensing](/docs/licensing/).
 
 ## Go deeper
 

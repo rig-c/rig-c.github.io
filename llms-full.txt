@@ -41,8 +41,8 @@ Try it end to end with no GPU and no Python — about a minute of commands on an
 
 | Package | Latest | Install | What it does |
 | --- | --- | --- | --- |
-| [**@rig-c/parts**](/docs/parts/) | `1.40.0` | `npm i -D @rig-c/parts` | Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them. |
-| [**@rig-c/pose**](/docs/pose/) | `0.33.0` | `npm i -D @rig-c/pose` | Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written. |
+| [**@rig-c/parts**](/docs/parts/) | `1.41.0` | `npm i -D @rig-c/parts` | Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them. |
+| [**@rig-c/pose**](/docs/pose/) | `0.35.0` | `npm i -D @rig-c/pose` | Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written. |
 | [**rig-c / @rig-c/core**](/docs/core/) | `2.61.0` | `npm i -D rig-c` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and `skeleton.model.json` out — gated by named assertions before a byte is written (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`). |
 | [**@rig-c/review**](/docs/review/) | `0.2.1` | `npm i -D @rig-c/review` | Local human inspection workspace: compare setup geometry, compiled-model playback, source video/sheets, and export frame/bone/slot-bound feedback ready to become an issue. |
 | [**@rig-c/play**](/docs/play/) | `1.12.0` | `npm i @rig-c/play` | Plays `skeleton.model.json` in the browser with no Spine runtime — as plain DOM elements (`<img>` with CSS `matrix()`) or one `<canvas>` per player. |
@@ -302,148 +302,232 @@ The example inputs in step 2 come from [rig-c/exam](https://github.com/rig-c/exa
 ================================================================================
 URL: https://rig-c.org/docs/parts/
 Markdown: https://rig-c.org/docs/parts/index.md
-Package: @rig-c/parts@1.40.0
+Package: @rig-c/parts@1.41.0
 Repository: https://github.com/rig-c/parts
 ================================================================================
 
 # @rig-c/parts
 
-Turn one anime character painting into a rigged, idling 2D character. Every stage is checked before anything is written.
+<p class="mod-role">One painting and its See-through layers in — measured parts, a drafted rig and a looping idle out.</p>
 
-## What it is
+<figure class="mod-hero">
+  <div class="media">
+    <video data-loop="the parts coming together" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-explode-poster.jpg" width="1280" height="720" aria-label="Recorded video: Character 1's seventeen parts laid out in a grid, then moving to their places in the rig">
+      <source src="/assets/docs/parts-explode.mp4" type="video/mp4">
+      <img src="/assets/docs/parts-explode-poster.jpg" alt="Character 1's seventeen parts laid out in a grid" width="1280" height="720">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Character 1's 17 parts as rig-parts assembled them, drawn from <code>out/parts/</code> at the positions <code>parts.json</code> records, in the rig's draw order.</figcaption>
+</figure>
 
-`@rig-c/parts` (command `rig-parts`) is a command-line tool. It takes a single character painting and the layers See-through decomposed it into. It merges them into measured parts, authors weighted meshes, bone chains and a looping idle, and hands that spec to rig-c to compile, gate, pack, render and check.
+<p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
-## When to use it
+*This page follows Character 1 from the Family set: here it is split into parts. Every module works on its own; this order is one path, not a requirement.*
 
-Use it when you start from a painting, not from a finished rig. It is built for agents that cannot see the image: every stage prints named, numeric findings instead of asking you to look.
+Cutting a painted character into rig parts is slow, and the mistakes show up late: a layer holds the wrong pixels, a part leaves a hole, a chain swings a skirt about its middle. `rig-parts` measures each of these and prints the number, so an agent that cannot see the image can still tell where it went wrong. A refusal names the object, the value found and the value required; nothing is written after a red, and no value is invented where the input is silent.
 
-It also reads an artist's own layered PSD, one layer per part, with no See-through step.
+## How Character 1 was made
 
-Do not use it to write Spine data directly. rig-parts never does that itself. Compiling, gating and packing belong to [rig-c](/docs/core/). Drawing the result on a web page belongs to [rig-play](/docs/play/). To set up the machine that makes the painting and the layers, start at [Getting started](/docs/getting-started/).
+### 1. Two See-through runs
 
-## What it solves
+<figure class="figure-wide">
+  <img src="/assets/docs/parts-layers.jpg" alt="A sheet of every See-through layer of Character 1, each labelled with its tag, size and opaque pixel count" width="1400" height="1225" loading="lazy">
+  <figcaption>The layers See-through returned — one run on the full figure, one on a square crop around the head, because a full-figure run leaves the eyes too small to separate. Each tile is labelled with its tag, size and opaque pixels.</figcaption>
+</figure>
 
-Cutting a painted character into rig parts is slow, and the mistakes show up late: a layer holds the wrong pixels, a part leaves a hole, a chain swings a skirt about its middle. rig-parts measures these. A refusal names the object, the value found and the value required. Nothing is written after a red, and no value is invented where the input is silent.
+### 2. Parts, and what they miss
 
-## What you get
+`assemble` merges the two runs into rig-space parts, then lays them back together and compares the result with the painting. The error map is the point of that step: it shows, in colour, the painting that no part holds.
 
-A green `build` ends like a Spine editor export, with one packed atlas page:
+<div class="compare cols-3">
+  <figure><img src="/assets/docs/parts-painting.jpg" alt="Character 1's painting" width="315" height="900" loading="lazy"><figcaption>The painting</figcaption></figure>
+  <figure><img src="/assets/docs/parts-recomposite.jpg" alt="The 17 parts laid back together" width="315" height="900" loading="lazy"><figcaption>The 17 parts, recomposited</figcaption></figure>
+  <figure><img src="/assets/docs/parts-errormap.jpg" alt="Error map: the figure in grey with thin red and blue edges where the parts and the painting differ" width="315" height="900" loading="lazy"><figcaption>The error map</figcaption></figure>
+</div>
 
-- **The artifact**: `skeleton.json`, `skeleton.atlas` and `skeleton.png` under `check/build/`. This is Spine 4.3 skeleton data, written by rig-c and gated under the `rig-play` profile.
-- **The intermediates**: the loose `parts/`, `parts.json` (where every part came from), the recomposite and its error map.
-- **The rig spec**: `rig.json` and `motion.json` in rig-c's spec.
-- **The checks**: both gate files, the idle's frames and `check.json`.
-- **With `--loop`**: the idle as a lossless APNG, an indexed APNG and a GIF.
+<div class="compare">
+  <figure><img src="/assets/docs/parts-painting-zoom.jpg" alt="Close-up of the painting: Character 1's left hand resting on her forearm" width="660" height="660" loading="lazy"><figcaption>The painting, around the resting hand</figcaption></figure>
+  <figure><img src="/assets/docs/parts-errormap-zoom.jpg" alt="The same close-up on the error map: a thin red line along the hand and sleeve edge, with a few blue pixels" width="660" height="660" loading="lazy"><figcaption>The error map there: <strong>red</strong> is painting no part holds, <strong>blue</strong> is a part whose colour is more than 40 off</figcaption></figure>
+</div>
+
+For this build `parts.json` records a mean difference of 0.873 per pixel, 98.3% of pixels within 8, and 6,041 uncovered error pixels. The largest hole it lists is 834 px along the edge of `bottomwear`. A clean recomposite is what lets the rig move without showing the background through.
+
+### 3. A drafted rig that idles
+
+`propose` drafts bones, weighted meshes, regions and a looping idle over those parts, for a person or an agent to correct; `build` runs assemble, rig and check in one process and stops at the first refusal.
+
+<div class="compare">
+  <figure>
+    <div class="media">
+      <video data-loop="the idle" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-idle-poster.jpg" width="246" height="640" aria-label="Recorded video: Character 1 breathing in its idle loop">
+        <source src="/assets/docs/parts-idle.mp4" type="video/mp4">
+        <img src="/assets/docs/parts-idle-poster.jpg" alt="Character 1 standing" width="246" height="640">
+      </video>
+    </div>
+    <figcaption><span class="media-kind">Recorded video</span> The idle, as <code>build --loop</code> wrote it: 41 frames at 12 fps.</figcaption>
+  </figure>
+  <figure><img src="/assets/docs/parts-contact.jpg" alt="A contact sheet of the idle's 41 frames" width="401" height="775" loading="lazy"><figcaption><code>check</code>'s contact sheet of the same idle — what the measured bars read.</figcaption></figure>
+</div>
+
+The idle then goes on: [Pose](/docs/pose/) gives the same rig a recorded motion, and [Core](/docs/core/) is the compiler every one of these builds went through.
 
 ## How it works
 
-1. **Inputs.** `inputs` cuts the two images See-through is fed: the painting on a white square, and a square crop around the head. The head run exists because a full-figure run leaves the eyes too small to separate.
-2. **Layers.** You run See-through by any route: a hosted demo, the upstream CLI, or ComfyUI. rig-parts reads its `.psd` or the ComfyUI wrapper form. An optional `comfy` adapter drives a ComfyUI box; nothing else needs one.
-3. **Assemble.** The two runs merge into rig-space parts. Uncovered holes are listed, and the error map shows them in red.
-4. **Propose.** `propose` drafts bones, meshes, regions and an idle, with an overlay to correct against. It is a draft, not a step of `build`. You copy its sections into `config.json`, and LINT lines flag what still looks wrong.
-5. **Build.** `build` runs assemble, rig and check in one process and stops at the first refusal.
+1. **Inputs.** `inputs` cuts the two images See-through is fed: the painting on a white square, and a square crop around the head.
+2. **Layers.** You run See-through by any route — a hosted demo, the upstream CLI, or ComfyUI. rig-parts reads its `.psd` or the ComfyUI wrapper form; an artist's own layered PSD works too, with no See-through step.
+3. **Assemble.** The two runs merge into rig-space parts; uncovered holes are listed and the error map shows them.
+4. **Propose.** Bones, meshes, regions and an idle are drafted with an overlay to correct against. It is a draft, not a step of `build`: you copy its sections into `config.json`, and LINT lines flag what still looks wrong.
+5. **Build.** Assemble, rig and check in one process; compiling, gating and packing are rig-c's.
 
-## Key concepts
-
-- **See-through layers**: the decomposition of the painting into tagged layers, one run on the full figure and one on the head.
-- **Parts**: the merged, measured pieces in rig space, recorded in `parts.json`.
-- **Proposal**: the drafted bones, meshes, regions and motion in `proposal.json`, to be corrected.
-- **Config**: `config.json`, the character's part plan, head box, bones and idle. Unknown or missing fields are refused by name.
-- **FAIL line**: a refusal; it names a rule and ends with `(see rig-parts guide <RULE>)`.
-- **Gate**: rig-c's validation of the compiled rig, here under the `rig-play` profile.
+**Key terms.** *See-through layers* — the painting's decomposition, one run on the full figure and one on the head. *Parts* — the merged, measured pieces in rig space (`parts.json`). *Proposal* — the drafted bones, meshes, regions and motion, to be corrected. *Config* — `config.json`, the character's part plan, head box, bones and idle; unknown or missing fields are refused by name. *FAIL line* — a refusal that names a rule and ends with `(see rig-parts guide <RULE>)`.
 
 ## Install
-
-Requires [Bun](https://bun.sh) 1.2 or later. rig-c comes with it as a dependency.
 
 ```sh
 npm i -D @rig-c/parts
 rig-parts --help
 ```
 
-Which Spine terms apply depends on what plays the output — rig-c's own model in `@rig-c/play` or an engine adapter, or the Spine data in a Spine Runtime or the editor. See [Licensing](/docs/licensing/).
+Requires [Bun](https://bun.sh) 1.2 or later; rig-c comes with it as a dependency. Which Spine terms apply depends on what plays the output: see [Licensing](/docs/licensing/).
+
+## Inputs and outputs
+
+| In | Out |
+| --- | --- |
+| One character painting (`painting.png`) | `check/build/skeleton.json`, `skeleton.atlas`, `skeleton.png` — Spine 4.3 data and one packed page |
+| Two See-through layer sets (`full`, `head`), as the ComfyUI wrapper form or a `.psd` | `parts/*.png`, `parts.json`, the recomposite and its error map |
+| A character config (`config.json`) | `rig/rig.json`, `rig/motion.json` in rig-c's spec |
+| Optional body-18 keypoints for `propose --keypoints` | `check/`: both gate files, the idle's frames, `contact.png`, `check.json`; with `--loop`, the idle as APNG and GIF |
+
+## Limits
+
+From the README's own *What it does not do*:
+
+- **One depth value per layer.** A layer that is in front of another in one place and behind it in another is right in the still and wrong once it moves.
+- **No expression or lip-sync, and no jiggle.** The mouth is one layer; nothing here proposes, keys or judges a soft region.
+- **Occluded pixels are See-through's synthesis**, not the artist's.
+- **No success rate is claimed** — ten characters measured stage by stage is an existence proof, not a rate.
+- **No WebP**: `loop` writes GIF and APNG.
+- **The proposer reads tags, not pictures**, and reads the torso by screen y unless it is given keypoints; it does not estimate a pose itself.
 
 ## Go deeper
 
 - [README: What it takes in](https://github.com/rig-c/parts#what-it-takes-in) and [What it gives out](https://github.com/rig-c/parts#what-it-gives-out)
 - [README: The loop, for an agent](https://github.com/rig-c/parts#the-loop-for-an-agent), the full command sequence
+- [README: What it does not do](https://github.com/rig-c/parts#what-it-does-not-do)
 - [docs/AUTHORING.md](https://github.com/rig-c/parts/blob/main/docs/AUTHORING.md): every config field, what to read after each stage, every refusal
 - [docs/PAINTING.md](https://github.com/rig-c/parts/blob/main/docs/PAINTING.md): what makes a painting riggable
-- [docs/STABILITY.md](https://github.com/rig-c/parts/blob/main/docs/STABILITY.md): what 1.0.0 holds stable
-- [NOTICE.md](https://github.com/rig-c/parts/blob/main/NOTICE.md): third-party terms, See-through's included
-- [CHANGELOG.md](https://github.com/rig-c/parts/blob/main/CHANGELOG.md)
-- [npm: @rig-c/parts](https://www.npmjs.com/package/@rig-c/parts)
+- [docs/STABILITY.md](https://github.com/rig-c/parts/blob/main/docs/STABILITY.md) · [NOTICE.md](https://github.com/rig-c/parts/blob/main/NOTICE.md) · [CHANGELOG.md](https://github.com/rig-c/parts/blob/main/CHANGELOG.md) · [npm](https://www.npmjs.com/package/@rig-c/parts)
+- Character 1's own files: [its folder in rig-c/parts-examples](https://github.com/rig-c/parts-examples/tree/c239b09328ca7364361b9761fac817502c09ede0/family/roa)
 
 ================================================================================
 URL: https://rig-c.org/docs/pose/
 Markdown: https://rig-c.org/docs/pose/index.md
-Package: @rig-c/pose@0.33.0
+Package: @rig-c/pose@0.35.0
 Repository: https://github.com/rig-c/pose
 ================================================================================
 
 # @rig-c/pose
 
-Pose moves a rig. It takes joint positions over time and writes them onto a rig-c rig as bone keys, and it checks those keys before it writes anything.
+<p class="mod-role">Joint positions over time in — bone keys on a rig-c rig out, checked before they are written.</p>
 
-## What it is
+<figure class="mod-hero">
+  <div class="media">
+    <video data-loop="the wave comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-wave-poster.jpg" width="978" height="792" aria-label="Recorded video: on the left a stick-figure pose raising and waving its right arm; on the right Character 1 doing the same wave">
+      <source src="/assets/docs/pose-wave.mp4" type="video/mp4">
+      <img src="/assets/docs/pose-wave-peak.jpg" alt="Side by side at the top of the wave: the source pose's raised arm and Character 1's raised arm" width="978" height="792">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right arm raised and waved. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
+</figure>
 
-A command-line tool, `rig-pose`, that turns a body-18 pose sequence into an animation in rig-c's motion format. In the rig-c toolchain, [core](/docs/core/) gates the rig, [parts](/docs/parts/) builds it, [play](/docs/play/) plays it, and pose moves it. Version 0.x is a prototype: the format, the commands and the output can change in any release before 1.0.
+<p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
-## When to use it
+*This page follows Character 1 from the Family set: here it is given a motion. Every module works on its own; this order is one path, not a requirement.*
 
-Use it when you already have joint positions (from a pose model, a dataset, or placed by hand) and a rig-c rig with limb chains, and you want an animation that follows them.
+A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones has traps of its own: setup rotations, and parents that turn their children. `rig-pose` cleans the sequence once, where it can be inspected, then turns each mapped bone to point along its segment — and refuses to write keys that do not land where the pose asked.
 
-Do not use it to:
+## How the wave reached Character 1
 
-- **Get the poses.** It does not extract poses from video; how you get joint positions is up to you.
-- **Build the rig.** The rig must have chains: a thigh with a shin below it, an upper arm with a forearm below it. [@rig-c/parts](/docs/parts/) builds such a rig from a painting. A rig whose arm is one bone is refused.
-- **Animate hands, fingers or depth.** It works in 2D. A limb pointing at the camera foreshortens, and the rig matches its direction, not its length.
+### What was carried, and what was not
 
-## What it solves
+The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and the **right arm** (shoulder, elbow, wrist) on the two sleeve bones. Character 1's rig has no left-arm bones (no `sleeve_l` in its `rig.json`), so the map leaves that arm out, and the hand with the cup is not mapped either: it turns with the forearm.
 
-A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones also has traps: setup rotations, and parents that turn their children. Pose cleans the sequence once, where it can be inspected, and then refuses to write keys that do not land where the pose asked.
+| Track the rig received | From the pose | First key | Top of the wave |
+| --- | --- | --- | --- |
+| `sleeve_r0` rotate | shoulder → elbow | −3.7° | −114.7° |
+| `sleeve_r1` rotate | elbow → wrist | 0.4° | −71.0° |
+| `chest` rotate | hip → neck | 2.6° | 2.6° (held) |
+| `hip` translate | hip | 0, 0 | 0, 0 (held) |
 
-## What you get
+**Direction, not length.** Each bone points the way its segment points in the picture but keeps the rig's own length: the upper arm is 300 px in the pose and 267 units on the rig, the forearm 335 px and 303 units. That is why the raised cup ends up above the source's wrist dot.
 
-- A cleaned `rig-pose-sequence/1` file that carries a `cleaned` record of what was done.
-- A motion file with the new animation, for the rig's motion spec.
-- With `--report`, a `rig-pose-report/1` JSON file of everything the run found.
-- With `--build`, the gated build, which `rigc preview` can play.
-- From `compare`, a `rig-pose-compare/1` report and an optional PNG sheet.
+<div class="compare">
+  <figure><img src="/assets/docs/pose-keypoints.jpg" alt="Character 1's painting with 18 labelled body joints drawn over it" width="400" height="1142" loading="lazy"><figcaption>Where the wave starts: 18 body joints placed by hand on the painting (shoulders, hips, knees and ankles under the clothes marked occluded).</figcaption></figure>
+  <figure><img src="/assets/docs/pose-wave-peak.jpg" alt="Side by side at the top of the wave: the source pose's raised arm in orange and Character 1's raised arm holding the cup" width="978" height="792" loading="lazy"><figcaption>The top of the wave, t = 0.50 s. Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
+</div>
+
+### What it checked before writing
+
+```
+rig-pose clean: SPIKES 0 replaced
+  JITTER mean |second difference| of y over 1207 joint-frame triple(s): 1.260 → 1.222 px/f² (3.1% lower)
+rig-pose retarget:
+  GATE   rigc build --profile spine-html: green — 52 assertions: 26 measured (26 passed, 0 failed), 26 skipped, 0 not in profile "rig-play"
+  LAND   bone "sleeve_r0" aim — worst |reached − asked| 0.000652° at frame 65 (t=2.708s); the tolerance is 0.01°
+  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.000983° at frame 4 (t=0.167s); the tolerance is 0.01°
+  FOLD   rigc render --folds at 24 fps: no mesh folds
+  wrote wave.motion.json — animations: idle, wave
+```
+
+The rig is built with the new animation and gated before anything is written; every mapped bone, posed by rig-c's own poser, has to land within 0.01° of what the pose asked on every frame. The run also says what it left out: 26 `IDLE-DROPPED` lines name the breathing, hair and skirt tracks that were not carried into `wave` — which is why only the arm moves.
+
+The joints were placed by hand on the painting (the way the guide's `docs/KEYPOINTS.md` describes), and the wave itself comes from the getting-started guide's `scripts/wave.ts`. Next, [Core](/docs/core/) is the compiler that gated this build, and [Review](/docs/review/) is where a person checks a motion like this one against footage.
 
 ## How it works
 
-1. **Clean.** `rig-pose clean` removes spikes, fills low-score or occluded joints from their neighbours, smooths each joint, and holds joints that have stopped. `retarget` reads only a sequence that `clean` wrote. COCO-17 input is converted here with `--coco`.
-2. **Map.** You write a map that says which bones carry which joints, chain by chain.
-3. **Retarget.** For every frame and every mapped bone, the bone is turned so it points the way its segment points in the picture, minus its setup angle and its parent's turn.
-4. **Check.** rig-c's gate must be green with the rig as it is and with the animation in. Every mapped bone must land on its asked angle on every frame, posed by rig-c's own poser. Hinges must bend only one way. If any check fails, nothing is written and every reason is printed.
-5. **List what it cannot decide.** Lines such as `HOLD`, `END-ON` and `IDLE-DROPPED` name what you should look at.
+1. **Clean.** `rig-pose clean` removes spikes, fills low-score or occluded joints from their neighbours, smooths each joint and holds joints that have stopped. `retarget` reads only a sequence `clean` wrote; COCO-17 input is converted with `--coco`.
+2. **Map.** You write which bones carry which joints, chain by chain.
+3. **Retarget.** For every frame and every mapped bone, the bone is turned so it points the way its segment points, minus its setup angle and its parent's turn.
+4. **Check.** The gate must be green with and without the animation, every mapped bone must land on its angle, hinges must bend one way; otherwise nothing is written and every reason is printed.
+5. **Say what it cannot decide.** Lines such as `HOLD`, `END-ON` and `IDLE-DROPPED` name what to look at.
+
+**Key terms.** *body-18* — the 18 joints the sequence uses; `r`/`l` are the subject's sides. *Chain* — a limb in the map, as bones that descend from one another. *Lands* — a mapped bone within 0.01° of the angle the pose asks for. *Cleaned record* — the block `clean` writes into the sequence, which `retarget` requires.
+
+## Install
 
 ```sh
-bun add @rig-c/pose
-rig-pose retarget --rig out/rig --map map.json --sequence dance.pose.json --out motion.json --animation dance
+npm i -D @rig-c/pose
+bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json --out wave.motion.json --name wave --build wave-build
 ```
 
-## Key concepts
+Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
 
-- **body-18**: the 18 joints the sequence uses (`nose`, `neck`, shoulders, elbows, wrists, hips, knees, ankles, eyes, ears); `r`/`l` are the subject's sides.
-- **chain**: a limb in the map, as bones that descend from one another; bone *k* carries the segment from joint *k* to joint *k*+1.
-- **lands**: a mapped bone, posed by rig-c's poser, is within 0.01° of the angle the pose asks for.
-- **cleaned record**: the `cleaned` block `clean` writes into the sequence; `retarget` requires it.
-- **alternates**: sets of slots switched together to show a second drawing for a pose bone rotation cannot carry.
+## Inputs and outputs
+| In | Out |
+| --- | --- |
+| A body-18 pose sequence, `rig-pose-sequence/1` (COCO-17 with `--coco`) | A cleaned sequence carrying its `cleaned` record (`rig-pose clean`) |
+| A rig built with rig-c: the `rig/` directory with `rig.json` and `motion.json` | A motion spec (`--out`, e.g. `motion.json`) with the bone keys |
+| A map, `rig-pose-map/1` — which bones carry which joints | A JSON report, `rig-pose-report/1` (`--report`), and a gated build (`--build`) |
+| For `compare`: a reference and a render sequence on one time base | `compare.json` and a `compare.png` sheet, differences per body unit, worst first |
+
+## Limits
+- **"0.x is the prototype."** The format, the command and the output can change in any release until 1.0 (README, intro).
+- **Does not extract poses from video**: the input is joint positions, from a pose model, a dataset or by hand (README §"What it does not do").
+- **2D only — does not turn the body**: a segment pointing at the camera foreshortens and "the rig cannot"; the direction is matched, not the length (README §"What it does not do").
+- **No front/behind order per segment, no blinks or mouth shapes**, and cloth physics is not fitted to the reference (README §"What it does not do").
+- **No hands or fingers** — there are no bones for them yet (README §"What it does not do").
+- No importable API: the supported surface is the `rig-pose` command (README §"Requirements").
 
 ## Go deeper
-
-- [Try it](https://github.com/rig-c/pose#try-it) and the [wave example](https://github.com/rig-c/pose/tree/main/examples/wave), with no art and no video
-- [Clean first](https://github.com/rig-c/pose#clean-first-rig-pose-clean)
-- [What it does](https://github.com/rig-c/pose#what-it-does): every check and every listed line
-- [The pose format](https://github.com/rig-c/pose#the-pose-rig-pose-sequence1) and [the map format](https://github.com/rig-c/pose#the-map-rig-pose-map1)
-- [Alternate drawings](https://github.com/rig-c/pose#alternate-drawings-alternates)
-- [Compare](https://github.com/rig-c/pose#compare-the-rigs-render-against-the-video)
-- [What it does not do](https://github.com/rig-c/pose#what-it-does-not-do) and [Requirements](https://github.com/rig-c/pose#requirements)
-- [CHANGELOG](https://github.com/rig-c/pose/blob/main/CHANGELOG.md) and the [npm page](https://www.npmjs.com/package/@rig-c/pose)
-- `rig-pose --help` lists every flag.
+- [Try it](https://github.com/rig-c/pose#try-it) — a self-contained wave example in the repository
+- [Clean first: `rig-pose clean`](https://github.com/rig-c/pose#clean-first-rig-pose-clean)
+- [What it does](https://github.com/rig-c/pose#what-it-does)
+- [The pose: `rig-pose-sequence/1`](https://github.com/rig-c/pose#the-pose-rig-pose-sequence1)
+- [The map: `rig-pose-map/1`](https://github.com/rig-c/pose#the-map-rig-pose-map1)
+- [Compare: the rig's render against the video](https://github.com/rig-c/pose#compare-the-rigs-render-against-the-video)
+- [What it does not do](https://github.com/rig-c/pose#what-it-does-not-do)
+- [npm](https://www.npmjs.com/package/@rig-c/pose) · [CHANGELOG](https://github.com/rig-c/pose/blob/main/CHANGELOG.md)
 
 ================================================================================
 URL: https://rig-c.org/docs/core/
@@ -452,62 +536,137 @@ Package: rig-c@2.61.0
 Repository: https://github.com/rig-c/core
 ================================================================================
 
-# rig-c core: the rig compiler
+# rig-c core (`rigc`)
 
-rigc turns loose part PNGs and two small JSON files into Spine 4.3 skeleton data. It checks the result against a list of named assertions first, and writes nothing if any of them fails.
+<p class="mod-role">The compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data out — and nothing written unless every named check passes.</p>
 
-## What it is
+<div class="triptych" role="group" aria-label="One mistake, its refusal, and the fix">
+<figure><figcaption><span class="label fail">1 · The mistake</span> one weight on one neck vertex</figcaption>
+<pre><code class="language-diff">                 "bone": "chest",
+                 "x": -112,
+                 "y": 315,
+-                "weight": 0.32227
++                "weight": 0.42227</code></pre></figure>
+<figure><figcaption><span class="label fail">2 · The refusal</span> named, with the value found</figcaption>
+<pre><code>  <span class="v-fail">FAIL</span>  A20_MESH_WEIGHTS_COHERENT: mesh "neck"
+        vertex 0 weights sum to 1.1000
+        (see rigc guide A20_MESH_WEIGHTS_COHERENT)
+  ..    52 assertions: 21 measured
+        (20 passed, 1 failed), 17 skipped
+rigc: 1 assertion(s) failed — nothing written
+exit=1</code></pre></figure>
+<figure><figcaption><span class="label pass">3 · After the fix</span> the same command, green</figcaption>
+<pre><code>  ..    52 assertions: 21 measured
+        (21 passed, 0 failed), 17 skipped,
+        14 not in profile "spine"
+rigc: wrote build/skeleton.json
+rigc: wrote build/skeleton.atlas
+rigc: wrote build/skeleton.model.json
+exit=0</code></pre></figure>
+</div>
 
-rigc is a rig compiler: a rig spec and a motion spec in, skeleton data out. It was built so AI agents can author rigs and check their own work, and it ships as an agent skill. On npm it is `rig-c`; `@rig-c/core` is the same package under the toolchain's scope, and the command it installs is `rigc`.
+<p class="mod-skip">Real output from Character 1's rig, <code>rig-c</code> 2.61.0 (long lines wrapped). Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
-## When to use it
+*This page follows Character 1 from the Family set: here it is checked. Every module works on its own; this order is one path, not a requirement.*
 
-Use it when you want Spine skeleton data generated from a spec and checked before it is written. The output loads in any Spine runtime and imports into the Spine editor, so the intended hand-off is: an AI drafts, a human refines in the editor.
+An agent authoring a rig cannot tell whether it succeeded, because Spine's JSON parser accepts a lot of nonsense silently: a constraint in the 4.2 shape simply vanishes, a `size:` that disagrees with the PNG collapses every UV, a four-number curve array yields NaN. Each of these loads clean, plays, and is wrong. `rigc` makes the failure legible: every refusal names its rule and the value it found, ends with the command that explains it, and leaves nothing on disk.
 
-Reach for a neighbour instead when:
+## Three mistakes an agent makes, on one rig
 
-- you start from one painting rather than finished part PNGs: [@rig-c/parts](/docs/parts/) produces the parts and rig specs, verified through rig-c;
-- you have a body-18 pose sequence to put on a rig: [@rig-c/pose](/docs/pose/) writes the bone keys in rigc's motion format;
-- you want to play the result in a browser without a Spine runtime: [@rig-c/play](/docs/play/) plays the `skeleton.model.json` that `rigc build` writes;
-- a person needs to look at a build and leave feedback: [@rig-c/review](/docs/review/).
+Each case starts from a fresh copy of Character 1's `rig.json`, `motion.json` and its 17 part images, built with `bunx rig-c@2.61.0 build --rig rig.json --motion motion.json --images images --out build`.
 
-## What it solves
+<div class="case">
 
-An agent authoring a rig cannot tell whether it succeeded, because Spine's JSON parser accepts a lot of nonsense silently. A constraint in the 4.2 shape simply vanishes. A `size:` that disagrees with the PNG collapses every UV. A four-number curve array yields NaN. Each of these loads clean, plays, and is wrong. rigc makes the failure legible: every failure is named by rule, and nothing reaches disk.
+### <span class="label fail">compile</span> A slot names a bone that does not exist
 
-## What you get
-
-- `skeleton.json` and `skeleton.atlas` in the Spine 4.3 format.
-- `skeleton.model.json`, rigc's own compiled model, written beside them.
-- A gate report, which names the profile it ran; `--report` also writes it as JSON.
-- On failure: one line per failed rule, ending with `(see rigc guide <RULE>)`, and no files.
-
-## How it works
-
-1. **Measure the art.** rigc reads the PNGs themselves instead of trusting sizes you typed, so the skeleton and the atlas cannot drift apart.
-2. **Compile two specs.** The rig spec (`rigc-rig/1`) holds structure: bones, slots in draw order, skins. The motion spec (`rigc-motion/1`) holds time: animations, tracks, keys.
-3. **Gate.** The compiled rig is checked against named assertions. The default profile, `spine`, runs the 36 validity rules: is this valid Spine 4.3 that any runtime plays correctly? `--profile rig-play` runs all 50; the extra 14 are one renderer's and one canvas budget's policy, which is why they are opt-in.
-4. **Write, or refuse.** Only a green gate writes `--out`.
-5. **Look at it.** A green gate says nothing about the picture, so `render`, `inspect` and `check` show and compare what was built.
-
-The published package links no Spine runtime. Install `@esotericsoftware/spine-core` beside it and the same `rigc` also runs the round trip through Spine's own parser, plus the commands that need it: `validate`, `preview`, `vote`, `bench` and `bonedist`. The Spine Runtimes License Agreement applies to that dependency wherever it is installed.
-
-rigc runs on Bun 1.2.0 or later.
-
-```bash
-bun add -d rig-c
-bun rigc build --rig rig.json --motion motion.json --out build/
-bun rigc render --candidate build/
+```diff
+     {
+       "name": "face",
+-      "bone": "head",
++      "bone": "haed",
+       "attachment": "face"
 ```
 
-## Key concepts
+```
+rigc compile error: rig.json: slot "face" names bone "haed", which this rig does not declare (see rigc guide CE_RIG_SLOT_BONE_UNKNOWN)
+exit=1
+```
 
-- **Rig spec** — the structure file: bones, the slots array (the setup draw order) and skins.
-- **Motion spec** — the time file, aimed at the rig by name.
-- **Named assertions** — the rules the gate runs; each failure names its rule.
-- **Profile** — which rulebook the gate checks against: `spine` (default) or `rig-play`.
-- **`A00_ROUNDTRIP_PARSE`** — Spine's own parse; it runs only where spine-core is installed and reports SKIP elsewhere.
-- **`ingest`** — `build` run backwards: a Spine 4.3 `skeleton.json` in, the two specs that rebuild it byte for byte out.
+`rigc guide CE_RIG_SLOT_BONE_UNKNOWN` prints that rule's row from the authoring guide, fix included: *Name a declared bone in slot.bone.* No `build/` directory exists afterwards.
+
+</div>
+
+<div class="case">
+
+### <span class="label fail">compile</span> An image the rig names was renamed on disk
+
+`mv images/hair_front.png images/hair-front.png`, with `rig.json` still naming `hair_front.png`:
+
+```
+rigc compile error: image "hair_front.png" is not on disk at images/hair_front.png (see rigc guide CE_COMPILE_IMAGE_MISSING)
+exit=1
+```
+
+The guide's fix: *Supply the PNG at the named images path or correct the image name.*
+
+</div>
+
+<div class="case">
+
+### <span class="label fail">gate</span> One vertex's weights do not sum to 1
+
+This one compiles; the gate measures it and refuses — the case at the top of this page. Its guide row covers *a weighted vertex with no bone, a negative weight, a bone index out of range, or weights that do not sum to 1*.
+
+</div>
+
+Put each value back and the same command passes, writing files byte-identical to the clean build. The two compile refusals stop before the gate runs, so they print no assertion summary; the third is a gate `FAIL` with one.
+
+## Passing is structural; looking is separate
+
+A green gate says the data is valid Spine 4.3 that plays without errors — in core's own words, *a rig with its head off its torso passes the gate*. So rigc also draws what it built, with no reference needed:
+
+<div class="compare">
+  <figure><img src="/assets/docs/core-render-contact.jpg" alt="A contact sheet of Character 1's idle: 41 small frames of the full figure" width="401" height="775" loading="lazy"><figcaption><code>rigc render --candidate build --animation idle</code> — <code>idle 41 frame(s), 3.333s + contact.png</code></figcaption></figure>
+  <figure><img src="/assets/docs/core-inspect-weights.jpg" alt="The neck mesh over dimmed art, coloured by how much each vertex follows the chest bone: blue near the head, red near the chest, with the triangle edges drawn" width="443" height="512" loading="lazy"><figcaption><code>rigc inspect … --show art,weights:chest,mesh --zoom slot:neck</code> — the neck mesh after the fix, coloured by its chest weight</figcaption></figure>
+</div>
+
+When a person needs to judge the motion against footage and hand back notes, that is [Review](/docs/review/).
+
+## How the gate decides
+
+1. **Measure the art.** rigc reads the PNGs themselves instead of trusting sizes you typed, so the skeleton and the atlas cannot drift apart.
+2. **Compile two specs.** The rig spec (`rigc-rig/1`) holds structure — bones, slots in draw order, skins. The motion spec (`rigc-motion/1`) holds time — animations, tracks, keys.
+3. **Gate.** The default profile, `spine`, runs the 36 validity rules: *is this valid Spine 4.3 that any runtime plays correctly?* `--profile rig-play` runs all 50; the extra 14 are one renderer's and one canvas budget's policy, which is why they are opt-in. Every report names its profile and lists, on `PROF` lines, the rules it left out.
+4. **Write, or refuse.** Only a green gate writes `--out`.
+
+The published package links no Spine runtime, so `A00_ROUNDTRIP_PARSE` — Spine's own parse — reports SKIP. Install `@esotericsoftware/spine-core` beside it and the same `rigc` runs that round trip too, plus `validate`, `preview`, `vote`, `bench` and `bonedist`.
+
+**Key terms.** *Rig spec* — bones, the slots array (the setup draw order) and skins. *Motion spec* — the time file, aimed at the rig by name. *Named assertion* — a rule the gate runs; each failure names it. *Profile* — the rulebook: `spine` (default) or `rig-play`. *`ingest`* — `build` run backwards: a Spine 4.3 `skeleton.json` in, the two specs that rebuild it byte for byte out.
+
+## Install
+
+```sh
+bun add -d rig-c
+bun rigc build --rig rig.json --motion motion.json --out build/
+```
+
+rigc runs on Bun 1.2.0 or later. The npm package is `rig-c`; `@rig-c/core` is the same package under the scope, and the command is `rigc`. Licensing by playback path: [Licensing](/docs/licensing/).
+
+## Inputs and outputs
+
+| In | Out |
+| --- | --- |
+| Part PNGs | `skeleton.json` + `skeleton.atlas` — Spine 4.3 data |
+| A rig spec (`rig.json`) | `skeleton.model.json` — rig-c's own compiled model, for [Play](/docs/play/) |
+| A motion spec (`motion.json`) | the gate report (`--report` also writes it as JSON) |
+| — | on a refusal: the named lines, and nothing on disk |
+
+## Limits
+
+- **The gate is structural.** It does not judge the picture; `render` and `inspect` are for looking.
+- **The round trip needs spine-core.** Without it, `A00_ROUNDTRIP_PARSE` is SKIP and `validate`, `preview`, `vote`, `bench`, `bonedist` do not run.
+- **Packing is opt-in and narrow** — `--pack` and `--atlas-in` do no trimming, rotation or scaling.
+- **It emits Spine's format.** What a product may do with that data, and with a Spine Runtime, is in [Licensing](/docs/licensing/).
 
 ## Go deeper
 
@@ -528,68 +687,114 @@ Package: @rig-c/review@0.2.1
 Repository: https://github.com/rig-c/review
 ================================================================================
 
-# Review
+# @rig-c/review
 
-Review is the human inspection gate in the rig-c toolchain. A person opens an agent's rig output in one local workspace, checks it, and saves feedback that the agent can read back.
+<p class="mod-role">A local inspection page for a person: open what an agent built, find what looks wrong, pin it to a frame and a slot, and hand it back as an issue.</p>
 
-## What it is
+<figure class="mod-hero">
+  <img src="/assets/docs/review-screen.jpg" alt="The rig-review page: the left column lists checkpoints and source files, the centre shows Character 1's shirt part zoomed in with a dashed selection box, the right column lists all 17 slots with topwear selected, and the Feedback panel below shows one saved defect on slot topwear" width="1600" height="1000">
+  <figcaption>Character 1's build from before the shoulder repair, open in <code>rig-review</code> 0.2.1: <code>topwear</code> soloed and zoomed, one defect saved against it, the review submitted as <em>changes requested</em>.</figcaption>
+</figure>
 
-`@rig-c/review` is a CLI, `rig-review`, that serves a browser workspace on `127.0.0.1`. It plays a compiled model through `@rig-c/play`, shows local image, video and pose-sequence references beside it, and records the person's review decision and feedback.
+<p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
-## When to use it
+*This page follows Character 1 from the Family set: here it is looked at. Every module works on its own; this order is one path, not a requirement.*
 
-Use it after a [Core](/docs/core/) build, when a person needs to look at the result before it goes on. The agent does not have to build a new viewer for each rig.
+The checks that keep a broken rig off the disk are structural: a shoulder that renders flat passes all of them. Someone has to look — and what they find has to reach whoever fixes it as something more precise than a screenshot. Review runs on your machine (`127.0.0.1` only), plays the build with the same `@rig-c/play` runtime a site would use, and records feedback bound to a frame range, a slot or bone, and the exact camera, without touching the files it was given.
 
-Do not use it to fix the rig. Motion is view, annotate and export only: it never retimes, authors keys or writes `motion.json`. It does not edit meshes, weights or source art. It also does not replace Core's compiler gate; `check` validates the delivery contract and model envelope, not visual quality. To ship a rig into a game, use [Play](/docs/play/) or an [engine adapter](/docs/adapters/).
+## One problem, from seeing it to the fix
 
-## What it solves
+Character 1's shirt once had a flat, indented shoulder: an earlier preparation script had cut away cloth that the hair covers in the still and uncovers when it moves. The family suite records that repair in [its shoulder-repair note](https://github.com/rig-c/parts-examples/blob/main/family/roa/SHOULDER_REPAIR.md). Here it is replayed in Review on the build from before the repair.
 
-An agent can produce a rig, but a person has to judge it. Without a shared tool, that judgment ends up as loose notes that point at nothing exact. Review ties each piece of feedback to the exact bytes that were reviewed, and to a frame interval and a bone or slot target. The agent then retrieves it with one command. If the input changes, the old approval does not carry over.
+<div class="case">
 
-## What you get
+### 1. Open the build, and look where the motion would reveal it
 
-- A **review status**: `approved`, `changes-requested` or `pending`. Opening never approves.
-- **Feedback** items with an inclusive frame interval, a bone/slot/rig target, a defect/quality category and a one-line summary.
-- A `reviewedSource` record: package revision, viewer/runtime versions, and SHA-256 plus path for the reviewed rig and motion.
-- JSON and issue-ready Markdown exports (`--format issue`).
-- **Frame strip** exports as PNG or JSON, with a `.png.json` provenance sidecar.
+`rig-review open <dir>` checks the folder and prints a loopback URL. In the whole rig the back hair covers the spot, so the reviewer pauses the idle, picks `topwear` in the parts list, ticks *Solo selected slot* and zooms in.
 
-## How it works
+<figure class="figure-wide">
+  <img src="/assets/docs/review-in-context.jpg" alt="The whole rig at the same zoom: the back hair covers the shoulder" width="1200" height="750" loading="lazy">
+  <figcaption>The same camera with every slot drawn — the hair hides what the solo view shows.</figcaption>
+</figure>
 
-1. Install it beside the agent and run `open` on the output folder. It recognizes `skeleton.model.json` at the root or under `build/`, plus `motion.json`, `report.json`, source videos and pose sequences. It reads them without changing them.
-2. `open` hashes the folder, starts or reuses a background loopback instance, prints its URL and exits. It never opens a browser and binds only `127.0.0.1`.
-3. The person inspects playback, parts and references, then explicitly saves a status and feedback. Feedback is stored under `~/.local/state/rig-c-review/`, outside the delivered files.
-4. The agent runs `feedback` on the same folder to read the session JSON. Changed content starts a fresh pending session.
-5. Optionally, `compare` seeks two outputs against one reference video with a single playhead.
+</div>
 
+<div class="case">
+
+### 2. Pin it, and submit
+
+*Use slot for feedback*, then a category, a frame range and one line of summary; *Submit review* with status *Changes requested*. The export is plain JSON (or issue-ready Markdown):
+
+```json
+{
+  "schema": "rig-review-feedback/1",
+  "reviewedSource": {
+    "viewerVersion": "0.2.1", "runtimeVersion": "1.12.0",
+    "rig": { "path": "build/skeleton.model.json", "sha256": "28490ee9e2c7fa8a…" }
+  },
+  "status": "changes-requested",
+  "feedback": [{
+    "frameStart": 15, "frameEnd": 15,
+    "target": { "kind": "slot", "name": "topwear" },
+    "category": "defect",
+    "summary": "Screen-left shoulder top of topwear is flat and indented (cloth alpha cut); exposed when hair moves aside",
+    "context": { "animation": "idle", "time": 1.25, "frame": null,
+                 "camera": { "zoom": 7.3586, "x": -112.72, "y": 1792.86, "coordinateSystem": "world-y-up" } }
+  }]
+}
+```
+
+The rig's hash, the viewer and runtime versions and the saved camera mean anyone holding the issue can reopen exactly this view. `"frame": null` is honest: this build declares no frame clock, so Review shows `rate unknown`, and the 15 is a number the reviewer entered (1.25 s at the check sampler's 12 fps).
+
+</div>
+
+<div class="case">
+
+### 3. The fix happens upstream; the rebuilt rig comes back
+
+Review changes nothing in the package — the repair was made in the authoring workflow: a guarded stage restored the original shirt cloth in that area and widened five outline vertices, then the rig was rebuilt and checked through the ordinary gates. Reopened in Review with the same view:
+
+<figure class="figure-wide">
+  <img src="/assets/docs/review-before-after.jpg" alt="Two close-ups of the shoulder: left, flat with a step; right, a smooth rounded shoulder" width="1296" height="400" loading="lazy">
+  <figcaption>Left: before the repair, as pinned. Right: the current build, same time, slot and camera.</figcaption>
+</figure>
+
+</div>
+
+Review also lines a build up against reference footage — side by side, synchronized cameras, frame strips — which is how a retargeted motion like the [Pose](/docs/pose/) page's wave gets judged against what it was meant to copy.
+
+## Install
 ```sh
 npm i -D @rig-c/review
 npx rig-review open /absolute/path/to/output
 ```
+Runs under Bun 1.3.0 or later, which must be on `PATH`; `open` prints a loopback URL and exits (README §"Start").
 
-It runs under Bun 1.3.0 or later. The CLI is the supported surface; no importable API is promised.
+## Inputs and outputs
+| In | Out |
+| --- | --- |
+| An output folder: `skeleton.model.json` (root or `build/`), `motion.json`, `report.json`, `skeleton.json`/`.skel`/`.atlas` | A loopback inspection page (`127.0.0.1` only) |
+| Source references: videos (`.mp4`, `.webm`, `.mov`), strip/contact/sheet images, `*pose*.json` sequences | Saved review session: status, checkpoint outcomes and feedback, under `~/.local/state/rig-c-review/` |
+| (optional) a curated `review.json` with checkpoints, references and angle axes | Feedback export as JSON or issue-ready Markdown (`feedback --format issue`) |
+| For `compare`: two outputs and one local reference video | Frame strips as PNG (plus a `.png.json` provenance sidecar) or JSON |
 
-## Key concepts
-
-- **Output folder**: an existing agent output opened as-is, with no manifest required.
-- **`review.json`**: an optional curated manifest with named checkpoints, references and angle axes.
-- **Checkpoint**: a named inspection point in a curated package, with its own outcome and notes.
-- **Producer clock**: `fps` plus `frame0`, or exact `frameTimes[]`, declared in the report. Without it the UI shows `rate unknown`.
-- **Reference binding**: the name and byte hash of a selected external video, bound into sessions and exports.
-- **Write capability**: a per-instance secret carried in the URL's `#cap=` fragment. A link without it opens read-only.
+## Limits
+- **"Motion is view, annotate and export only."** It never retimes, authors keys, or writes `motion.json` (README, intro).
+- **No modeling touch-up yet**: it "does not edit meshes, weights or source art" (README, intro).
+- **`check` validates the delivery contract and model envelope**, not the upstream compiler gate or visual quality; a raw `skeleton.json` can be inspected but not played (README §"Existing output handoff").
+- **No frame rate is inferred**: without a declared clock the page shows `rate unknown`, and strip PNGs need the report's exact `frameTimes` (README §"Existing output handoff", §"Frame strip export").
+- **Never publishes an issue automatically**; saving or exporting feedback modifies no model (README §"Feedback ownership").
+- **Maturity**: "the CLI is the supported surface, and no importable API is promised yet" (README §"Start"; the README still says 0.1.x while npm is at 0.2.1).
 
 ## Go deeper
-
-- [README: Start](https://github.com/rig-c/review#start)
-- [README: Feedback ownership](https://github.com/rig-c/review#feedback-ownership)
-- [README: Compare two outputs](https://github.com/rig-c/review#compare-two-outputs)
-- [README: Frame strip export](https://github.com/rig-c/review#frame-strip-export)
-- [README: Managed front and write capability](https://github.com/rig-c/review#managed-front-and-write-capability)
-- [README: Control the current inspection page](https://github.com/rig-c/review#control-the-current-inspection-page)
-- [docs/REVIEW_PACKAGE.md](https://github.com/rig-c/review/blob/main/docs/REVIEW_PACKAGE.md) (package format and HTTP contract)
-- [docs/DESIGN.md](https://github.com/rig-c/review/blob/main/docs/DESIGN.md) (product boundary and direction)
-- [CHANGELOG](https://github.com/rig-c/review/blob/main/CHANGELOG.md)
-- [npm: @rig-c/review](https://www.npmjs.com/package/@rig-c/review)
+- [Place in the toolchain](https://github.com/rig-c/review#place-in-the-toolchain)
+- [Existing output handoff](https://github.com/rig-c/review#existing-output-handoff)
+- [Compare two outputs](https://github.com/rig-c/review#compare-two-outputs)
+- [Feedback ownership](https://github.com/rig-c/review#feedback-ownership)
+- [One-command owner handoff](https://github.com/rig-c/review#one-command-owner-handoff)
+- [docs/REVIEW_PACKAGE.md](https://github.com/rig-c/review/blob/main/docs/REVIEW_PACKAGE.md) — the `review.json` package and folder adapter ([two-package comparison](https://github.com/rig-c/review/blob/main/docs/REVIEW_PACKAGE.md#two-package-comparison))
+- [docs/DESIGN.md](https://github.com/rig-c/review/blob/main/docs/DESIGN.md) — the runnable foundation vs. future modeling touch-up
+- [npm](https://www.npmjs.com/package/@rig-c/review) · [CHANGELOG](https://github.com/rig-c/review/blob/main/CHANGELOG.md)
 
 ================================================================================
 URL: https://rig-c.org/docs/play/
@@ -598,68 +803,94 @@ Package: @rig-c/play@1.12.0
 Repository: https://github.com/rig-c/play
 ================================================================================
 
-# Play
+# @rig-c/play
 
-Play is the runtime of the rig-c toolchain. It loads the model a [Core](/docs/core/) build writes and animates it in a web page.
+<p class="mod-role">The browser player for the model rigc writes — no Spine runtime, rigid parts as plain DOM elements or the whole rig in one canvas.</p>
 
-## What it is
+The live player on this page plays Character 1 with two motions (idle and the wave from the Pose page), with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.
 
-`@rig-c/play` plays `skeleton.model.json`, the compiled model document that `rigc build` writes. In the default `dom` mode, each rigid slot is one absolutely positioned `<img>`, posed with one CSS `matrix()` write per frame, and deforming meshes draw on small per-part canvases. In `canvas` mode the whole frame draws into one `<canvas>` per player.
+<p class="mod-skip">Skip to <a href="#a-minimal-page">A minimal page</a> · <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
-## When to use it
+*This page follows Character 1 from the Family set: here it is played. Every module works on its own; this order is one path, not a requirement.*
 
-Use it to show a rigc-built character in a browser page, with no game engine. It suits a few characters that mostly hold a pose with some parts deforming. The README reports that this case holds 60 fps on every engine it measured.
+A rigged character usually means a canvas runtime that rasterizes everything. For a rigid part, though, the bone transform is a plain affine map that CSS `matrix()` expresses exactly — so the rigid parts can live in the DOM, where the browser composites them and you can inspect and style them like any element. Play keeps that path, and adds what the DOM cannot do alone: per-part mesh canvases, `clip-path` clipping, and skipping meshes that did not move. Switch the player above to **One canvas** to see the other mode draw the same pose.
 
-When you already render with PixiJS, Phaser or Three.js, use the [engine adapters](/docs/adapters/) instead. They draw Play's posed frames inside that engine. To inspect a rig and leave feedback, use [Review](/docs/review/). Play does not play Spine exports; a Spine export is refused by name.
+## What you just ran
 
-## What it solves
+The player above is the published package doing what any page does with it — nothing on this site poses the rig:
 
-A rigged character usually means a canvas runtime that rasterizes everything. For a rigid part, though, the bone transform is a plain affine map that CSS `matrix()` expresses exactly. So the rigid parts can live in the DOM, where the browser composites them and you can inspect and style them like any element. Play keeps that path and adds what the DOM cannot do alone: per-part mesh canvases, `clip-path` clipping, and dirty-skip for meshes that did not move.
+1. `loadModel()` read Character 1's `skeleton.model.json` and cut each atlas region into its own bitmap (the `.atlas` and `skeleton.json` beside it are not fetched).
+2. `new RigPlayer(root, assets, { mode })` opened the motion you picked on a live track; rig-c's core, bundled in the package, poses bones, constraints, physics and draw order on the CPU, one `frame(dt)` at a time.
+3. Each frame became a `PosedFrame` — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one `matrix()` string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).
+4. **Bones** and **Mesh** draw from the player's own read-only queries, `bone(name)` and `posedFrame()`; **Pause** calls `pause()`.
 
-## What you get
+The `wave` is the motion the [Pose](/docs/pose/) page retargeted onto this rig; `idle` came with the rig from [Parts](/docs/parts/).
 
-- `loadModel()`: loads the model document and cuts each atlas region into its own bitmap. The `.atlas` and `skeleton.json` next to it are not fetched.
-- `RigPlayer`: plays, queues and mixes animations on several tracks, and steps one `frame(delta)` at a time.
-- `DomRenderer` and `CanvasRenderer`: the two render modes. You can switch in place with `player.mode`.
-- `PosedFrame`: a plain record of what to draw this frame. Any code that produces one can draw through the renderer.
-- Read-only queries: `bone()`, `bounds()`, `posedFrame()` and `slotIdentity()`.
-- Attachment sets from an optional `sets.json`, switched with `setSet()`.
+## A minimal page
 
-## How it works
+Twenty-odd lines, from the README, load a model from jsDelivr, fit its stage box to a container and drive the clock:
 
-1. `loadModel` reads the compiled model document with `rig-c/core`, which is bundled into the package. There is nothing else to install.
-2. At load time each region on the document's pages is cut into its own bitmap, with its rotation restored.
-3. `RigPlayer` opens an animation on a live track. The core poses bones, constraints, physics, deform and draw order on the CPU, one `dt` at a time.
-4. Each frame the pose becomes a `PosedFrame`: region corners or mesh vertices, UVs, tint, blend and clip, in draw order.
-5. For a region, the renderer derives the affine from three corners and writes one `matrix()` string. Meshes draw through one shared WebGL context by default, and fall back to canvas2d.
+```html
+<div id="stage" style="position: relative; width: 480px; height: 640px; overflow: hidden"></div>
+<script type="module">
+  import { loadModel, RigPlayer } from 'https://cdn.jsdelivr.net/npm/@rig-c/play@1/dist/index.js';
+  const stage = document.getElementById('stage');
+  const assets = await loadModel({ modelUrl: 'rigs/look/skeleton.model.json' });
+  const root = stage.appendChild(document.createElement('div'));
+  const player = new RigPlayer(root, assets);
+  player.play(assets.animations[0].name);
+  const box = assets.stage ?? player.bounds();
+  const scale = Math.min(stage.clientWidth / box.width, stage.clientHeight / box.height);
+  root.style.cssText = `position: absolute; transform-origin: 0 0; transform: scale(${scale});
+    left: ${-box.x * scale}px; top: ${(box.y + box.height) * scale}px`;
+  player.renderer.syncPixelRatio();
+  let last = performance.now();
+  requestAnimationFrame(function tick(now) {
+    player.frame((now - last) / 1000);
+    last = now;
+    requestAnimationFrame(tick);
+  });
+</script>
+```
+
+The player does not run its own clock: the page calls `frame(dt)`, so pausing, slowing down or stopping the loop is yours to decide (this site's player stays paused when your system asks for reduced motion). To play the same model inside PixiJS, Phaser or Three.js, see the [adapters](/docs/adapters/).
+
+**Key terms.** *Model document* — `skeleton.model.json` (spec `rigc-compiled/3`). *Region attachment* — a rigid part, an `<img>` with a CSS matrix. *Mesh attachment* — a deforming part on its own small canvas. *Render mode* — `dom` (default) or `canvas`. *Mesh backend* — `webgl` (default since 1.9) or `canvas2d`. *Attachment set* — a named swap of slot attachments from `sets.json`.
+
+## Install
 
 ```sh
 npm i @rig-c/play
+npm i -D rig-c    # rigc build writes the model the player loads
 ```
 
-## Key concepts
+Runs in the browser as an ES module; rig-c's posing core is bundled, so there is nothing else to install. The package is MIT and links nothing from Esoteric Software — see [Licensing](/docs/licensing/).
 
-- **Model document**: `skeleton.model.json` (spec `rigc-compiled/3`). It holds the skeleton, animations and region placement.
-- **Region attachment**: a rigid part, drawn as an `<img>` with a CSS matrix.
-- **Mesh attachment**: a deforming part, drawn on its own small canvas sized to its world bounds.
-- **Render mode**: `dom` (the default) or `canvas`.
-- **Mesh backend**: `webgl` (the default since 1.9) or `canvas2d`.
-- **Dirty-skip**: a mesh whose vertices match its last raster reuses that raster.
-- **Attachment set**: a named swap of slot attachments, declared in `sets.json`.
+## Inputs and outputs
+| In | Out |
+| --- | --- |
+| `skeleton.model.json` — the compiled model `rigc build` writes (spec `rigc-compiled/3`) | DOM mode (default): one `<img>` per rigid slot posed by a CSS `matrix()`, small per-part canvases for meshes |
+| Its atlas page images (the `.atlas` and `skeleton.json` beside it are not fetched) | Canvas mode: the whole frame in one `<canvas>` per player |
+| (optional) `sets.json` — named attachment sets, spec `rig-parts-sets/1` | Reads off the pose: `player.bone(name)`, `player.bounds()`, `slotIdentity()` |
+| (optional) your own `PosedFrame` records, via `DomRenderer.render` | |
+
+## Limits
+From the README's *Status* and *No counterpart in 1.0.0* (it has no limits section):
+- **Status: "Production."** — 60 fps on every engine measured for the practical scenario (README §"Status").
+- **Reads rigc's model only**: "a Spine export is refused by name"; `loadModel` reads a compiled model document and nothing else (README §"Why", §"No counterpart in 1.0.0").
+- **Which render mode is faster where is "not measured on a device yet"**, so the default stays `dom` (README §"Status").
+- **Dark/two-colour tint stays out of scope in DOM mode**; RGB tint needs reference-filter support, Safari 15+ (README §"Status").
+- **Clipping caveats**: an inverse polygon matches Spine's clipper only when convex, and the cost of many `clip-path`s on real-device Safari is not measured (README §"Status").
+- **No per-slot changes from code** (attachment, colour) and no `scale` on load; scaling the root element is the caller's (README §"No counterpart in 1.0.0").
 
 ## Go deeper
-
-- [Try it live](/examples/#2-play-it-live): the published player running the 20 Family rigs on this site, with bone and mesh overlays
-
-- [README: Install](https://github.com/rig-c/play#install)
-- [README: A minimal page](https://github.com/rig-c/play#a-minimal-page)
-- [README: Drawing your own frames](https://github.com/rig-c/play#drawing-your-own-frames)
-- [README: Runtime knobs and what they cost](https://github.com/rig-c/play#runtime-knobs-and-what-they-cost)
-- [README: Benchmark](https://github.com/rig-c/play#benchmark-dom-canvas-and-official-webgl)
-- [README: How it works](https://github.com/rig-c/play#how-it-works)
-- [README: License](https://github.com/rig-c/play#license) and [NOTICE.md](https://github.com/rig-c/play/blob/main/NOTICE.md)
-- [CHANGELOG](https://github.com/rig-c/play/blob/main/CHANGELOG.md)
-- [npm: @rig-c/play](https://www.npmjs.com/package/@rig-c/play)
+- [Install](https://github.com/rig-c/play#install) · [A minimal page](https://github.com/rig-c/play#a-minimal-page)
+- [Status](https://github.com/rig-c/play#status)
+- [Attachment sets (`sets.json`)](https://github.com/rig-c/play#attachment-sets-setsjson)
+- [Runtime knobs and what they cost](https://github.com/rig-c/play#runtime-knobs-and-what-they-cost)
+- [Benchmark: DOM, canvas and official WebGL](https://github.com/rig-c/play#benchmark-dom-canvas-and-official-webgl)
+- [How it works](https://github.com/rig-c/play#how-it-works)
+- [npm](https://www.npmjs.com/package/@rig-c/play) · [CHANGELOG](https://github.com/rig-c/play/blob/main/CHANGELOG.md)
 
 ================================================================================
 URL: https://rig-c.org/docs/adapters/

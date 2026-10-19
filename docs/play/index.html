@@ -117,82 +117,106 @@
         <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Play</li></ol></nav>
         <div class="pkg-bar"><span class="pkg"><code>@rig-c/play</code> <span class="ver">1.12.0</span></span><a href="https://github.com/rig-c/play">github.com/rig-c/play</a><a href="https://www.npmjs.com/package/@rig-c/play">npm</a></div>
         <article>
-<h1 id="play">Play</h1>
-<p>Play is the runtime of the rig-c toolchain. It loads the model a <a href="/docs/core/">Core</a> build writes and animates it in a web page.</p>
-<h2 id="what-it-is">What it is</h2>
-<p><code>@rig-c/play</code> plays <code>skeleton.model.json</code>, the compiled model document that <code>rigc build</code> writes. In the default <code>dom</code> mode, each rigid slot is one absolutely positioned <code>&lt;img&gt;</code>, posed with one CSS <code>matrix()</code> write per frame, and deforming meshes draw on small per-part canvases. In <code>canvas</code> mode the whole frame draws into one <code>&lt;canvas&gt;</code> per player.</p>
-<h2 id="when-to-use-it">When to use it</h2>
-<p>Use it to show a rigc-built character in a browser page, with no game engine. It suits a few characters that mostly hold a pose with some parts deforming. The README reports that this case holds 60 fps on every engine it measured.</p>
-<p>When you already render with PixiJS, Phaser or Three.js, use the <a href="/docs/adapters/">engine adapters</a> instead. They draw Play's posed frames inside that engine. To inspect a rig and leave feedback, use <a href="/docs/review/">Review</a>. Play does not play Spine exports; a Spine export is refused by name.</p>
-<h2 id="what-it-solves">What it solves</h2>
-<p>A rigged character usually means a canvas runtime that rasterizes everything. For a rigid part, though, the bone transform is a plain affine map that CSS <code>matrix()</code> expresses exactly. So the rigid parts can live in the DOM, where the browser composites them and you can inspect and style them like any element. Play keeps that path and adds what the DOM cannot do alone: per-part mesh canvases, <code>clip-path</code> clipping, and dirty-skip for meshes that did not move.</p>
-<h2 id="what-you-get">What you get</h2>
-<ul>
-<li><code>loadModel()</code>: loads the model document and cuts each atlas region into its own bitmap. The <code>.atlas</code> and <code>skeleton.json</code> next to it are not fetched.</li>
-<li><code>RigPlayer</code>: plays, queues and mixes animations on several tracks, and steps one <code>frame(delta)</code> at a time.</li>
-<li><code>DomRenderer</code> and <code>CanvasRenderer</code>: the two render modes. You can switch in place with <code>player.mode</code>.</li>
-<li><code>PosedFrame</code>: a plain record of what to draw this frame. Any code that produces one can draw through the renderer.</li>
-<li>Read-only queries: <code>bone()</code>, <code>bounds()</code>, <code>posedFrame()</code> and <code>slotIdentity()</code>.</li>
-<li>Attachment sets from an optional <code>sets.json</code>, switched with <code>setSet()</code>.</li>
-</ul>
-<h2 id="how-it-works">How it works</h2>
+<h1 id="rig-cplay">@rig-c/play</h1>
+<p class="mod-role">The browser player for the model rigc writes — no Spine runtime, rigid parts as plain DOM elements or the whole rig in one canvas.</p>
+<section class="live-demo live-demo-play" data-model-url="/assets/rigs/character-1-wave/skeleton.model.json" data-character="Character 1" data-label="Character 1" data-fit="0.78" aria-label="Live player">
+<div class="demo-head"><span class="badge-live">Live</span><span>@rig-c/play 1.12.0 running in your browser — not a recording</span></div>
+<div class="demo-body">
+<div class="demo-stage" id="demo-stage-play" data-part="demo-stage"><button type="button" class="btn btn-primary demo-start" data-part="demo-start">Start the player</button><canvas class="demo-overlay" data-part="demo-overlay" aria-hidden="true"></canvas></div>
+<div class="demo-panel">
+<div class="demo-controls" role="group" aria-label="Player controls">
+<label>Motion <select data-part="demo-motion"><option>idle</option></select></label>
+<label>Render mode <select data-part="demo-mode"><option value="dom">DOM (default)</option><option value="canvas">One canvas</option></select></label>
+<div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
+</div>
+<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 (about 2.2 MB).</p>
+<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted wave added.</p>
+<noscript><p class="demo-status" data-kind="error">The live player needs JavaScript.</p></noscript>
+</div>
+</div>
+</section>
+<script type="module" src="/assets/demo.js"></script>
+<p class="mod-skip">Skip to <a href="#a-minimal-page">A minimal page</a> · <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
+<nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol><li><a href="/docs/parts/"><strong>Parts</strong><span>split into parts</span></a></li><li><a href="/docs/pose/"><strong>Pose</strong><span>given a motion</span></a></li><li><a href="/docs/core/"><strong>Core</strong><span>checked</span></a></li><li><a href="/docs/review/"><strong>Review</strong><span>looked at</span></a></li><li><a href="/docs/play/" aria-current="step"><strong>Play</strong><span>played</span></a></li></ol></nav>
+<p>A rigged character usually means a canvas runtime that rasterizes everything. For a rigid part, though, the bone transform is a plain affine map that CSS <code>matrix()</code> expresses exactly — so the rigid parts can live in the DOM, where the browser composites them and you can inspect and style them like any element. Play keeps that path, and adds what the DOM cannot do alone: per-part mesh canvases, <code>clip-path</code> clipping, and skipping meshes that did not move. Switch the player above to <strong>One canvas</strong> to see the other mode draw the same pose.</p>
+<h2 id="what-you-just-ran">What you just ran</h2>
+<p>The player above is the published package doing what any page does with it — nothing on this site poses the rig:</p>
 <ol>
-<li><code>loadModel</code> reads the compiled model document with <code>rig-c/core</code>, which is bundled into the package. There is nothing else to install.</li>
-<li>At load time each region on the document's pages is cut into its own bitmap, with its rotation restored.</li>
-<li><code>RigPlayer</code> opens an animation on a live track. The core poses bones, constraints, physics, deform and draw order on the CPU, one <code>dt</code> at a time.</li>
-<li>Each frame the pose becomes a <code>PosedFrame</code>: region corners or mesh vertices, UVs, tint, blend and clip, in draw order.</li>
-<li>For a region, the renderer derives the affine from three corners and writes one <code>matrix()</code> string. Meshes draw through one shared WebGL context by default, and fall back to canvas2d.</li>
+<li><code>loadModel()</code> read Character 1's <code>skeleton.model.json</code> and cut each atlas region into its own bitmap (the <code>.atlas</code> and <code>skeleton.json</code> beside it are not fetched).</li>
+<li><code>new RigPlayer(root, assets, { mode })</code> opened the motion you picked on a live track; rig-c's core, bundled in the package, poses bones, constraints, physics and draw order on the CPU, one <code>frame(dt)</code> at a time.</li>
+<li>Each frame became a <code>PosedFrame</code> — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one <code>matrix()</code> string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).</li>
+<li><strong>Bones</strong> and <strong>Mesh</strong> draw from the player's own read-only queries, <code>bone(name)</code> and <code>posedFrame()</code>; <strong>Pause</strong> calls <code>pause()</code>.</li>
 </ol>
-<pre><code class="language-sh">npm i @rig-c/play
+<p>The <code>wave</code> is the motion the <a href="/docs/pose/">Pose</a> page retargeted onto this rig; <code>idle</code> came with the rig from <a href="/docs/parts/">Parts</a>.</p>
+<h2 id="a-minimal-page">A minimal page</h2>
+<p>Twenty-odd lines, from the README, load a model from jsDelivr, fit its stage box to a container and drive the clock:</p>
+<pre><code class="language-html">&lt;div id=&quot;stage&quot; style=&quot;position: relative; width: 480px; height: 640px; overflow: hidden&quot;&gt;&lt;/div&gt;
+&lt;script type=&quot;module&quot;&gt;
+  import { loadModel, RigPlayer } from 'https://cdn.jsdelivr.net/npm/@rig-c/play@1/dist/index.js';
+  const stage = document.getElementById('stage');
+  const assets = await loadModel({ modelUrl: 'rigs/look/skeleton.model.json' });
+  const root = stage.appendChild(document.createElement('div'));
+  const player = new RigPlayer(root, assets);
+  player.play(assets.animations[0].name);
+  const box = assets.stage ?? player.bounds();
+  const scale = Math.min(stage.clientWidth / box.width, stage.clientHeight / box.height);
+  root.style.cssText = `position: absolute; transform-origin: 0 0; transform: scale(${scale});
+    left: ${-box.x * scale}px; top: ${(box.y + box.height) * scale}px`;
+  player.renderer.syncPixelRatio();
+  let last = performance.now();
+  requestAnimationFrame(function tick(now) {
+    player.frame((now - last) / 1000);
+    last = now;
+    requestAnimationFrame(tick);
+  });
+&lt;/script&gt;
 </code></pre>
-<h2 id="key-concepts">Key concepts</h2>
+<p>The player does not run its own clock: the page calls <code>frame(dt)</code>, so pausing, slowing down or stopping the loop is yours to decide (this site's player stays paused when your system asks for reduced motion). To play the same model inside PixiJS, Phaser or Three.js, see the <a href="/docs/adapters/">adapters</a>.</p>
+<p><strong>Key terms.</strong> <em>Model document</em> — <code>skeleton.model.json</code> (spec <code>rigc-compiled/3</code>). <em>Region attachment</em> — a rigid part, an <code>&lt;img&gt;</code> with a CSS matrix. <em>Mesh attachment</em> — a deforming part on its own small canvas. <em>Render mode</em> — <code>dom</code> (default) or <code>canvas</code>. <em>Mesh backend</em> — <code>webgl</code> (default since 1.9) or <code>canvas2d</code>. <em>Attachment set</em> — a named swap of slot attachments from <code>sets.json</code>.</p>
+<section class="tech" aria-label="Technical details">
+<h2 id="install">Install</h2>
+<pre><code class="language-sh">npm i @rig-c/play
+npm i -D rig-c    # rigc build writes the model the player loads
+</code></pre>
+<p>Runs in the browser as an ES module; rig-c's posing core is bundled, so there is nothing else to install. The package is MIT and links nothing from Esoteric Software — see <a href="/docs/licensing/">Licensing</a>.</p>
+<h2 id="inputs-and-outputs">Inputs and outputs</h2>
+<table>
+<thead>
+<tr><th>In</th><th>Out</th></tr>
+</thead>
+<tbody>
+<tr><td><code>skeleton.model.json</code> — the compiled model <code>rigc build</code> writes (spec <code>rigc-compiled/3</code>)</td><td>DOM mode (default): one <code>&lt;img&gt;</code> per rigid slot posed by a CSS <code>matrix()</code>, small per-part canvases for meshes</td></tr>
+<tr><td>Its atlas page images (the <code>.atlas</code> and <code>skeleton.json</code> beside it are not fetched)</td><td>Canvas mode: the whole frame in one <code>&lt;canvas&gt;</code> per player</td></tr>
+<tr><td>(optional) <code>sets.json</code> — named attachment sets, spec <code>rig-parts-sets/1</code></td><td>Reads off the pose: <code>player.bone(name)</code>, <code>player.bounds()</code>, <code>slotIdentity()</code></td></tr>
+<tr><td>(optional) your own <code>PosedFrame</code> records, via <code>DomRenderer.render</code></td><td></td></tr>
+</tbody>
+</table>
+<h2 id="limits">Limits</h2>
+<p>From the README's <em>Status</em> and <em>No counterpart in 1.0.0</em> (it has no limits section):</p>
 <ul>
-<li><strong>Model document</strong>: <code>skeleton.model.json</code> (spec <code>rigc-compiled/3</code>). It holds the skeleton, animations and region placement.</li>
-<li><strong>Region attachment</strong>: a rigid part, drawn as an <code>&lt;img&gt;</code> with a CSS matrix.</li>
-<li><strong>Mesh attachment</strong>: a deforming part, drawn on its own small canvas sized to its world bounds.</li>
-<li><strong>Render mode</strong>: <code>dom</code> (the default) or <code>canvas</code>.</li>
-<li><strong>Mesh backend</strong>: <code>webgl</code> (the default since 1.9) or <code>canvas2d</code>.</li>
-<li><strong>Dirty-skip</strong>: a mesh whose vertices match its last raster reuses that raster.</li>
-<li><strong>Attachment set</strong>: a named swap of slot attachments, declared in <code>sets.json</code>.</li>
+<li><strong>Status: &quot;Production.&quot;</strong> — 60 fps on every engine measured for the practical scenario (README §&quot;Status&quot;).</li>
+<li><strong>Reads rigc's model only</strong>: &quot;a Spine export is refused by name&quot;; <code>loadModel</code> reads a compiled model document and nothing else (README §&quot;Why&quot;, §&quot;No counterpart in 1.0.0&quot;).</li>
+<li><strong>Which render mode is faster where is &quot;not measured on a device yet&quot;</strong>, so the default stays <code>dom</code> (README §&quot;Status&quot;).</li>
+<li><strong>Dark/two-colour tint stays out of scope in DOM mode</strong>; RGB tint needs reference-filter support, Safari 15+ (README §&quot;Status&quot;).</li>
+<li><strong>Clipping caveats</strong>: an inverse polygon matches Spine's clipper only when convex, and the cost of many <code>clip-path</code>s on real-device Safari is not measured (README §&quot;Status&quot;).</li>
+<li><strong>No per-slot changes from code</strong> (attachment, colour) and no <code>scale</code> on load; scaling the root element is the caller's (README §&quot;No counterpart in 1.0.0&quot;).</li>
 </ul>
 <h2 id="go-deeper">Go deeper</h2>
 <ul>
-<li>
-<p><a href="/examples/#2-play-it-live">Try it live</a>: the published player running the 20 Family rigs on this site, with bone and mesh overlays</p>
-</li>
-<li>
-<p><a href="https://github.com/rig-c/play#install">README: Install</a></p>
-</li>
-<li>
-<p><a href="https://github.com/rig-c/play#a-minimal-page">README: A minimal page</a></p>
-</li>
-<li>
-<p><a href="https://github.com/rig-c/play#drawing-your-own-frames">README: Drawing your own frames</a></p>
-</li>
-<li>
-<p><a href="https://github.com/rig-c/play#runtime-knobs-and-what-they-cost">README: Runtime knobs and what they cost</a></p>
-</li>
-<li>
-<p><a href="https://github.com/rig-c/play#benchmark-dom-canvas-and-official-webgl">README: Benchmark</a></p>
-</li>
-<li>
-<p><a href="https://github.com/rig-c/play#how-it-works">README: How it works</a></p>
-</li>
-<li>
-<p><a href="https://github.com/rig-c/play#license">README: License</a> and <a href="https://github.com/rig-c/play/blob/main/NOTICE.md">NOTICE.md</a></p>
-</li>
-<li>
-<p><a href="https://github.com/rig-c/play/blob/main/CHANGELOG.md">CHANGELOG</a></p>
-</li>
-<li>
-<p><a href="https://www.npmjs.com/package/@rig-c/play">npm: @rig-c/play</a></p>
-</li>
+<li><a href="https://github.com/rig-c/play#install">Install</a> · <a href="https://github.com/rig-c/play#a-minimal-page">A minimal page</a></li>
+<li><a href="https://github.com/rig-c/play#status">Status</a></li>
+<li><a href="https://github.com/rig-c/play#attachment-sets-setsjson">Attachment sets (<code>sets.json</code>)</a></li>
+<li><a href="https://github.com/rig-c/play#runtime-knobs-and-what-they-cost">Runtime knobs and what they cost</a></li>
+<li><a href="https://github.com/rig-c/play#benchmark-dom-canvas-and-official-webgl">Benchmark: DOM, canvas and official WebGL</a></li>
+<li><a href="https://github.com/rig-c/play#how-it-works">How it works</a></li>
+<li><a href="https://www.npmjs.com/package/@rig-c/play">npm</a> · <a href="https://github.com/rig-c/play/blob/main/CHANGELOG.md">CHANGELOG</a></li>
 </ul>
+</section>
 
         </article>
         <nav aria-label="Docs pages" class="pager"><a href="/docs/review/" rel="prev"><span>Previous</span>Review</a><a href="/docs/adapters/" rel="next"><span>Next</span>Adapters</a></nav>
       </main>
-      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-you-just-ran">What you just ran</a></li><li><a href="#a-minimal-page">A minimal page</a></li><li><a href="#install">Install</a></li><li><a href="#inputs-and-outputs">Inputs and outputs</a></li><li><a href="#limits">Limits</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
     </div>
     <footer class="site-footer">
       <div class="footer-inner">
