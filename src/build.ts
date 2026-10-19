@@ -34,8 +34,42 @@ function version(slug: string): string {
   return v;
 }
 
-function expand(page: Page): string {
+// The Family rigs the live demo plays, pinned to one rig-c/parts-examples commit.
+const FAMILY_SHA = 'c239b09328ca7364361b9761fac817502c09ede0';
+const FAMILY = ['Character 1', 'Character 2', 'Character 3', 'Character 4', 'Character 5'];
+const FAMILY_DIRS = ['roa', 'luna', 'jinni', 'naru', 'nova'];
+const OUTFITS = ['office', 'homewear', 'swimwear', 'uniform'];
+
+// The live demo is markup plus /assets/demo.js; the Markdown mirror gets a sentence instead.
+function liveDemo(target: 'html' | 'md'): string {
+  if (target === 'md') {
+    return `The live demo on ${SITE_ORIGIN}/examples/ plays the 20 Family rigs (5 characters × 4 outfits) in the browser with @rig-c/play, with play/pause and bone and mesh overlays. It needs JavaScript.`;
+  }
+  const characters = FAMILY.map((name, i) => `<option value="${FAMILY_DIRS[i]}">${name}</option>`).join('');
+  const outfits = OUTFITS.map((o) => `<option value="${o}">${o}</option>`).join('');
+  return `<section class="live-demo" id="live-demo" data-sha="${FAMILY_SHA}" aria-label="Live demo">
+<div class="demo-head"><span class="badge-live">Live</span><span>Running in your browser — not a recording</span></div>
+<div class="demo-body">
+<div class="demo-stage" id="demo-stage"><button type="button" class="btn btn-primary demo-start" id="demo-start">Start the live demo</button><canvas class="demo-overlay" id="demo-overlay" aria-hidden="true"></canvas></div>
+<div class="demo-panel">
+<div class="demo-controls" role="group" aria-label="Live demo controls">
+<label>Character <select id="demo-character">${characters}</select></label>
+<label>Outfit <select id="demo-outfit">${outfits}</select></label>
+<label>Motion <select id="demo-motion"><option>idle</option></select></label>
+<div class="demo-buttons"><button type="button" class="btn" id="demo-play">Play</button><button type="button" class="btn" id="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" id="demo-mesh" aria-pressed="false">Mesh</button></div>
+</div>
+<p class="demo-status" id="demo-status" role="status" aria-live="polite">Not loaded yet. Pressing Start downloads the player (about 0.4 MB) and one rig (about 1.5–2 MB); each outfit or character you pick loads another.</p>
+<p class="demo-source" id="demo-source">Source for each rig: its config.json and built model, linked here once it loads.</p>
+<noscript><p class="demo-status" data-kind="error">The live demo needs JavaScript. The recorded preview above shows the same rigs.</p></noscript>
+</div>
+</div>
+</section>
+<script type="module" src="/assets/demo.js"></script>`;
+}
+
+function expand(page: Page, target: 'html' | 'md' = 'md'): string {
   return page.markdown
+    .replace('{{live-demo}}', liveDemo(target))
     .replace('{{docs-map}}', docsMap())
     .replace(/\{\{version:([a-z-]+)\}\}/g, (_, slug: string) => version(slug));
 }
@@ -282,7 +316,7 @@ function pager(page: Page): string {
 }
 
 function renderPage(page: Page): string {
-  const body = renderMarkdown(expand(page));
+  const body = renderMarkdown(expand(page, 'html'));
   let main: string;
   if (page.section === 'home') {
     // The hero carries the page's one <h1>; the Markdown's own H1 stays in the .md mirror only.

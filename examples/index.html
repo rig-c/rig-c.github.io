@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>rig-c Reproducible Examples — parts-examples (20-Rig Family) &amp; Trailer</title>
-    <meta name="description" content="Public reproducible character inputs, the 5-character x 4-outfit (20 rigs, 396 parts) Agent Family deterministic rebuild suite, and the 12-second rig-c trailer.">
-    <meta name="keywords" content="rig-c examples, parts-examples, rig-c trailer, See-through dataset, deterministic rigging, Spine 4.3 examples">
+    <title>rig-c Examples — See the Rigs, Play Them Live, Rebuild Them</title>
+    <meta name="description" content="The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus the inputs, configs and commands that rebuild them.">
+    <meta name="keywords" content="rig-c examples, live demo, @rig-c/play, parts-examples, rig-c trailer, reproducible rigging, Spine 4.3 examples">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://rig-c.org/examples/">
     <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
@@ -14,14 +14,14 @@
     <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="rig-c">
-    <meta property="og:title" content="rig-c Reproducible Examples — parts-examples (20-Rig Family) &amp; Trailer">
-    <meta property="og:description" content="Public reproducible character inputs, the 5-character x 4-outfit (20 rigs, 396 parts) Agent Family deterministic rebuild suite, and the 12-second rig-c trailer.">
+    <meta property="og:title" content="rig-c Examples — See the Rigs, Play Them Live, Rebuild Them">
+    <meta property="og:description" content="The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus the inputs, configs and commands that rebuild them.">
     <meta property="og:url" content="https://rig-c.org/examples/">
     <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="rig-c Reproducible Examples — parts-examples (20-Rig Family) &amp; Trailer">
-    <meta name="twitter:description" content="Public reproducible character inputs, the 5-character x 4-outfit (20 rigs, 396 parts) Agent Family deterministic rebuild suite, and the 12-second rig-c trailer.">
+    <meta name="twitter:title" content="rig-c Examples — See the Rigs, Play Them Live, Rebuild Them">
+    <meta name="twitter:description" content="The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus the inputs, configs and commands that rebuild them.">
     <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
     <meta name="theme-color" content="#070b18">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,8 +36,8 @@
     {
       "@type": "TechArticle",
       "@id": "https://rig-c.org/examples/#article",
-      "headline": "rig-c Reproducible Examples — parts-examples (20-Rig Family) & Trailer",
-      "description": "Public reproducible character inputs, the 5-character x 4-outfit (20 rigs, 396 parts) Agent Family deterministic rebuild suite, and the 12-second rig-c trailer.",
+      "headline": "rig-c Examples — See the Rigs, Play Them Live, Rebuild Them",
+      "description": "The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus the inputs, configs and commands that rebuild them.",
       "url": "https://rig-c.org/examples/",
       "datePublished": "2026-10-19",
       "dateModified": "2026-10-19",
@@ -88,11 +88,47 @@
       <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li aria-current="page">Examples</li></ol></nav>
       <div class="pkg-bar"><a href="https://github.com/rig-c/parts-examples">github.com/rig-c/parts-examples</a></div>
       <article>
-<h1 id="reproducible-examples-parts-examples-trailer">Reproducible Examples (<code>parts-examples</code> &amp; <code>trailer</code>)</h1>
-<p>Every public rig-c showcase ships with its generated source paintings, See-through layer decompositions, agent-authored configs, and one-command deterministic rebuild scripts.</p>
-<h2 id="1-rig-cparts-examples-public-character-inputs-the-20-rig-agent-family">1. <code>rig-c/parts-examples</code> — Public Character Inputs &amp; The 20-Rig Agent Family</h2>
-<p>Repository: <a href="https://github.com/rig-c/parts-examples">https://github.com/rig-c/parts-examples</a></p>
-<h3 id="single-character-fixtures">Single-Character Fixtures</h3>
+<h1 id="examples">Examples</h1>
+<p>See what the rigs look like, play one in your browser, then open the files and commands that rebuild it.</p>
+<h2 id="1-see-the-result">1. See the result</h2>
+<figure class="figure-media">
+  <div class="media">
+    <video data-loop="the Family preview" controls muted loop playsinline preload="metadata" poster="/assets/family-preview-poster.jpg" width="960" height="832" aria-label="Recorded video: five rigged characters breathing and swaying in a light breeze">
+      <source src="/assets/family-preview.mp4" type="video/mp4">
+      <img src="/assets/family-preview-poster.jpg" alt="Five rigged characters standing side by side" width="960" height="832">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The five accepted Family rigs, rendered from their real models with breathing, blinking and a constant light breeze — from <a href="https://github.com/rig-c/parts-examples/tree/main/family">rig-c/parts-examples</a> (<a href="https://github.com/rig-c/parts-examples/blob/main/family/scripts/render-readme-preview.mjs">render recipe</a>).</figcaption>
+</figure>
+<h2 id="2-play-it-live">2. Play it live</h2>
+<section class="live-demo" id="live-demo" data-sha="c239b09328ca7364361b9761fac817502c09ede0" aria-label="Live demo">
+<div class="demo-head"><span class="badge-live">Live</span><span>Running in your browser — not a recording</span></div>
+<div class="demo-body">
+<div class="demo-stage" id="demo-stage"><button type="button" class="btn btn-primary demo-start" id="demo-start">Start the live demo</button><canvas class="demo-overlay" id="demo-overlay" aria-hidden="true"></canvas></div>
+<div class="demo-panel">
+<div class="demo-controls" role="group" aria-label="Live demo controls">
+<label>Character <select id="demo-character"><option value="roa">Character 1</option><option value="luna">Character 2</option><option value="jinni">Character 3</option><option value="naru">Character 4</option><option value="nova">Character 5</option></select></label>
+<label>Outfit <select id="demo-outfit"><option value="office">office</option><option value="homewear">homewear</option><option value="swimwear">swimwear</option><option value="uniform">uniform</option></select></label>
+<label>Motion <select id="demo-motion"><option>idle</option></select></label>
+<div class="demo-buttons"><button type="button" class="btn" id="demo-play">Play</button><button type="button" class="btn" id="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" id="demo-mesh" aria-pressed="false">Mesh</button></div>
+</div>
+<p class="demo-status" id="demo-status" role="status" aria-live="polite">Not loaded yet. Pressing Start downloads the player (about 0.4 MB) and one rig (about 1.5–2 MB); each outfit or character you pick loads another.</p>
+<p class="demo-source" id="demo-source">Source for each rig: its config.json and built model, linked here once it loads.</p>
+<noscript><p class="demo-status" data-kind="error">The live demo needs JavaScript. The recorded preview above shows the same rigs.</p></noscript>
+</div>
+</div>
+</section>
+<script type="module" src="/assets/demo.js"></script>
+<p>The live demo loads the published <a href="/docs/play/"><code>@rig-c/play</code></a> 1.12.0 from jsDelivr and the Family models from rig-c/parts-examples at one pinned commit. Each rig plays its own <code>idle</code> — the only motion these models carry — with its physics; the blink and the breeze in the recording above come from the Family viewer, not from the models.</p>
+<h2 id="3-open-the-sources-and-rebuild">3. Open the sources and rebuild</h2>
+<h3 id="the-family-suite-5-characters-4-outfits-20-rigs-396-parts">The Family suite — 5 characters × 4 outfits (20 rigs, 396 parts)</h3>
+<p><a href="https://github.com/rig-c/parts-examples/tree/main/family"><code>rig-c/parts-examples/family</code></a> starts from one wide group illustration (<code>1024×571</code> RGBA) upscaled with <code>4x-AnimeSharp</code> to <code>4096×2284</code>, decomposed with See-through in two passes (<code>full</code> + <code>head</code>), and rigged per character in four outfit sets (<code>office</code>, <code>homewear</code>, <code>swimwear</code>, <code>uniform</code>). Each rig's config pins its declared mesh and binding repairs (<code>declared-repairs.json</code>) by hash. The live demo links each rig's <code>config.json</code> and built model under the player.</p>
+<p>From the repository root (Bun and Node on <code>PATH</code>), this rebuilds all 20 rigs from their configs and checks them against the stored outputs:</p>
+<pre><code class="language-sh">bun install --cwd family/tools/outline-field-islands --frozen-lockfile
+node family/tools/verify-reproducibility.mjs --out /tmp/new-repro-evidence
+bun family/tools/verify-accepted.mjs --out /tmp/new-family-evidence
+</code></pre>
+<h3 id="standalone-character-inputs">Standalone character inputs</h3>
 <table>
 <thead>
 <tr><th>Key</th><th>Seed</th><th>Checkpoint</th><th>See-through Layers</th><th>Purpose</th></tr>
@@ -106,20 +142,14 @@
 <tr><td><code>reference-demo</code></td><td><code>71004</code></td><td>Pony Diffusion V6 XL</td><td>29 full + 29 head</td><td>Regression fixture held to the reference implementation's outputs.</td></tr>
 </tbody>
 </table>
-<h3 id="family-5-characters-4-outfits-20-rigs-396-parts"><code>family/</code> — 5 Characters × 4 Outfits (20 Rigs, 396 Parts)</h3>
-<p>Starting from one wide group illustration (<code>1024×571</code> RGBA) upscaled with <code>4x-AnimeSharp</code> to <code>4096×2284</code>, the <code>family/</code> suite overcomes See-through's fixed <code>1024×1024</code> resolution limit by combining 2-pass (<code>full</code> + <code>head</code>) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (<code>declared-repairs.json</code>) across 5 characters and 4 outfit sets (<code>office</code>, <code>homewear</code>, <code>swimwear</code>, <code>uniform</code>).</p>
-<pre><code class="language-sh"># Deterministic rebuild &amp; compiler gate across all 20 rigs (396 parts)
-bun install --cwd family/tools/outline-field-islands --frozen-lockfile
-node family/tools/verify-reproducibility.mjs --out /tmp/new-repro-evidence
-bun family/tools/verify-accepted.mjs --out /tmp/new-family-evidence
-</code></pre>
-<h2 id="2-rig-ctrailer-12-second-reproducible-animated-short">2. <code>rig-c/trailer</code> — 12-Second Reproducible Animated Short</h2>
-<p>Repository: <a href="https://github.com/rig-c/trailer">https://github.com/rig-c/trailer</a></p>
-<p>A character sitting on a swing under a night sky breathes, tilts her head, smiles, kicks her legs, hops, and waves, her twin tails following on physics chains — rebuilt byte-for-byte (240 frames at 20 fps, <code>960×540</code> WebP + <code>1920×1080</code> PNG frames) from one painting, two See-through layer sets, and agent-authored configs:</p>
+<p>These are inputs — painting, See-through inputs and layers; <a href="/docs/parts/"><code>@rig-c/parts</code></a> keeps the configs and expected outputs under its own <code>examples/&lt;key&gt;/</code>.</p>
+<h3 id="rig-ctrailer-the-12-second-short"><code>rig-c/trailer</code> — the 12-second short</h3>
+<p><a href="https://github.com/rig-c/trailer"><code>rig-c/trailer</code></a> is the loop on the landing page: a character on a swing breathes, tilts her head, smiles, kicks her legs, hops and waves, her twin tails following on physics chains — 240 frames at 20 fps, rebuilt from one painting, two See-through layer sets and agent-authored configs:</p>
 <pre><code class="language-sh">git clone https://github.com/rig-c/trailer &amp;&amp; cd trailer
 pip install -r requirements.txt
 ./build.sh
 </code></pre>
+<p>Licences for all of these: <a href="/docs/licensing/">Licensing</a>.</p>
 
       </article>
     </main>
