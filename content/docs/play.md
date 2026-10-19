@@ -59,6 +59,8 @@ npm i @rig-c/play
 
 ## Go deeper
 
+- [Try it live](/examples/#2-play-it-live): the published player running the 20 Family rigs on this site, with bone and mesh overlays
+
 - [README: Install](https://github.com/rig-c/play#install)
 - [README: A minimal page](https://github.com/rig-c/play#a-minimal-page)
 - [README: Drawing your own frames](https://github.com/rig-c/play#drawing-your-own-frames)

@@ -1,20 +1,48 @@
 ---
 navLabel: Examples
-title: rig-c Reproducible Examples — parts-examples (20-Rig Family) & Trailer
-description: Public reproducible character inputs, the 5-character x 4-outfit (20 rigs, 396 parts) Agent Family deterministic rebuild suite, and the 12-second rig-c trailer.
-keywords: rig-c examples, parts-examples, rig-c trailer, See-through dataset, deterministic rigging, Spine 4.3 examples
+title: rig-c Examples — See the Rigs, Play Them Live, Rebuild Them
+description: The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus the inputs, configs and commands that rebuild them.
+keywords: rig-c examples, live demo, @rig-c/play, parts-examples, rig-c trailer, reproducible rigging, Spine 4.3 examples
 repoUrl: https://github.com/rig-c/parts-examples
-summaryForLlms: Reproducible showcase repositories: rig-c/parts-examples (6 standalone character input sets + 5x4=20 Family rigs, 396 part rows, with SHA256 reproducibility gates) and rig-c/trailer (12s 240-frame animated short rebuilt by ./build.sh).
+summaryForLlms: Examples in three steps: a recorded preview of the Family rigs, a live in-browser demo that plays all 20 Family rigs (5 characters × 4 outfits) with the published @rig-c/play, then the sources and rebuild commands (rig-c/parts-examples family suite, six standalone input sets, rig-c/trailer).
 ---
-# Reproducible Examples (`parts-examples` & `trailer`)
+# Examples
 
-Every public rig-c showcase ships with its generated source paintings, See-through layer decompositions, agent-authored configs, and one-command deterministic rebuild scripts.
+See what the rigs look like, play one in your browser, then open the files and commands that rebuild it.
 
-## 1. `rig-c/parts-examples` — Public Character Inputs & The 20-Rig Agent Family
+## 1. See the result
 
-Repository: <https://github.com/rig-c/parts-examples>
+<figure class="figure-media">
+  <div class="media">
+    <video data-loop="the Family preview" controls muted loop playsinline preload="metadata" poster="/assets/family-preview-poster.jpg" width="960" height="832" aria-label="Recorded video: five rigged characters breathing and swaying in a light breeze">
+      <source src="/assets/family-preview.mp4" type="video/mp4">
+      <img src="/assets/family-preview-poster.jpg" alt="Five rigged characters standing side by side" width="960" height="832">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The five accepted Family rigs, rendered from their real models with breathing, blinking and a constant light breeze — from <a href="https://github.com/rig-c/parts-examples/tree/main/family">rig-c/parts-examples</a> (<a href="https://github.com/rig-c/parts-examples/blob/main/family/scripts/render-readme-preview.mjs">render recipe</a>).</figcaption>
+</figure>
 
-### Single-Character Fixtures
+## 2. Play it live
+
+{{live-demo}}
+
+The live demo loads the published [`@rig-c/play`](/docs/play/) 1.12.0 from jsDelivr and the Family models from rig-c/parts-examples at one pinned commit. Each rig plays its own `idle` — the only motion these models carry — with its physics; the blink and the breeze in the recording above come from the Family viewer, not from the models.
+
+## 3. Open the sources and rebuild
+
+### The Family suite — 5 characters × 4 outfits (20 rigs, 396 parts)
+
+[`rig-c/parts-examples/family`](https://github.com/rig-c/parts-examples/tree/main/family) starts from one wide group illustration (`1024×571` RGBA) upscaled with `4x-AnimeSharp` to `4096×2284`, decomposed with See-through in two passes (`full` + `head`), and rigged per character in four outfit sets (`office`, `homewear`, `swimwear`, `uniform`). Each rig's config pins its declared mesh and binding repairs (`declared-repairs.json`) by hash. The live demo links each rig's `config.json` and built model under the player.
+
+From the repository root (Bun and Node on `PATH`), this rebuilds all 20 rigs from their configs and checks them against the stored outputs:
+
+```sh
+bun install --cwd family/tools/outline-field-islands --frozen-lockfile
+node family/tools/verify-reproducibility.mjs --out /tmp/new-repro-evidence
+bun family/tools/verify-accepted.mjs --out /tmp/new-family-evidence
+```
+
+### Standalone character inputs
 
 | Key | Seed | Checkpoint | See-through Layers | Purpose |
 | --- | --- | --- | --- | --- |
@@ -25,25 +53,24 @@ Repository: <https://github.com/rig-c/parts-examples>
 | `reference-sample` | `70011` | Pony Diffusion V6 XL | 29 full + 29 head | Regression fixture held to the reference implementation's outputs. |
 | `reference-demo` | `71004` | Pony Diffusion V6 XL | 29 full + 29 head | Regression fixture held to the reference implementation's outputs. |
 
-### `family/` — 5 Characters × 4 Outfits (20 Rigs, 396 Parts)
+These are inputs — painting, See-through inputs and layers; [`@rig-c/parts`](/docs/parts/) keeps the configs and expected outputs under its own `examples/<key>/`.
 
-Starting from one wide group illustration (`1024×571` RGBA) upscaled with `4x-AnimeSharp` to `4096×2284`, the `family/` suite overcomes See-through's fixed `1024×1024` resolution limit by combining 2-pass (`full` + `head`) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (`declared-repairs.json`) across 5 characters and 4 outfit sets (`office`, `homewear`, `swimwear`, `uniform`).
+### `rig-c/trailer` — the 12-second short
 
-```sh
-# Deterministic rebuild & compiler gate across all 20 rigs (396 parts)
-bun install --cwd family/tools/outline-field-islands --frozen-lockfile
-node family/tools/verify-reproducibility.mjs --out /tmp/new-repro-evidence
-bun family/tools/verify-accepted.mjs --out /tmp/new-family-evidence
-```
-
-## 2. `rig-c/trailer` — 12-Second Reproducible Animated Short
-
-Repository: <https://github.com/rig-c/trailer>
-
-A character sitting on a swing under a night sky breathes, tilts her head, smiles, kicks her legs, hops, and waves, her twin tails following on physics chains — rebuilt byte-for-byte (240 frames at 20 fps, `960×540` WebP + `1920×1080` PNG frames) from one painting, two See-through layer sets, and agent-authored configs:
+[`rig-c/trailer`](https://github.com/rig-c/trailer) is the loop on the landing page: a character on a swing breathes, tilts her head, smiles, kicks her legs, hops and waves, her twin tails following on physics chains — 240 frames at 20 fps, rebuilt from one painting, two See-through layer sets and agent-authored configs:
 
 ```sh
 git clone https://github.com/rig-c/trailer && cd trailer
 pip install -r requirements.txt
 ./build.sh
 ```
+
+Licences for all of these: [Licensing](/docs/licensing/).
+
+<!-- SOURCES (not published)
+- family preview: parts-examples family/README.md "움직이는 미리보기" (5 accepted models, breathing, blink, breeze 4, render-readme-preview.mjs)
+- 20 rigs / 396 part rows / outfits / config paths / repro commands: family/README.md §현재 승인된 입력과 재검증
+- every model carries one animation, idle; stage 800x2284; 2 files per rig; jsDelivr CORS: demo survey of all 20 models at c239b09
+- blink from the viewer's adjust, not the model: family/viewer/index.html lines 545-568
+- standalone table: parts-examples README Layout table; trailer: rig-c/trailer README
+-->
