@@ -1,12 +1,12 @@
 # rig-c — Complete Toolchain Documentation (llms-full.txt)
 
-> Source: https://rig-c.org/llms-full.txt
+> Source: https://rig-c.github.io/llms-full.txt
 > Generated: 2026-10-19
-> Purpose: Single-request Markdown bundle of all documentation pages on https://rig-c.org for AI agents, RAG pipelines, and curl inspection.
+> Purpose: Single-request Markdown bundle of all documentation pages on https://rig-c.github.io for AI agents, RAG pipelines, and curl inspection.
 
 ================================================================================
-URL: https://rig-c.org/
-Markdown: https://rig-c.org/index.md
+URL: https://rig-c.github.io/
+Markdown: https://rig-c.github.io/index.md
 Package: rig-c@2.61.0
 Repository: https://github.com/rig-c
 ================================================================================
@@ -49,14 +49,16 @@ bun add @rig-c/play
 
 ### Install Agent Skills
 
-`rig-c` and `@rig-c/parts` ship [Agent Skills](https://agentskills.io) (`skills/<name>/SKILL.md`) that route coding agents directly to the authoritative authoring rules:
+`rig-c` and `@rig-c/parts` ship [Agent Skills](https://agentskills.io) (`skills/<name>/SKILL.md`, inside each npm package) that route coding agents directly to the authoritative authoring rules:
 
 ```sh
-# Install skills for Codex, Gemini CLI, or Antigravity
-bunx rig-c skills install
+# Codex, Gemini CLI, or Antigravity: link rig-c's skills into .agents/skills/
+bun add -d rig-c
+bun rigc skills install
 
-# Or add the Claude Code plugin marketplace
+# Claude Code: the rig-c/core repository is a plugin marketplace
 /plugin marketplace add rig-c/core
+/plugin install rigc@rigc
 ```
 
 ## Built for Agents That Cannot See
@@ -84,8 +86,8 @@ All rig-c packages are **MIT licensed**. The published packages link **no Spine 
 - Importing `skeleton.json` into the Spine Editor or playing it with an official Spine Runtime is subject to Esoteric Software's [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license) and [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license).
 
 ================================================================================
-URL: https://rig-c.org/getting-started/
-Markdown: https://rig-c.org/getting-started/index.md
+URL: https://rig-c.github.io/getting-started/
+Markdown: https://rig-c.github.io/getting-started/index.md
 Repository: https://github.com/rig-c/getting-started
 ================================================================================
 
@@ -206,8 +208,8 @@ bun ../getting-started/scripts/serve.ts
 3. **In a game engine via official Spine Runtimes**: Load `skeleton.json` and `skeleton.atlas` in Unity, Godot, Unreal, or C++ runtimes under the Spine Runtimes License.
 
 ================================================================================
-URL: https://rig-c.org/parts/
-Markdown: https://rig-c.org/parts/index.md
+URL: https://rig-c.github.io/parts/
+Markdown: https://rig-c.github.io/parts/index.md
 Package: @rig-c/parts@1.38.0
 Repository: https://github.com/rig-c/parts
 ================================================================================
@@ -277,8 +279,8 @@ rig-parts comfy seethrough --image work/st_input_full.png --out layers/full --ho
 ```
 
 ================================================================================
-URL: https://rig-c.org/pose/
-Markdown: https://rig-c.org/pose/index.md
+URL: https://rig-c.github.io/pose/
+Markdown: https://rig-c.github.io/pose/index.md
 Package: @rig-c/pose@0.33.0
 Repository: https://github.com/rig-c/pose
 ================================================================================
@@ -347,8 +349,8 @@ Nothing is written unless every hard gate passes:
 And the diagnostic report (`<out>.report.json`, consumed by [`@rig-c/review`](/review/) and agents) records `HOLD`, `SHORT`, `END-ON`, `FOLD`, `POSTURE`, `FEET`, `STANCE`, `SHEAR`, `SEAM_OVER_MOTION` (`seams` + `seamPairs` with `--parts`), `NOD` loop closure, and alternate-drawing `SWITCH`/`UNCOVERED` demands.
 
 ================================================================================
-URL: https://rig-c.org/core/
-Markdown: https://rig-c.org/core/index.md
+URL: https://rig-c.github.io/core/
+Markdown: https://rig-c.github.io/core/index.md
 Package: rig-c@2.61.0
 Repository: https://github.com/rig-c/core
 ================================================================================
@@ -396,8 +398,8 @@ bun add -d rig-c     # pin in a project
 - **Named resolution everywhere**: Bone parents, slot bones, constraint targets, draw-order slots, and mesh vertex weights resolve by name, never silent raw array indices.
 
 ================================================================================
-URL: https://rig-c.org/review/
-Markdown: https://rig-c.org/review/index.md
+URL: https://rig-c.github.io/review/
+Markdown: https://rig-c.github.io/review/index.md
 Package: @rig-c/review@0.2.1
 Repository: https://github.com/rig-c/review
 ================================================================================
@@ -446,8 +448,8 @@ When pointed at an output folder without a `review.json` manifest, `rig-review` 
 When `report.json` carries `rig-pose-report/1` event markers (`HOLD`, `FOLD`, `FEET`, `SEAM`), `rig-review` exposes read-only event markers and prefills feedback coordinates with actual bone and slot names.
 
 ================================================================================
-URL: https://rig-c.org/play/
-Markdown: https://rig-c.org/play/index.md
+URL: https://rig-c.github.io/play/
+Markdown: https://rig-c.github.io/play/index.md
 Package: @rig-c/play@1.12.0
 Repository: https://github.com/rig-c/play
 ================================================================================
@@ -502,8 +504,8 @@ Standing comparison against `@esotericsoftware/spine-webgl 4.3.13` (600 measured
 | **20 independent small players** | `60.00 fps` (**20/20 drawn**, 1 context) | `59.99 fps` (**20/20 drawn**, 1 context) | `60.00 fps` (**16/20 drawn**, 4 evicted) | Official loses 4 players to the browser's 16 WebGL context limit; `@rig-c/play` draws all 20. |
 
 ================================================================================
-URL: https://rig-c.org/adapters/
-Markdown: https://rig-c.org/adapters/index.md
+URL: https://rig-c.github.io/adapters/
+Markdown: https://rig-c.github.io/adapters/index.md
 Package: @rig-c/pixi@0.1.1
 Repository: https://github.com/rig-c/adapters
 ================================================================================
@@ -577,8 +579,8 @@ npm install @rig-c/three three @rig-c/play
 3. **Zero Spine runtime**: Links no Esoteric Software code.
 
 ================================================================================
-URL: https://rig-c.org/exam/
-Markdown: https://rig-c.org/exam/index.md
+URL: https://rig-c.github.io/exam/
+Markdown: https://rig-c.github.io/exam/index.md
 Repository: https://github.com/rig-c/exam
 ================================================================================
 
@@ -625,8 +627,8 @@ Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and d
 5. **The grader rebuilds from inputs.** `grade.py` trusts only the handed-in config/spec files and rebuilds from scratch.
 
 ================================================================================
-URL: https://rig-c.org/examples/
-Markdown: https://rig-c.org/examples/index.md
+URL: https://rig-c.github.io/examples/
+Markdown: https://rig-c.github.io/examples/index.md
 Repository: https://github.com/rig-c/parts-examples
 ================================================================================
 
@@ -643,14 +645,15 @@ Repository: <https://github.com/rig-c/parts-examples>
 | Key | Seed | Checkpoint | See-through Layers | Purpose |
 | --- | --- | --- | --- | --- |
 | `demo` | `71006` (+ hand detailer) | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | The primary `@rig-c/parts` README character: twin tails, bow, layered skirt, arms held clear of the body. |
-| `scarf` | `72004` | Pony Diffusion V6 XL | 29 full + 29 head | Long hanging red scarf with both ends free; passes 9/9 check bars on both lattice and contour mesh modes. |
+| `scarf` | `72004` | Pony Diffusion V6 XL | 29 full + 29 head | A very long red scarf with both ends hanging free, knit sweater and pleated skirt: the hanging element the others lack. |
 | `three-quarter` | `250011` | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | Head turned toward image left and tilted for head-frame turn measurements. |
+| `wind` | `372108` | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | Very long ribbon-wrapped twin tails and a wide two-layer skirt, painted for wind interaction. |
 | `reference-sample` | `70011` | Pony Diffusion V6 XL | 29 full + 29 head | Regression fixture held to the reference implementation's outputs. |
 | `reference-demo` | `71004` | Pony Diffusion V6 XL | 29 full + 29 head | Regression fixture held to the reference implementation's outputs. |
 
 ### `family/` — 5 Characters × 4 Outfits (20 Rigs, 396 Parts)
 
-Starting from one wide group illustration (`1024×571` RGBA) upscaled with `4x-AnimeSharp` to `4096×2284`, the `family/` suite overcomes See-through's fixed `1024×1024` resolution limit by combining 2-pass (`full` + `head`) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (`declared-repairs.json`) across 5 characters (`roa`, `luna`, `jinni`, `naru`, `nova`) and 4 outfit sets (`office`, `homewear`, `swimwear`, `uniform`).
+Starting from one wide group illustration (`1024×571` RGBA) upscaled with `4x-AnimeSharp` to `4096×2284`, the `family/` suite overcomes See-through's fixed `1024×1024` resolution limit by combining 2-pass (`full` + `head`) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (`declared-repairs.json`) across 5 characters and 4 outfit sets (`office`, `homewear`, `swimwear`, `uniform`).
 
 ```sh
 # Deterministic rebuild & compiler gate across all 20 rigs (396 parts)

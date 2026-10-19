@@ -13,7 +13,8 @@ export interface PageSpec {
   html: string;
 }
 
-export const SITE_ORIGIN = 'https://rig-c.org';
+// rig-c.org has no DNS yet; canonicals point at the live GitHub Pages host until the custom domain is connected.
+export const SITE_ORIGIN = 'https://rig-c.github.io';
 
 export const PAGES: readonly PageSpec[] = [
   {
@@ -78,14 +79,16 @@ bun add @rig-c/play
 
 ### Install Agent Skills
 
-\`rig-c\` and \`@rig-c/parts\` ship [Agent Skills](https://agentskills.io) (\`skills/<name>/SKILL.md\`) that route coding agents directly to the authoritative authoring rules:
+\`rig-c\` and \`@rig-c/parts\` ship [Agent Skills](https://agentskills.io) (\`skills/<name>/SKILL.md\`, inside each npm package) that route coding agents directly to the authoritative authoring rules:
 
 \`\`\`sh
-# Install skills for Codex, Gemini CLI, or Antigravity
-bunx rig-c skills install
+# Codex, Gemini CLI, or Antigravity: link rig-c's skills into .agents/skills/
+bun add -d rig-c
+bun rigc skills install
 
-# Or add the Claude Code plugin marketplace
+# Claude Code: the rig-c/core repository is a plugin marketplace
 /plugin marketplace add rig-c/core
+/plugin install rigc@rigc
 \`\`\`
 
 ## Built for Agents That Cannot See
@@ -195,12 +198,14 @@ bun add -d @rig-c/parts rig-c @rig-c/pose @rig-c/review
 bun add @rig-c/play</code></pre>
 
 <h3>Install Agent Skills</h3>
-<p><code>rig-c</code> and <code>@rig-c/parts</code> ship <a href="https://agentskills.io">Agent Skills</a> (<code>skills/&lt;name&gt;/SKILL.md</code>) that route coding agents directly to the authoritative authoring rules:</p>
-<pre><code># Install skills for Codex, Gemini CLI, or Antigravity
-bunx rig-c skills install
+<p><code>rig-c</code> and <code>@rig-c/parts</code> ship <a href="https://agentskills.io">Agent Skills</a> (<code>skills/&lt;name&gt;/SKILL.md</code>, inside each npm package) that route coding agents directly to the authoritative authoring rules:</p>
+<pre><code># Codex, Gemini CLI, or Antigravity: link rig-c's skills into .agents/skills/
+bun add -d rig-c
+bun rigc skills install
 
-# Or add the Claude Code plugin marketplace
-/plugin marketplace add rig-c/core</code></pre>
+# Claude Code: the rig-c/core repository is a plugin marketplace
+/plugin marketplace add rig-c/core
+/plugin install rigc@rigc</code></pre>
 
 <h2>Built for Agents That Cannot See</h2>
 <p>An AI agent asked to author a 2D rig cannot see the screen, and standard JSON parsers accept broken rigs in silence — a 4.2-shaped constraint vanishes in 4.3, a mismatched <code>size:</code> collapses every UV, a four-number curve array yields <code>NaN</code>, and a mesh whose vertex count equals its UV count silently loses its bone weights.</p>
@@ -467,7 +472,7 @@ bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.json --out 
     repoUrl: 'https://github.com/rig-c/parts',
     npmUrl: 'https://www.npmjs.com/package/@rig-c/parts',
     summaryForLlms:
-      '@rig-c/parts (v1.38.0) CLI and pipeline: merges full + head See-through runs, proposes bones/meshes/physics, and runs rigc build + 10-bar quality check.',
+      '@rig-c/parts (v1.38.0) CLI and pipeline: merges full + head See-through runs, proposes bones/meshes/physics, and runs rigc build + rig-parts check (nine bars, plus fold, feet, sleeve-stress, limb and joint-range bars where the rig has them).',
     markdown: `# @rig-c/parts (\`rig-parts\`)
 
 **AI-authored 2D character rigs from one anime painting, verified before they are written.**
@@ -1621,7 +1626,7 @@ Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and d
     ],
     repoUrl: 'https://github.com/rig-c/parts-examples',
     summaryForLlms:
-      'Reproducible showcase repositories: rig-c/parts-examples (5 single characters + 5x4=20 Agent Family rigs with SHA256 reproducibility gates) and rig-c/trailer (12s 240-frame animated short rebuilt by ./build.sh).',
+      'Reproducible showcase repositories: rig-c/parts-examples (6 standalone character input sets + 5x4=20 Family rigs, 396 part rows, with SHA256 reproducibility gates) and rig-c/trailer (12s 240-frame animated short rebuilt by ./build.sh).',
     markdown: `# Reproducible Examples (\`parts-examples\` & \`trailer\`)
 
 Every public rig-c showcase ships with its generated source paintings, See-through layer decompositions, agent-authored configs, and one-command deterministic rebuild scripts.
@@ -1635,14 +1640,15 @@ Repository: <https://github.com/rig-c/parts-examples>
 | Key | Seed | Checkpoint | See-through Layers | Purpose |
 | --- | --- | --- | --- | --- |
 | \`demo\` | \`71006\` (+ hand detailer) | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | The primary \`@rig-c/parts\` README character: twin tails, bow, layered skirt, arms held clear of the body. |
-| \`scarf\` | \`72004\` | Pony Diffusion V6 XL | 29 full + 29 head | Long hanging red scarf with both ends free; passes 9/9 check bars on both lattice and contour mesh modes. |
+| \`scarf\` | \`72004\` | Pony Diffusion V6 XL | 29 full + 29 head | A very long red scarf with both ends hanging free, knit sweater and pleated skirt: the hanging element the others lack. |
 | \`three-quarter\` | \`250011\` | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | Head turned toward image left and tilted for head-frame turn measurements. |
+| \`wind\` | \`372108\` | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | Very long ribbon-wrapped twin tails and a wide two-layer skirt, painted for wind interaction. |
 | \`reference-sample\` | \`70011\` | Pony Diffusion V6 XL | 29 full + 29 head | Regression fixture held to the reference implementation's outputs. |
 | \`reference-demo\` | \`71004\` | Pony Diffusion V6 XL | 29 full + 29 head | Regression fixture held to the reference implementation's outputs. |
 
 ### \`family/\` — 5 Characters × 4 Outfits (20 Rigs, 396 Parts)
 
-Starting from one wide group illustration (\`1024×571\` RGBA) upscaled with \`4x-AnimeSharp\` to \`4096×2284\`, the \`family/\` suite overcomes See-through's fixed \`1024×1024\` resolution limit by combining 2-pass (\`full\` + \`head\`) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (\`declared-repairs.json\`) across 5 characters (\`roa\`, \`luna\`, \`jinni\`, \`naru\`, \`nova\`) and 4 outfit sets (\`office\`, \`homewear\`, \`swimwear\`, \`uniform\`).
+Starting from one wide group illustration (\`1024×571\` RGBA) upscaled with \`4x-AnimeSharp\` to \`4096×2284\`, the \`family/\` suite overcomes See-through's fixed \`1024×1024\` resolution limit by combining 2-pass (\`full\` + \`head\`) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (\`declared-repairs.json\`) across 5 characters and 4 outfit sets (\`office\`, \`homewear\`, \`swimwear\`, \`uniform\`).
 
 \`\`\`sh
 # Deterministic rebuild & compiler gate across all 20 rigs (396 parts)
@@ -1697,7 +1703,7 @@ pip install -r requirements.txt
         <td><code>72004</code></td>
         <td>Pony Diffusion V6 XL</td>
         <td>29 full + 29 head</td>
-        <td>Long hanging red scarf with both ends free; passes 9/9 check bars on both lattice and contour mesh modes.</td>
+        <td>A very long red scarf with both ends hanging free, knit sweater and pleated skirt: the hanging element the others lack.</td>
       </tr>
       <tr>
         <td><code>three-quarter</code></td>
@@ -1705,6 +1711,13 @@ pip install -r requirements.txt
         <td>Hassaku XL (Illustrious) v1.3 Style A</td>
         <td>29 full + 29 head</td>
         <td>Head turned toward image left and tilted for head-frame turn measurements.</td>
+      </tr>
+      <tr>
+        <td><code>wind</code></td>
+        <td><code>372108</code></td>
+        <td>Hassaku XL (Illustrious) v1.3 Style A</td>
+        <td>29 full + 29 head</td>
+        <td>Very long ribbon-wrapped twin tails and a wide two-layer skirt, painted for wind interaction.</td>
       </tr>
       <tr>
         <td><code>reference-sample</code></td>
@@ -1725,7 +1738,7 @@ pip install -r requirements.txt
 </div>
 
 <h3><code>family/</code> — 5 Characters × 4 Outfits (20 Rigs, 396 Parts)</h3>
-<p>Starting from one wide group illustration (<code>1024×571</code> RGBA) upscaled with <code>4x-AnimeSharp</code> to <code>4096×2284</code>, the <code>family/</code> suite overcomes See-through's fixed <code>1024×1024</code> resolution limit by combining 2-pass (<code>full</code> + <code>head</code>) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (<code>declared-repairs.json</code>) across 5 characters (<code>roa</code>, <code>luna</code>, <code>jinni</code>, <code>naru</code>, <code>nova</code>) and 4 outfit sets (<code>office</code>, <code>homewear</code>, <code>swimwear</code>, <code>uniform</code>).</p>
+<p>Starting from one wide group illustration (<code>1024×571</code> RGBA) upscaled with <code>4x-AnimeSharp</code> to <code>4096×2284</code>, the <code>family/</code> suite overcomes See-through's fixed <code>1024×1024</code> resolution limit by combining 2-pass (<code>full</code> + <code>head</code>) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (<code>declared-repairs.json</code>) across 5 characters and 4 outfit sets (<code>office</code>, <code>homewear</code>, <code>swimwear</code>, <code>uniform</code>).</p>
 <pre><code># Deterministic rebuild &amp; compiler gate across all 20 rigs (396 parts)
 bun install --cwd family/tools/outline-field-islands --frozen-lockfile
 node family/tools/verify-reproducibility.mjs --out /tmp/new-repro-evidence

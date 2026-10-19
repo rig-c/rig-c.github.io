@@ -7,7 +7,7 @@
     <meta name="description" content="AI-authored 2D character rigging and animation, verified before a byte is written. Compile Spine 4.3 skeleton data and model documents from one painting with named assertions.">
     <meta name="keywords" content="rig-c, rigc, 2D rigging, Spine 4.3, AI agent toolchain, @rig-c/parts, @rig-c/pose, @rig-c/play, @rig-c/review, @rig-c/adapters">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <link rel="canonical" href="https://rig-c.org/">
+    <link rel="canonical" href="https://rig-c.github.io/">
     <link rel="alternate" type="text/markdown" href="/index.md" title="Overview (Markdown)">
     <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
     <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
@@ -15,13 +15,13 @@
     <meta property="og:site_name" content="rig-c">
     <meta property="og:title" content="rig-c — AI-Authored 2D Rigging and Animation Toolchain">
     <meta property="og:description" content="AI-authored 2D character rigging and animation, verified before a byte is written. Compile Spine 4.3 skeleton data and model documents from one painting with named assertions.">
-    <meta property="og:url" content="https://rig-c.org/">
-    <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
+    <meta property="og:url" content="https://rig-c.github.io/">
+    <meta property="og:image" content="https://rig-c.github.io/assets/banner.svg">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="rig-c — AI-Authored 2D Rigging and Animation Toolchain">
     <meta name="twitter:description" content="AI-authored 2D character rigging and animation, verified before a byte is written. Compile Spine 4.3 skeleton data and model documents from one painting with named assertions.">
-    <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <meta name="twitter:image" content="https://rig-c.github.io/assets/banner.svg">
     <link rel="stylesheet" href="/styles.css">
     <script type="application/ld+json">
 {
@@ -29,8 +29,8 @@
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://rig-c.org/#website",
-      "url": "https://rig-c.org/",
+      "@id": "https://rig-c.github.io/#website",
+      "url": "https://rig-c.github.io/",
       "name": "rig-c",
       "alternateName": [
         "rigc",
@@ -46,14 +46,14 @@
     },
     {
       "@type": "SoftwareApplication",
-      "@id": "https://rig-c.org/#toolchain",
+      "@id": "https://rig-c.github.io/#toolchain",
       "name": "rig-c",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "macOS, Linux, Windows, Web Browser",
       "softwareVersion": "2.61.0",
-      "url": "https://rig-c.org/",
+      "url": "https://rig-c.github.io/",
       "downloadUrl": "https://www.npmjs.com/package/rig-c",
-      "codeRepository": "https://github.com/rig-c/rigc",
+      "codeRepository": "https://github.com/rig-c/core",
       "description": "AI-authored 2D character rigging and animation, verified before a byte is written. Compile Spine 4.3 skeleton data and model documents from one painting with named assertions.",
       "offers": {
         "@type": "Offer",
@@ -177,12 +177,14 @@ bun add -d @rig-c/parts rig-c @rig-c/pose @rig-c/review
 bun add @rig-c/play</code></pre>
 
 <h3>Install Agent Skills</h3>
-<p><code>rig-c</code> and <code>@rig-c/parts</code> ship <a href="https://agentskills.io">Agent Skills</a> (<code>skills/&lt;name&gt;/SKILL.md</code>) that route coding agents directly to the authoritative authoring rules:</p>
-<pre><code># Install skills for Codex, Gemini CLI, or Antigravity
-bunx rig-c skills install
+<p><code>rig-c</code> and <code>@rig-c/parts</code> ship <a href="https://agentskills.io">Agent Skills</a> (<code>skills/&lt;name&gt;/SKILL.md</code>, inside each npm package) that route coding agents directly to the authoritative authoring rules:</p>
+<pre><code># Codex, Gemini CLI, or Antigravity: link rig-c's skills into .agents/skills/
+bun add -d rig-c
+bun rigc skills install
 
-# Or add the Claude Code plugin marketplace
-/plugin marketplace add rig-c/core</code></pre>
+# Claude Code: the rig-c/core repository is a plugin marketplace
+/plugin marketplace add rig-c/core
+/plugin install rigc@rigc</code></pre>
 
 <h2>Built for Agents That Cannot See</h2>
 <p>An AI agent asked to author a 2D rig cannot see the screen, and standard JSON parsers accept broken rigs in silence — a 4.2-shaped constraint vanishes in 4.3, a mismatched <code>size:</code> collapses every UV, a four-number curve array yields <code>NaN</code>, and a mesh whose vertex count equals its UV count silently loses its bone weights.</p>

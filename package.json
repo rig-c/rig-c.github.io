@@ -2,7 +2,7 @@
   "name": "rig-c-site",
   "private": true,
   "version": "0.1.0",
-  "description": "Official static website for rig-c (https://rig-c.org) — SEO and AI-crawler (curl / llms.txt) first",
+  "description": "Official static website for rig-c (https://rig-c.github.io) — SEO and AI-crawler (curl / llms.txt) first",
   "type": "module",
   "scripts": {
     "build": "bun src/build.ts",

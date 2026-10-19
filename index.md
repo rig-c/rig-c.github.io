@@ -36,14 +36,16 @@ bun add @rig-c/play
 
 ### Install Agent Skills
 
-`rig-c` and `@rig-c/parts` ship [Agent Skills](https://agentskills.io) (`skills/<name>/SKILL.md`) that route coding agents directly to the authoritative authoring rules:
+`rig-c` and `@rig-c/parts` ship [Agent Skills](https://agentskills.io) (`skills/<name>/SKILL.md`, inside each npm package) that route coding agents directly to the authoritative authoring rules:
 
 ```sh
-# Install skills for Codex, Gemini CLI, or Antigravity
-bunx rig-c skills install
+# Codex, Gemini CLI, or Antigravity: link rig-c's skills into .agents/skills/
+bun add -d rig-c
+bun rigc skills install
 
-# Or add the Claude Code plugin marketplace
+# Claude Code: the rig-c/core repository is a plugin marketplace
 /plugin marketplace add rig-c/core
+/plugin install rigc@rigc
 ```
 
 ## Built for Agents That Cannot See
