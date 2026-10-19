@@ -20,11 +20,13 @@ One character painting goes in; a rigged, animated 2D character that plays in th
 ## From loose parts to a living rig
 
 <figure class="figure-media">
-  <video autoplay muted loop playsinline preload="metadata" poster="/assets/rigc-demo-poster.jpg" width="600" height="404">
-    <source src="/assets/rigc-demo.mp4" type="video/mp4">
-    <img src="/assets/rigc-demo-poster.jpg" alt="Loose part PNGs assembling themselves into a character that breathes, blinks and waves" width="600" height="404">
-  </video>
-  <figcaption>Loose part PNGs assembling themselves into a character that breathes, blinks and waves — from the <a href="https://github.com/rig-c/core">rig-c/core</a> README.</figcaption>
+  <div class="media">
+    <video data-loop="the assembly demo" controls muted loop playsinline preload="metadata" poster="/assets/rigc-demo-poster.jpg" width="600" height="404" aria-label="Recorded video: loose part PNGs assembling themselves into a character that breathes, blinks and waves">
+      <source src="/assets/rigc-demo.mp4" type="video/mp4">
+      <img src="/assets/rigc-demo-poster.jpg" alt="Loose part PNGs assembling themselves into a character that breathes, blinks and waves" width="600" height="404">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Loose part PNGs assembling themselves into a character that breathes, blinks and waves — from the <a href="https://github.com/rig-c/core">rig-c/core</a> README.</figcaption>
 </figure>
 
 1. **[Parts](/docs/parts/)** merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle.

@@ -28,6 +28,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
     <link rel="stylesheet" href="/styles.css">
+    <script src="/assets/media.js" defer></script>
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -95,11 +96,13 @@
           <pre class="install"><code>bunx rig-c --help</code></pre>
         </div>
         <figure class="hero-media">
-          <video autoplay muted loop playsinline preload="auto" poster="/assets/trailer-poster.jpg" width="960" height="540">
-            <source src="/assets/trailer.mp4" type="video/mp4">
-            <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, smiles, kicks her legs and waves" width="960" height="540">
-          </video>
-          <figcaption>One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a></figcaption>
+          <div class="media">
+            <video data-loop="the trailer loop" controls muted loop playsinline preload="metadata" poster="/assets/trailer-poster.jpg" width="960" height="540" aria-label="Recorded video: a rigged character on a swing breathes, smiles, kicks her legs and waves">
+              <source src="/assets/trailer.mp4" type="video/mp4">
+              <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, smiles, kicks her legs and waves" width="960" height="540">
+            </video>
+          </div>
+          <figcaption><span class="media-kind">Recorded video</span> One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a></figcaption>
         </figure>
       </section>
       <article class="home-body">
@@ -107,11 +110,13 @@
 <p><strong>rig-c makes no images.</strong> The painting and its layer split (<a href="https://github.com/shitagaki-lab/see-through">See-through</a>) come from image models you run yourself — on your own GPU, or a free web demo. rig-c starts from those files, ships no model weights, and runs every one of its own steps on the CPU.</p>
 <h2 id="from-loose-parts-to-a-living-rig">From loose parts to a living rig</h2>
 <figure class="figure-media">
-  <video autoplay muted loop playsinline preload="metadata" poster="/assets/rigc-demo-poster.jpg" width="600" height="404">
-    <source src="/assets/rigc-demo.mp4" type="video/mp4">
-    <img src="/assets/rigc-demo-poster.jpg" alt="Loose part PNGs assembling themselves into a character that breathes, blinks and waves" width="600" height="404">
-  </video>
-  <figcaption>Loose part PNGs assembling themselves into a character that breathes, blinks and waves — from the <a href="https://github.com/rig-c/core">rig-c/core</a> README.</figcaption>
+  <div class="media">
+    <video data-loop="the assembly demo" controls muted loop playsinline preload="metadata" poster="/assets/rigc-demo-poster.jpg" width="600" height="404" aria-label="Recorded video: loose part PNGs assembling themselves into a character that breathes, blinks and waves">
+      <source src="/assets/rigc-demo.mp4" type="video/mp4">
+      <img src="/assets/rigc-demo-poster.jpg" alt="Loose part PNGs assembling themselves into a character that breathes, blinks and waves" width="600" height="404">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Loose part PNGs assembling themselves into a character that breathes, blinks and waves — from the <a href="https://github.com/rig-c/core">rig-c/core</a> README.</figcaption>
 </figure>
 <ol>
 <li><strong><a href="/docs/parts/">Parts</a></strong> merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle.</li>
