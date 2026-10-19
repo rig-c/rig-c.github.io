@@ -11,14 +11,15 @@ Repository: <https://github.com/rig-c/parts-examples>
 | Key | Seed | Checkpoint | See-through Layers | Purpose |
 | --- | --- | --- | --- | --- |
 | `demo` | `71006` (+ hand detailer) | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | The primary `@rig-c/parts` README character: twin tails, bow, layered skirt, arms held clear of the body. |
-| `scarf` | `72004` | Pony Diffusion V6 XL | 29 full + 29 head | Long hanging red scarf with both ends free; passes 9/9 check bars on both lattice and contour mesh modes. |
+| `scarf` | `72004` | Pony Diffusion V6 XL | 29 full + 29 head | A very long red scarf with both ends hanging free, knit sweater and pleated skirt: the hanging element the others lack. |
 | `three-quarter` | `250011` | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | Head turned toward image left and tilted for head-frame turn measurements. |
+| `wind` | `372108` | Hassaku XL (Illustrious) v1.3 Style A | 29 full + 29 head | Very long ribbon-wrapped twin tails and a wide two-layer skirt, painted for wind interaction. |
 | `reference-sample` | `70011` | Pony Diffusion V6 XL | 29 full + 29 head | Regression fixture held to the reference implementation's outputs. |
 | `reference-demo` | `71004` | Pony Diffusion V6 XL | 29 full + 29 head | Regression fixture held to the reference implementation's outputs. |
 
 ### `family/` — 5 Characters × 4 Outfits (20 Rigs, 396 Parts)
 
-Starting from one wide group illustration (`1024×571` RGBA) upscaled with `4x-AnimeSharp` to `4096×2284`, the `family/` suite overcomes See-through's fixed `1024×1024` resolution limit by combining 2-pass (`full` + `head`) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (`declared-repairs.json`) across 5 characters (`roa`, `luna`, `jinni`, `naru`, `nova`) and 4 outfit sets (`office`, `homewear`, `swimwear`, `uniform`).
+Starting from one wide group illustration (`1024×571` RGBA) upscaled with `4x-AnimeSharp` to `4096×2284`, the `family/` suite overcomes See-through's fixed `1024×1024` resolution limit by combining 2-pass (`full` + `head`) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (`declared-repairs.json`) across 5 characters and 4 outfit sets (`office`, `homewear`, `swimwear`, `uniform`).
 
 ```sh
 # Deterministic rebuild & compiler gate across all 20 rigs (396 parts)
