@@ -103,7 +103,7 @@ This copies the hand-placed body-18 joints for this painting out of the guide's 
 uv run --with rtmlib --with onnxruntime python ../getting-started/scripts/keypoints.py inputs/painting.png --out keypoints.json
 ```
 
-With this painting, the script's ankles land about 44 px below the hand-placed ones, just off the shoe art. Since `@rig-c/parts` 1.17.0, `propose` drafts a chain per leg from them, and step 8 then refuses with `ASSEMBLE_LIMB_JOINT_ON_ART` on `foot_l` (measured 2026-10-19 on 1.17.0 through 1.41.0). Until that is resolved upstream, use the hand-placed file for this example.
+With this painting the script puts the left ankle just off the shoe art. On `@rig-c/parts` 1.41.1, step 7 then prints one `LINT` beginning `LINT foot_l at [428, 1077], the l_ankle joint and leg_l1's tip, lies on none of leg_l's art within 1 px along its joint line`, drafts that leg without its ankle cut, and the build goes green (measured 2026-10-20 from empty caches: all ten steps in 166 s, the model download included). From 1.17.0 through 1.41.0 the same joints made step 8 refuse with `ASSEMBLE_LIMB_JOINT_ON_ART`; use the hand-placed file if you are on one of those.
 
 ### 7. Draft the bones
 
