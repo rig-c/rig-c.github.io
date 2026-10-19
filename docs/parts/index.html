@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@rig-c/parts: a 2D character rig from one painting</title>
+    <meta name="description" content="A CLI for agents that turns one anime painting and its See-through layers into measured parts and a gated, packed Spine-format rig.">
+    <meta name="keywords" content="">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://rig-c.org/docs/parts/">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <link rel="alternate" type="text/markdown" href="/docs/parts/index.md" title="Parts (Markdown)">
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="rig-c">
+    <meta property="og:title" content="@rig-c/parts: a 2D character rig from one painting">
+    <meta property="og:description" content="A CLI for agents that turns one anime painting and its See-through layers into measured parts and a gated, packed Spine-format rig.">
+    <meta property="og:url" content="https://rig-c.org/docs/parts/">
+    <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@rig-c/parts: a 2D character rig from one painting">
+    <meta name="twitter:description" content="A CLI for agents that turns one anime painting and its See-through layers into measured parts and a gated, packed Spine-format rig.">
+    <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://rig-c.org/docs/parts/#article",
+      "headline": "@rig-c/parts: a 2D character rig from one painting",
+      "description": "A CLI for agents that turns one anime painting and its See-through layers into measured parts and a gated, packed Spine-format rig.",
+      "url": "https://rig-c.org/docs/parts/",
+      "datePublished": "2026-10-19",
+      "dateModified": "2026-10-19",
+      "inLanguage": "en",
+      "author": {
+        "@type": "Organization",
+        "name": "rig-c",
+        "url": "https://github.com/rig-c"
+      },
+      "isPartOf": {
+        "@id": "https://rig-c.org/#website"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "rig-c",
+          "item": "https://rig-c.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Docs",
+          "item": "https://rig-c.org/docs/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Parts",
+          "item": "https://rig-c.org/docs/parts/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "@rig-c/parts",
+      "version": "1.40.0",
+      "codeRepository": "https://github.com/rig-c/parts",
+      "url": "https://rig-c.org/docs/parts/",
+      "programmingLanguage": "TypeScript",
+      "description": "A CLI for agents that turns one anime painting and its See-through layers into measured parts and a gated, packed Spine-format rig."
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="section-docs">
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>rig-c</span></a>
+        <nav aria-label="Primary" class="site-nav">
+          <a href="/docs/" aria-current="page">Docs</a>
+          <a href="/examples/">Examples</a>
+          <a href="/exam/">Exam</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+        </nav>
+      </div>
+    </header>
+    <div class="docs-layout">
+        <nav aria-label="Docs" class="docs-nav">
+          <ol>
+            <li><a href="/docs/">Overview</a></li>
+            <li><a href="/docs/getting-started/">Getting Started</a></li>
+            <li><a href="/docs/parts/" aria-current="page">Parts</a></li>
+            <li><a href="/docs/pose/">Pose</a></li>
+            <li><a href="/docs/core/">Core</a></li>
+            <li><a href="/docs/review/">Review</a></li>
+            <li><a href="/docs/play/">Play</a></li>
+            <li><a href="/docs/adapters/">Adapters</a></li>
+          </ol>
+        </nav>
+      <main class="site-main docs-main">
+        <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Parts</li></ol></nav>
+        <div class="pkg-bar"><span class="pkg"><code>@rig-c/parts</code> <span class="ver">1.40.0</span></span><a href="https://github.com/rig-c/parts">github.com/rig-c/parts</a><a href="https://www.npmjs.com/package/@rig-c/parts">npm</a></div>
+        <article>
+<h1 id="rig-cparts">@rig-c/parts</h1>
+<p>Turn one anime character painting into a rigged, idling 2D character. Every stage is checked before anything is written.</p>
+<h2 id="what-it-is">What it is</h2>
+<p><code>@rig-c/parts</code> (command <code>rig-parts</code>) is a command-line tool. It takes a single character painting and the layers See-through decomposed it into. It merges them into measured parts, authors weighted meshes, bone chains and a looping idle, and hands that spec to rig-c to compile, gate, pack, render and check.</p>
+<h2 id="when-to-use-it">When to use it</h2>
+<p>Use it when you start from a painting, not from a finished rig. It is built for agents that cannot see the image: every stage prints named, numeric findings instead of asking you to look.</p>
+<p>It also reads an artist's own layered PSD, one layer per part, with no See-through step.</p>
+<p>Do not use it to write Spine data directly. rig-parts never does that itself. Compiling, gating and packing belong to <a href="/docs/core/">rig-c</a>. Drawing the result on a web page belongs to <a href="/docs/play/">rig-play</a>. To set up the machine that makes the painting and the layers, start at <a href="/docs/getting-started/">Getting started</a>.</p>
+<h2 id="what-it-solves">What it solves</h2>
+<p>Cutting a painted character into rig parts is slow, and the mistakes show up late: a layer holds the wrong pixels, a part leaves a hole, a chain swings a skirt about its middle. rig-parts measures these. A refusal names the object, the value found and the value required. Nothing is written after a red, and no value is invented where the input is silent.</p>
+<h2 id="what-you-get">What you get</h2>
+<p>A green <code>build</code> ends like a Spine editor export, with one packed atlas page:</p>
+<ul>
+<li><strong>The artifact</strong>: <code>skeleton.json</code>, <code>skeleton.atlas</code> and <code>skeleton.png</code> under <code>check/build/</code>. This is Spine 4.3 skeleton data, written by rig-c and gated under the <code>rig-play</code> profile.</li>
+<li><strong>The intermediates</strong>: the loose <code>parts/</code>, <code>parts.json</code> (where every part came from), the recomposite and its error map.</li>
+<li><strong>The rig spec</strong>: <code>rig.json</code> and <code>motion.json</code> in rig-c's spec.</li>
+<li><strong>The checks</strong>: both gate files, the idle's frames and <code>check.json</code>.</li>
+<li><strong>With <code>--loop</code></strong>: the idle as a lossless APNG, an indexed APNG and a GIF.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<ol>
+<li><strong>Inputs.</strong> <code>inputs</code> cuts the two images See-through is fed: the painting on a white square, and a square crop around the head. The head run exists because a full-figure run leaves the eyes too small to separate.</li>
+<li><strong>Layers.</strong> You run See-through by any route: a hosted demo, the upstream CLI, or ComfyUI. rig-parts reads its <code>.psd</code> or the ComfyUI wrapper form. An optional <code>comfy</code> adapter drives a ComfyUI box; nothing else needs one.</li>
+<li><strong>Assemble.</strong> The two runs merge into rig-space parts. Uncovered holes are listed, and the error map shows them in red.</li>
+<li><strong>Propose.</strong> <code>propose</code> drafts bones, meshes, regions and an idle, with an overlay to correct against. It is a draft, not a step of <code>build</code>. You copy its sections into <code>config.json</code>, and LINT lines flag what still looks wrong.</li>
+<li><strong>Build.</strong> <code>build</code> runs assemble, rig and check in one process and stops at the first refusal.</li>
+</ol>
+<h2 id="key-concepts">Key concepts</h2>
+<ul>
+<li><strong>See-through layers</strong>: the decomposition of the painting into tagged layers, one run on the full figure and one on the head.</li>
+<li><strong>Parts</strong>: the merged, measured pieces in rig space, recorded in <code>parts.json</code>.</li>
+<li><strong>Proposal</strong>: the drafted bones, meshes, regions and motion in <code>proposal.json</code>, to be corrected.</li>
+<li><strong>Config</strong>: <code>config.json</code>, the character's part plan, head box, bones and idle. Unknown or missing fields are refused by name.</li>
+<li><strong>FAIL line</strong>: a refusal; it names a rule and ends with <code>(see rig-parts guide &lt;RULE&gt;)</code>.</li>
+<li><strong>Gate</strong>: rig-c's validation of the compiled rig, here under the <code>rig-play</code> profile.</li>
+</ul>
+<h2 id="install">Install</h2>
+<p>Requires <a href="https://bun.sh">Bun</a> 1.2 or later. rig-c comes with it as a dependency.</p>
+<pre><code class="language-sh">npm i -D @rig-c/parts
+rig-parts --help
+</code></pre>
+<p>Output is Spine skeleton data, so using it in a product requires a Spine Editor licence.</p>
+<h2 id="go-deeper">Go deeper</h2>
+<ul>
+<li><a href="https://github.com/rig-c/parts#what-it-takes-in">README: What it takes in</a> and <a href="https://github.com/rig-c/parts#what-it-gives-out">What it gives out</a></li>
+<li><a href="https://github.com/rig-c/parts#the-loop-for-an-agent">README: The loop, for an agent</a>, the full command sequence</li>
+<li><a href="https://github.com/rig-c/parts/blob/main/docs/AUTHORING.md">docs/AUTHORING.md</a>: every config field, what to read after each stage, every refusal</li>
+<li><a href="https://github.com/rig-c/parts/blob/main/docs/PAINTING.md">docs/PAINTING.md</a>: what makes a painting riggable</li>
+<li><a href="https://github.com/rig-c/parts/blob/main/docs/STABILITY.md">docs/STABILITY.md</a>: what 1.0.0 holds stable</li>
+<li><a href="https://github.com/rig-c/parts/blob/main/NOTICE.md">NOTICE.md</a>: third-party terms, See-through's included</li>
+<li><a href="https://github.com/rig-c/parts/blob/main/CHANGELOG.md">CHANGELOG.md</a></li>
+<li><a href="https://www.npmjs.com/package/@rig-c/parts">npm: @rig-c/parts</a></li>
+</ul>
+
+        </article>
+        <nav aria-label="Docs pages" class="pager"><a href="/docs/getting-started/" rel="prev"><span>Previous</span>Getting Started</a><a href="/docs/pose/" rel="next"><span>Next</span>Pose</a></nav>
+      </main>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#install">Install</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+    </div>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <nav aria-label="Machine-readable" class="footer-links">
+          <a href="/docs/parts/index.md">This page as Markdown</a>
+          <a href="/llms.txt">llms.txt</a>
+          <a href="/llms-full.txt">llms-full.txt</a>
+          <a href="/sitemap.xml">sitemap.xml</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+          <a href="https://www.npmjs.com/package/rig-c">npm</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

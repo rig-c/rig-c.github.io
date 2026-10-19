@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>rig-c core — a 2D rig compiler with a named-assertion gate</title>
+    <meta name="description" content="rigc compiles a rig spec and a motion spec into Spine 4.3 skeleton data, and writes nothing unless every named assertion passes.">
+    <meta name="keywords" content="">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://rig-c.org/docs/core/">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <link rel="alternate" type="text/markdown" href="/docs/core/index.md" title="Core (Markdown)">
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="rig-c">
+    <meta property="og:title" content="rig-c core — a 2D rig compiler with a named-assertion gate">
+    <meta property="og:description" content="rigc compiles a rig spec and a motion spec into Spine 4.3 skeleton data, and writes nothing unless every named assertion passes.">
+    <meta property="og:url" content="https://rig-c.org/docs/core/">
+    <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="rig-c core — a 2D rig compiler with a named-assertion gate">
+    <meta name="twitter:description" content="rigc compiles a rig spec and a motion spec into Spine 4.3 skeleton data, and writes nothing unless every named assertion passes.">
+    <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://rig-c.org/docs/core/#article",
+      "headline": "rig-c core — a 2D rig compiler with a named-assertion gate",
+      "description": "rigc compiles a rig spec and a motion spec into Spine 4.3 skeleton data, and writes nothing unless every named assertion passes.",
+      "url": "https://rig-c.org/docs/core/",
+      "datePublished": "2026-10-19",
+      "dateModified": "2026-10-19",
+      "inLanguage": "en",
+      "author": {
+        "@type": "Organization",
+        "name": "rig-c",
+        "url": "https://github.com/rig-c"
+      },
+      "isPartOf": {
+        "@id": "https://rig-c.org/#website"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "rig-c",
+          "item": "https://rig-c.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Docs",
+          "item": "https://rig-c.org/docs/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Core",
+          "item": "https://rig-c.org/docs/core/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "rig-c",
+      "version": "2.61.0",
+      "codeRepository": "https://github.com/rig-c/core",
+      "url": "https://rig-c.org/docs/core/",
+      "programmingLanguage": "TypeScript",
+      "description": "rigc compiles a rig spec and a motion spec into Spine 4.3 skeleton data, and writes nothing unless every named assertion passes."
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="section-docs">
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>rig-c</span></a>
+        <nav aria-label="Primary" class="site-nav">
+          <a href="/docs/" aria-current="page">Docs</a>
+          <a href="/examples/">Examples</a>
+          <a href="/exam/">Exam</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+        </nav>
+      </div>
+    </header>
+    <div class="docs-layout">
+        <nav aria-label="Docs" class="docs-nav">
+          <ol>
+            <li><a href="/docs/">Overview</a></li>
+            <li><a href="/docs/getting-started/">Getting Started</a></li>
+            <li><a href="/docs/parts/">Parts</a></li>
+            <li><a href="/docs/pose/">Pose</a></li>
+            <li><a href="/docs/core/" aria-current="page">Core</a></li>
+            <li><a href="/docs/review/">Review</a></li>
+            <li><a href="/docs/play/">Play</a></li>
+            <li><a href="/docs/adapters/">Adapters</a></li>
+          </ol>
+        </nav>
+      <main class="site-main docs-main">
+        <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Core</li></ol></nav>
+        <div class="pkg-bar"><span class="pkg"><code>rig-c</code> <span class="ver">2.61.0</span></span><a href="https://github.com/rig-c/core">github.com/rig-c/core</a><a href="https://www.npmjs.com/package/rig-c">npm</a></div>
+        <article>
+<h1 id="rig-c-core-the-rig-compiler">rig-c core: the rig compiler</h1>
+<p>rigc turns loose part PNGs and two small JSON files into Spine 4.3 skeleton data. It checks the result against a list of named assertions first, and writes nothing if any of them fails.</p>
+<h2 id="what-it-is">What it is</h2>
+<p>rigc is a rig compiler: a rig spec and a motion spec in, skeleton data out. It was built so AI agents can author rigs and check their own work, and it ships as an agent skill. On npm it is <code>rig-c</code>; <code>@rig-c/core</code> is the same package under the toolchain's scope, and the command it installs is <code>rigc</code>.</p>
+<h2 id="when-to-use-it">When to use it</h2>
+<p>Use it when you want Spine skeleton data generated from a spec and checked before it is written. The output loads in any Spine runtime and imports into the Spine editor, so the intended hand-off is: an AI drafts, a human refines in the editor.</p>
+<p>Reach for a neighbour instead when:</p>
+<ul>
+<li>you start from one painting rather than finished part PNGs: <a href="/docs/parts/">@rig-c/parts</a> produces the parts and rig specs, verified through rig-c;</li>
+<li>you have a body-18 pose sequence to put on a rig: <a href="/docs/pose/">@rig-c/pose</a> writes the bone keys in rigc's motion format;</li>
+<li>you want to play the result in a browser without a Spine runtime: <a href="/docs/play/">@rig-c/play</a> plays the <code>skeleton.model.json</code> that <code>rigc build</code> writes;</li>
+<li>a person needs to look at a build and leave feedback: <a href="/docs/review/">@rig-c/review</a>.</li>
+</ul>
+<h2 id="what-it-solves">What it solves</h2>
+<p>An agent authoring a rig cannot tell whether it succeeded, because Spine's JSON parser accepts a lot of nonsense silently. A constraint in the 4.2 shape simply vanishes. A <code>size:</code> that disagrees with the PNG collapses every UV. A four-number curve array yields NaN. Each of these loads clean, plays, and is wrong. rigc makes the failure legible: every failure is named by rule, and nothing reaches disk.</p>
+<h2 id="what-you-get">What you get</h2>
+<ul>
+<li><code>skeleton.json</code> and <code>skeleton.atlas</code> in the Spine 4.3 format.</li>
+<li><code>skeleton.model.json</code>, rigc's own compiled model, written beside them.</li>
+<li>A gate report, which names the profile it ran; <code>--report</code> also writes it as JSON.</li>
+<li>On failure: one line per failed rule, ending with <code>(see rigc guide &lt;RULE&gt;)</code>, and no files.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<ol>
+<li><strong>Measure the art.</strong> rigc reads the PNGs themselves instead of trusting sizes you typed, so the skeleton and the atlas cannot drift apart.</li>
+<li><strong>Compile two specs.</strong> The rig spec (<code>rigc-rig/1</code>) holds structure: bones, slots in draw order, skins. The motion spec (<code>rigc-motion/1</code>) holds time: animations, tracks, keys.</li>
+<li><strong>Gate.</strong> The compiled rig is checked against named assertions. The default profile, <code>spine</code>, runs the 36 validity rules: is this valid Spine 4.3 that any runtime plays correctly? <code>--profile rig-play</code> runs all 50; the extra 14 are one renderer's and one canvas budget's policy, which is why they are opt-in.</li>
+<li><strong>Write, or refuse.</strong> Only a green gate writes <code>--out</code>.</li>
+<li><strong>Look at it.</strong> A green gate says nothing about the picture, so <code>render</code>, <code>inspect</code> and <code>check</code> show and compare what was built.</li>
+</ol>
+<p>The published package links no Spine runtime. Install <code>@esotericsoftware/spine-core</code> beside it and the same <code>rigc</code> also runs the round trip through Spine's own parser, plus the commands that need it: <code>validate</code>, <code>preview</code>, <code>vote</code>, <code>bench</code> and <code>bonedist</code>. The Spine Runtimes License Agreement applies to that dependency wherever it is installed.</p>
+<p>rigc runs on Bun 1.2.0 or later.</p>
+<pre><code class="language-bash">bun add -d rig-c
+bun rigc build --rig rig.json --motion motion.json --out build/
+bun rigc render --candidate build/
+</code></pre>
+<h2 id="key-concepts">Key concepts</h2>
+<ul>
+<li><strong>Rig spec</strong> — the structure file: bones, the slots array (the setup draw order) and skins.</li>
+<li><strong>Motion spec</strong> — the time file, aimed at the rig by name.</li>
+<li><strong>Named assertions</strong> — the rules the gate runs; each failure names its rule.</li>
+<li><strong>Profile</strong> — which rulebook the gate checks against: <code>spine</code> (default) or <code>rig-play</code>.</li>
+<li><strong><code>A00_ROUNDTRIP_PARSE</code></strong> — Spine's own parse; it runs only where spine-core is installed and reports SKIP elsewhere.</li>
+<li><strong><code>ingest</code></strong> — <code>build</code> run backwards: a Spine 4.3 <code>skeleton.json</code> in, the two specs that rebuild it byte for byte out.</li>
+</ul>
+<h2 id="go-deeper">Go deeper</h2>
+<ul>
+<li><a href="https://github.com/rig-c/core#what-you-get">README: What you get</a> · <a href="https://github.com/rig-c/core#install">Install</a> · <a href="https://github.com/rig-c/core#install-it-into-your-agent">Install it into your agent</a></li>
+<li><a href="https://github.com/rig-c/core#first-rig-in-ten-minutes">README: First rig in ten minutes</a></li>
+<li><a href="https://github.com/rig-c/core#commands">README: Commands</a> and <a href="https://github.com/rig-c/core#starting-from-a-skeleton-you-already-have">Starting from a skeleton you already have</a></li>
+<li><a href="https://github.com/rig-c/core#licensing-stated-plainly">README: Licensing, stated plainly</a> and <a href="https://github.com/rig-c/core/blob/main/NOTICE.md">NOTICE.md</a></li>
+<li><a href="https://github.com/rig-c/core/blob/main/docs/AUTHORING.md">docs/AUTHORING.md</a> — the format guide; read it before writing a spec</li>
+<li><a href="https://github.com/rig-c/core/blob/main/docs/RIGGING.md">docs/RIGGING.md</a> · <a href="https://github.com/rig-c/core/blob/main/docs/MOTION.md">docs/MOTION.md</a> · <a href="https://github.com/rig-c/core/blob/main/docs/FACE.md">docs/FACE.md</a> · <a href="https://github.com/rig-c/core/blob/main/docs/INGEST.md">docs/INGEST.md</a> · <a href="https://github.com/rig-c/core/blob/main/docs/PROMPTING.md">docs/PROMPTING.md</a></li>
+<li><a href="https://github.com/rig-c/core/blob/main/docs/BENCHMARK.md">docs/BENCHMARK.md</a> — why you can trust the output, and the 50 assertions with their profiles</li>
+<li><a href="https://www.npmjs.com/package/rig-c">npm: rig-c</a> · <a href="https://github.com/rig-c/core/blob/main/CHANGELOG.md">CHANGELOG.md</a></li>
+<li>Start here: <a href="/docs/getting-started/">/docs/getting-started/</a></li>
+</ul>
+
+        </article>
+        <nav aria-label="Docs pages" class="pager"><a href="/docs/pose/" rel="prev"><span>Previous</span>Pose</a><a href="/docs/review/" rel="next"><span>Next</span>Review</a></nav>
+      </main>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+    </div>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <nav aria-label="Machine-readable" class="footer-links">
+          <a href="/docs/core/index.md">This page as Markdown</a>
+          <a href="/llms.txt">llms.txt</a>
+          <a href="/llms-full.txt">llms-full.txt</a>
+          <a href="/sitemap.xml">sitemap.xml</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+          <a href="https://www.npmjs.com/package/rig-c">npm</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

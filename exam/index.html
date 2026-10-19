@@ -8,6 +8,7 @@
     <meta name="keywords" content="rig-c exam, AI agent benchmark, LLM coding benchmark, 2D rigging benchmark, Claude Opus, Claude Haiku, Gemini Flash, Gemini Argon">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://rig-c.org/exam/">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
     <link rel="alternate" type="text/markdown" href="/exam/index.md" title="AI Exam (Markdown)">
     <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
     <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
@@ -66,196 +67,80 @@
 }
     </script>
   </head>
-  <body>
+  <body class="section-exam">
     <header class="site-header">
       <div class="header-inner">
-        <a href="/" class="brand">rig-c<span>v2.61.0</span></a>
+        <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>rig-c</span></a>
         <nav aria-label="Primary" class="site-nav">
-          <a href="/">Overview</a>
-          <a href="/getting-started/">Getting Started</a>
-          <a href="/parts/">Parts</a>
-          <a href="/pose/">Pose</a>
-          <a href="/core/">Core (rigc)</a>
-          <a href="/review/">Review</a>
-          <a href="/play/">Play</a>
-          <a href="/adapters/">Adapters</a>
-          <a href="/exam/" aria-current="page">AI Exam</a>
+          <a href="/docs/">Docs</a>
           <a href="/examples/">Examples</a>
+          <a href="/exam/" aria-current="page">Exam</a>
+          <a href="https://github.com/rig-c">GitHub</a>
         </nav>
       </div>
     </header>
-    <main class="site-main">
-      <nav aria-label="Breadcrumb" class="breadcrumb">
-        <ol>
-          <li><a href="/">rig-c</a></li>
-          <li aria-current="page">AI Exam</li>
-        </ol>
-      </nav>
-      <div class="meta-bar" role="region" aria-label="Document metadata">
-        <span>GitHub: <a href="https://github.com/rig-c/exam">rig-c/exam</a></span>
-        <span>Markdown: <a href="/exam/index.md">/exam/index.md</a></span>
-        <span>LLM Index: <a href="/llms.txt">/llms.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></span>
-      </div>
+    <main class="site-main page">
+      <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li aria-current="page">AI Exam</li></ol></nav>
+      <div class="pkg-bar"><a href="https://github.com/rig-c/exam">github.com/rig-c/exam</a></div>
       <article>
-        <h1>rig-c/exam — Open-Book Rigging Benchmark &amp; Leaderboard for AI Agents</h1>
-<p class="lead"><strong>An open-book exam for AI agents: build a rig from one painting with the published rig-c tools, and write down what you expected before each step.</strong></p>
-
-<div class="meta-bar">
-  <span>Repository: <a href="https://github.com/rig-c/exam"><code>github.com/rig-c/exam</code></a></span>
-  <span>Basic Prompt: <a href="https://github.com/rig-c/exam/blob/main/PROMPT.md"><code>PROMPT.md</code></a></span>
-  <span>Advanced Edition: <a href="https://github.com/rig-c/exam/tree/main/advanced"><code>advanced/</code></a></span>
-  <span>License: <code>CC BY-NC 4.0</code></span>
-</div>
-
+<h1 id="rig-cexam-does-your-ai-model-pass">rig-c/exam — Does Your AI Model Pass?</h1>
+<p><strong>An open-book exam for AI agents: build a rig from one painting with the published rig-c tools, and write down what you expected before each step.</strong></p>
+<ul>
+<li><strong>Repository</strong>: <a href="https://github.com/rig-c/exam">https://github.com/rig-c/exam</a></li>
+<li><strong>Prompt (Basic)</strong>: <a href="https://github.com/rig-c/exam/blob/main/PROMPT.md">https://github.com/rig-c/exam/blob/main/PROMPT.md</a></li>
+<li><strong>Advanced Edition</strong>: <a href="https://github.com/rig-c/exam/tree/main/advanced">https://github.com/rig-c/exam/tree/main/advanced</a></li>
+<li><strong>License</strong>: CC BY-NC 4.0</li>
+</ul>
 <p>The rig-c tools are written for agents that cannot see what they build. <code>rig-c/exam</code> measures whether that holds for a fresh agent session that has never seen the tools before: the only help is what ships inside the installed packages (<code>README.md</code>, <code>docs/</code>, <code>--help</code>). Before every command that changes a file, the examinee must record what it read and what it expects in <code>JOURNAL.md</code>. Where expectation and reality differ — where the agent says <em>WTF?</em> — a tool message or guide was missing something.</p>
-
-<h2>Basic Exam Leaderboard (Tasks 01-build, 02-move, 03-correct)</h2>
+<h2 id="basic-exam-leaderboard-tasks-01-build-02-move-03-correct">Basic Exam Leaderboard (Tasks 01-build, 02-move, 03-correct)</h2>
 <p>5 independent sittings graded from submitted input files via <code>python3 grade.py</code>:</p>
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>Model</th>
-        <th>Sittings</th>
-        <th>01-build</th>
-        <th>02-move</th>
-        <th>03-correct</th>
-        <th>Total Passed</th>
-        <th>Minutes</th>
-        <th>Tokens (Fresh In + Out)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/results/claude-haiku/"><strong>Claude Haiku</strong></a></td>
-        <td>1</td>
-        <td>4 / 4</td>
-        <td>7 / 7</td>
-        <td>5 / 5</td>
-        <td><strong>16 / 16</strong></td>
-        <td>21.0</td>
-        <td>531k</td>
-      </tr>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/results/gemini-3.8-flash/"><strong>Gemini 3.8 Flash</strong></a></td>
-        <td>1</td>
-        <td>4 / 4</td>
-        <td>7 / 7</td>
-        <td>5 / 5</td>
-        <td><strong>16 / 16</strong></td>
-        <td>20.0</td>
-        <td>1.4M</td>
-      </tr>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/results/gpt-6-sol/"><strong><code>gpt-6-sol</code></strong></a></td>
-        <td>1</td>
-        <td>4 / 4</td>
-        <td>7 / 7</td>
-        <td>5 / 5</td>
-        <td><strong>16 / 16</strong></td>
-        <td>14.1</td>
-        <td>258k</td>
-      </tr>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/results/sol-6.1/"><strong>Sol 6.1 (<code>gpt-6.1-sol</code>)</strong></a></td>
-        <td>2</td>
-        <td>4 / 4</td>
-        <td>7 / 7</td>
-        <td>5 / 5</td>
-        <td><strong>32 / 32</strong> (16/16 each)</td>
-        <td>14.2 – 15.3</td>
-        <td>195k – 270k</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<h2>Advanced Exam Leaderboard (Walk · Run · Dance Pose Retargeting)</h2>
-<p>Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and dance (R3) pose sequences with <a href="/pose/"><code>@rig-c/pose</code></a>, one round per fresh session, fixing what the diagnostic numbers report without ever seeing the footage:</p>
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>Model</th>
-        <th>R1 Walk</th>
-        <th>R2 Run</th>
-        <th>R3 Dance</th>
-        <th>0.21 Shin-Scale Row (What-If)</th>
-        <th>Minutes (R1 · R2 · R3)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/advanced/results/claude-haiku-5-5/"><code>claude-haiku-5-5</code></a></td>
-        <td><strong>9 / 9</strong></td>
-        <td>8 / 14 (FAIL)</td>
-        <td><strong>13 / 13</strong></td>
-        <td>passes all 3</td>
-        <td><code>3.1 · 2.4 · 7.4</code></td>
-      </tr>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/advanced/results/claude-opus-5-5/"><code>claude-opus-5-5</code></a></td>
-        <td><strong>9 / 9</strong></td>
-        <td><strong>14 / 14</strong></td>
-        <td><strong>13 / 13</strong></td>
-        <td>fails R2 (<code>0.106</code>)</td>
-        <td><code>8.2 · 8.7 · 8.4</code></td>
-      </tr>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/advanced/results/claude-sonnet-5-5/"><code>claude-sonnet-5-5</code></a></td>
-        <td><strong>9 / 9</strong></td>
-        <td><strong>14 / 14</strong></td>
-        <td><strong>13 / 13</strong></td>
-        <td>passes all 3</td>
-        <td><code>7.3 · 10.3 · 18.7</code></td>
-      </tr>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/advanced/results/gemini-3.8-flash-medium/"><code>gemini-3.8-flash-medium</code></a></td>
-        <td><strong>9 / 9</strong></td>
-        <td><strong>14 / 14</strong></td>
-        <td><strong>13 / 13</strong></td>
-        <td>fails R2 (<code>0.106</code>)</td>
-        <td><code>8.1 · 14.3 · 11.4</code></td>
-      </tr>
-      <tr>
-        <td><a href="https://github.com/rig-c/exam/tree/main/advanced/results/gemini-4-argon-high/"><code>gemini-4-argon-high</code></a></td>
-        <td><strong>9 / 9</strong></td>
-        <td><strong>14 / 14</strong></td>
-        <td><strong>13 / 13</strong></td>
-        <td>passes all 3</td>
-        <td><code>16.8 · 20.3 · 32.5</code></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<h2>Rules of the Exam</h2>
+<table>
+<thead>
+<tr><th>Model</th><th align="center">Sittings</th><th align="center">01-build</th><th align="center">02-move</th><th>03-correct</th><th>Total Lines Passed</th><th align="center">Minutes</th><th align="center">Tokens (Fresh In + Out)</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Claude Haiku</strong> (<code>2026-10-12-haiku</code>)</td><td align="center">1</td><td align="center">4 / 4</td><td align="center">7 / 7</td><td>5 / 5</td><td><strong>16 / 16</strong></td><td align="center">21.0</td><td align="center">531k</td></tr>
+<tr><td><strong>Gemini 3.8 Flash</strong> (<code>2026-10-13-gemini-3.8-flash</code>)</td><td align="center">1</td><td align="center">4 / 4</td><td align="center">7 / 7</td><td>5 / 5</td><td><strong>16 / 16</strong></td><td align="center">20.0</td><td align="center">1.4M</td></tr>
+<tr><td><strong><code>gpt-6-sol</code></strong> (<code>2026-10-13-gpt-6-sol</code>)</td><td align="center">1</td><td align="center">4 / 4</td><td align="center">7 / 7</td><td>5 / 5</td><td><strong>16 / 16</strong></td><td align="center">14.1</td><td align="center">258k</td></tr>
+<tr><td><strong>Sol 6.1 (<code>gpt-6.1-sol</code>)</strong> (2 sittings)</td><td align="center">2</td><td align="center">4 / 4</td><td align="center">7 / 7</td><td>5 / 5</td><td><strong>32 / 32</strong> (16/16 each)</td><td align="center">14.2 – 15.3</td><td align="center">195k – 270k</td></tr>
+</tbody>
+</table>
+<h2 id="advanced-exam-leaderboard-walk-run-dance-pose-retargeting">Advanced Exam Leaderboard (Walk · Run · Dance Pose Retargeting)</h2>
+<p>Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and dance (R3) pose sequences with <a href="/docs/pose/"><code>@rig-c/pose</code></a>, one round per fresh session, fixing what the diagnostic numbers report without ever seeing the footage:</p>
+<table>
+<thead>
+<tr><th>Model</th><th align="center">R1 Walk</th><th align="center">R2 Run</th><th align="center">R3 Dance</th><th>0.21 Shin-Scale Row (What-If)</th><th>Minutes (R1 · R2 · R3)</th></tr>
+</thead>
+<tbody>
+<tr><td><code>claude-haiku-5-5</code></td><td align="center"><strong>9 / 9</strong></td><td align="center">8 / 14 (FAIL)</td><td align="center"><strong>13 / 13</strong></td><td>passes all 3</td><td><code>3.1 · 2.4 · 7.4</code></td></tr>
+<tr><td><code>claude-opus-5-5</code></td><td align="center"><strong>9 / 9</strong></td><td align="center"><strong>14 / 14</strong></td><td align="center"><strong>13 / 13</strong></td><td>fails R2 (<code>0.106</code>)</td><td><code>8.2 · 8.7 · 8.4</code></td></tr>
+<tr><td><code>claude-sonnet-5-5</code></td><td align="center"><strong>9 / 9</strong></td><td align="center"><strong>14 / 14</strong></td><td align="center"><strong>13 / 13</strong></td><td>passes all 3</td><td><code>7.3 · 10.3 · 18.7</code></td></tr>
+<tr><td><code>gemini-3.8-flash-medium</code></td><td align="center"><strong>9 / 9</strong></td><td align="center"><strong>14 / 14</strong></td><td align="center"><strong>13 / 13</strong></td><td>fails R2 (<code>0.106</code>)</td><td><code>8.1 · 14.3 · 11.4</code></td></tr>
+<tr><td><code>gemini-4-argon-high</code></td><td align="center"><strong>9 / 9</strong></td><td align="center"><strong>14 / 14</strong></td><td align="center"><strong>13 / 13</strong></td><td>passes all 3</td><td><code>16.8 · 20.3 · 32.5</code></td></tr>
+</tbody>
+</table>
+<h2 id="rules-of-the-exam">Rules of the Exam</h2>
 <ol>
-  <li><strong>Open book, closed neighbours.</strong> Examinees may read anything inside the pinned npm packages and public tool repos, but may not read another examinee's run under <code>results/</code> or ask a human.</li>
-  <li><strong>Pinned versions.</strong> <code>npm ci</code> installs the exact round versions declared in <code>package.json</code>.</li>
-  <li><strong>Journal before you act.</strong> Every step in <code>JOURNAL.md</code> must record expectations before running the command.</li>
-  <li><strong>Submit the transcript.</strong> Raw session logs are submitted alongside <code>JOURNAL.md</code>.</li>
-  <li><strong>The grader rebuilds from inputs.</strong> <code>grade.py</code> trusts only the handed-in config/spec files and rebuilds from scratch.</li>
+<li><strong>Open book, closed neighbours.</strong> Examinees may read anything inside the pinned npm packages and public tool repos, but may not read another examinee's run under <code>results/</code> or ask a human.</li>
+<li><strong>Pinned versions.</strong> <code>npm ci</code> installs the exact round versions declared in <code>package.json</code>.</li>
+<li><strong>Journal before you act.</strong> Every step in <code>JOURNAL.md</code> must record expectations before running the command.</li>
+<li><strong>Submit the transcript.</strong> Raw session logs are submitted alongside <code>JOURNAL.md</code>.</li>
+<li><strong>The grader rebuilds from inputs.</strong> <code>grade.py</code> trusts only the handed-in config/spec files and rebuilds from scratch.</li>
 </ol>
+
       </article>
-      <nav aria-label="Page pagination" class="meta-bar">
-        <span>Previous: <a href="/adapters/" rel="prev">Adapters</a></span>
-        <span>Next: <a href="/examples/" rel="next">Examples</a></span>
-      </nav>
     </main>
     <footer class="site-footer">
       <div class="footer-inner">
-        <div>
-          <strong>rig-c</strong> — AI-authored 2D rigging and animation toolchain. Static HTML &amp; Markdown built for zero-JS <code>curl</code> and search indexing.
-        </div>
-        <div class="footer-links">
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <nav aria-label="Machine-readable" class="footer-links">
+          <a href="/exam/index.md">This page as Markdown</a>
           <a href="/llms.txt">llms.txt</a>
           <a href="/llms-full.txt">llms-full.txt</a>
-          <a href="/exam/index.md">Page Markdown</a>
           <a href="/sitemap.xml">sitemap.xml</a>
           <a href="https://github.com/rig-c">GitHub</a>
           <a href="https://www.npmjs.com/package/rig-c">npm</a>
-        </div>
+        </nav>
       </div>
     </footer>
   </body>

@@ -7,55 +7,61 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://rig-c.org/getting-started/</loc>
+    <loc>https://rig-c.org/docs/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rig-c.org/parts/</loc>
+    <loc>https://rig-c.org/docs/getting-started/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rig-c.org/pose/</loc>
+    <loc>https://rig-c.org/docs/parts/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rig-c.org/core/</loc>
+    <loc>https://rig-c.org/docs/pose/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rig-c.org/review/</loc>
+    <loc>https://rig-c.org/docs/core/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rig-c.org/play/</loc>
+    <loc>https://rig-c.org/docs/review/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rig-c.org/adapters/</loc>
+    <loc>https://rig-c.org/docs/play/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rig-c.org/exam/</loc>
+    <loc>https://rig-c.org/docs/adapters/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://rig-c.org/examples/</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rig-c.org/exam/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

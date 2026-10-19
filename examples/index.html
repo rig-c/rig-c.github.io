@@ -8,6 +8,7 @@
     <meta name="keywords" content="rig-c examples, parts-examples, rig-c trailer, See-through dataset, deterministic rigging, Spine 4.3 examples">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://rig-c.org/examples/">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
     <link rel="alternate" type="text/markdown" href="/examples/index.md" title="Examples (Markdown)">
     <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
     <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
@@ -66,136 +67,68 @@
 }
     </script>
   </head>
-  <body>
+  <body class="section-examples">
     <header class="site-header">
       <div class="header-inner">
-        <a href="/" class="brand">rig-c<span>v2.61.0</span></a>
+        <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>rig-c</span></a>
         <nav aria-label="Primary" class="site-nav">
-          <a href="/">Overview</a>
-          <a href="/getting-started/">Getting Started</a>
-          <a href="/parts/">Parts</a>
-          <a href="/pose/">Pose</a>
-          <a href="/core/">Core (rigc)</a>
-          <a href="/review/">Review</a>
-          <a href="/play/">Play</a>
-          <a href="/adapters/">Adapters</a>
-          <a href="/exam/">AI Exam</a>
+          <a href="/docs/">Docs</a>
           <a href="/examples/" aria-current="page">Examples</a>
+          <a href="/exam/">Exam</a>
+          <a href="https://github.com/rig-c">GitHub</a>
         </nav>
       </div>
     </header>
-    <main class="site-main">
-      <nav aria-label="Breadcrumb" class="breadcrumb">
-        <ol>
-          <li><a href="/">rig-c</a></li>
-          <li aria-current="page">Examples</li>
-        </ol>
-      </nav>
-      <div class="meta-bar" role="region" aria-label="Document metadata">
-        <span>GitHub: <a href="https://github.com/rig-c/parts-examples">rig-c/parts-examples</a></span>
-        <span>Markdown: <a href="/examples/index.md">/examples/index.md</a></span>
-        <span>LLM Index: <a href="/llms.txt">/llms.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></span>
-      </div>
+    <main class="site-main page">
+      <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li aria-current="page">Examples</li></ol></nav>
+      <div class="pkg-bar"><a href="https://github.com/rig-c/parts-examples">github.com/rig-c/parts-examples</a></div>
       <article>
-        <h1>rig-c Reproducible Examples — parts-examples (20-Rig Family) &amp; Trailer</h1>
-<p class="lead">Every public rig-c showcase ships with its generated source paintings, See-through layer decompositions, agent-authored configs, and one-command deterministic rebuild scripts.</p>
-
-<div class="meta-bar">
-  <span>Inputs &amp; Family: <a href="https://github.com/rig-c/parts-examples"><code>github.com/rig-c/parts-examples</code></a></span>
-  <span>Trailer: <a href="https://github.com/rig-c/trailer"><code>github.com/rig-c/trailer</code></a></span>
-</div>
-
-<h2>1. <code>rig-c/parts-examples</code> — Public Character Inputs &amp; The 20-Rig Agent Family</h2>
-
-<h3>Single-Character Fixtures</h3>
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>Key</th>
-        <th>Seed</th>
-        <th>Checkpoint</th>
-        <th>See-through Layers</th>
-        <th>Purpose</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><code>demo</code></td>
-        <td><code>71006</code> (+ hand detailer)</td>
-        <td>Hassaku XL (Illustrious) v1.3 Style A</td>
-        <td>29 full + 29 head</td>
-        <td>The primary <a href="/parts/"><code>@rig-c/parts</code></a> README character: twin tails, bow, layered skirt, arms held clear of the body.</td>
-      </tr>
-      <tr>
-        <td><code>scarf</code></td>
-        <td><code>72004</code></td>
-        <td>Pony Diffusion V6 XL</td>
-        <td>29 full + 29 head</td>
-        <td>A very long red scarf with both ends hanging free, knit sweater and pleated skirt: the hanging element the others lack.</td>
-      </tr>
-      <tr>
-        <td><code>three-quarter</code></td>
-        <td><code>250011</code></td>
-        <td>Hassaku XL (Illustrious) v1.3 Style A</td>
-        <td>29 full + 29 head</td>
-        <td>Head turned toward image left and tilted for head-frame turn measurements.</td>
-      </tr>
-      <tr>
-        <td><code>wind</code></td>
-        <td><code>372108</code></td>
-        <td>Hassaku XL (Illustrious) v1.3 Style A</td>
-        <td>29 full + 29 head</td>
-        <td>Very long ribbon-wrapped twin tails and a wide two-layer skirt, painted for wind interaction.</td>
-      </tr>
-      <tr>
-        <td><code>reference-sample</code></td>
-        <td><code>70011</code></td>
-        <td>Pony Diffusion V6 XL</td>
-        <td>29 full + 29 head</td>
-        <td>Regression fixture held to the reference implementation's outputs.</td>
-      </tr>
-      <tr>
-        <td><code>reference-demo</code></td>
-        <td><code>71004</code></td>
-        <td>Pony Diffusion V6 XL</td>
-        <td>29 full + 29 head</td>
-        <td>Regression fixture held to the reference implementation's outputs.</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<h3><code>family/</code> — 5 Characters × 4 Outfits (20 Rigs, 396 Parts)</h3>
+<h1 id="reproducible-examples-parts-examples-trailer">Reproducible Examples (<code>parts-examples</code> &amp; <code>trailer</code>)</h1>
+<p>Every public rig-c showcase ships with its generated source paintings, See-through layer decompositions, agent-authored configs, and one-command deterministic rebuild scripts.</p>
+<h2 id="1-rig-cparts-examples-public-character-inputs-the-20-rig-agent-family">1. <code>rig-c/parts-examples</code> — Public Character Inputs &amp; The 20-Rig Agent Family</h2>
+<p>Repository: <a href="https://github.com/rig-c/parts-examples">https://github.com/rig-c/parts-examples</a></p>
+<h3 id="single-character-fixtures">Single-Character Fixtures</h3>
+<table>
+<thead>
+<tr><th>Key</th><th>Seed</th><th>Checkpoint</th><th>See-through Layers</th><th>Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td><code>demo</code></td><td><code>71006</code> (+ hand detailer)</td><td>Hassaku XL (Illustrious) v1.3 Style A</td><td>29 full + 29 head</td><td>The primary <code>@rig-c/parts</code> README character: twin tails, bow, layered skirt, arms held clear of the body.</td></tr>
+<tr><td><code>scarf</code></td><td><code>72004</code></td><td>Pony Diffusion V6 XL</td><td>29 full + 29 head</td><td>A very long red scarf with both ends hanging free, knit sweater and pleated skirt: the hanging element the others lack.</td></tr>
+<tr><td><code>three-quarter</code></td><td><code>250011</code></td><td>Hassaku XL (Illustrious) v1.3 Style A</td><td>29 full + 29 head</td><td>Head turned toward image left and tilted for head-frame turn measurements.</td></tr>
+<tr><td><code>wind</code></td><td><code>372108</code></td><td>Hassaku XL (Illustrious) v1.3 Style A</td><td>29 full + 29 head</td><td>Very long ribbon-wrapped twin tails and a wide two-layer skirt, painted for wind interaction.</td></tr>
+<tr><td><code>reference-sample</code></td><td><code>70011</code></td><td>Pony Diffusion V6 XL</td><td>29 full + 29 head</td><td>Regression fixture held to the reference implementation's outputs.</td></tr>
+<tr><td><code>reference-demo</code></td><td><code>71004</code></td><td>Pony Diffusion V6 XL</td><td>29 full + 29 head</td><td>Regression fixture held to the reference implementation's outputs.</td></tr>
+</tbody>
+</table>
+<h3 id="family-5-characters-4-outfits-20-rigs-396-parts"><code>family/</code> — 5 Characters × 4 Outfits (20 Rigs, 396 Parts)</h3>
 <p>Starting from one wide group illustration (<code>1024×571</code> RGBA) upscaled with <code>4x-AnimeSharp</code> to <code>4096×2284</code>, the <code>family/</code> suite overcomes See-through's fixed <code>1024×1024</code> resolution limit by combining 2-pass (<code>full</code> + <code>head</code>) decomposition, visible-surface 4x detail injection, and hash-bound declarative mesh/binding repair recipes (<code>declared-repairs.json</code>) across 5 characters and 4 outfit sets (<code>office</code>, <code>homewear</code>, <code>swimwear</code>, <code>uniform</code>).</p>
-<pre><code># Deterministic rebuild &amp; compiler gate across all 20 rigs (396 parts)
+<pre><code class="language-sh"># Deterministic rebuild &amp; compiler gate across all 20 rigs (396 parts)
 bun install --cwd family/tools/outline-field-islands --frozen-lockfile
 node family/tools/verify-reproducibility.mjs --out /tmp/new-repro-evidence
-bun family/tools/verify-accepted.mjs --out /tmp/new-family-evidence</code></pre>
-
-<h2>2. <code>rig-c/trailer</code> — 12-Second Reproducible Animated Short</h2>
+bun family/tools/verify-accepted.mjs --out /tmp/new-family-evidence
+</code></pre>
+<h2 id="2-rig-ctrailer-12-second-reproducible-animated-short">2. <code>rig-c/trailer</code> — 12-Second Reproducible Animated Short</h2>
+<p>Repository: <a href="https://github.com/rig-c/trailer">https://github.com/rig-c/trailer</a></p>
 <p>A character sitting on a swing under a night sky breathes, tilts her head, smiles, kicks her legs, hops, and waves, her twin tails following on physics chains — rebuilt byte-for-byte (240 frames at 20 fps, <code>960×540</code> WebP + <code>1920×1080</code> PNG frames) from one painting, two See-through layer sets, and agent-authored configs:</p>
-<pre><code>git clone https://github.com/rig-c/trailer &amp;&amp; cd trailer
+<pre><code class="language-sh">git clone https://github.com/rig-c/trailer &amp;&amp; cd trailer
 pip install -r requirements.txt
-./build.sh</code></pre>
+./build.sh
+</code></pre>
+
       </article>
-      <nav aria-label="Page pagination" class="meta-bar">
-        <span>Previous: <a href="/exam/" rel="prev">AI Exam</a></span>
-      </nav>
     </main>
     <footer class="site-footer">
       <div class="footer-inner">
-        <div>
-          <strong>rig-c</strong> — AI-authored 2D rigging and animation toolchain. Static HTML &amp; Markdown built for zero-JS <code>curl</code> and search indexing.
-        </div>
-        <div class="footer-links">
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <nav aria-label="Machine-readable" class="footer-links">
+          <a href="/examples/index.md">This page as Markdown</a>
           <a href="/llms.txt">llms.txt</a>
           <a href="/llms-full.txt">llms-full.txt</a>
-          <a href="/examples/index.md">Page Markdown</a>
           <a href="/sitemap.xml">sitemap.xml</a>
           <a href="https://github.com/rig-c">GitHub</a>
           <a href="https://www.npmjs.com/package/rig-c">npm</a>
-        </div>
+        </nav>
       </div>
     </footer>
   </body>

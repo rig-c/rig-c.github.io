@@ -1,9 +1,11 @@
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { PAGES, type PageSpec, SITE_ORIGIN } from './pages.ts';
+import { htmlRel, mdRoute, PAGES, type Page, REDIRECTS, SITE_ORIGIN } from './content.ts';
 
 const ROOT_DIR = resolve(import.meta.dir, '..');
 const TODAY = '2026-10-19';
+const DOCS = PAGES.filter((p) => p.section === 'docs');
+const CORE = PAGES.find((p) => p.route === '/docs/core/');
 
 function escapeHtml(value: string): string {
   return value
@@ -14,19 +16,46 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
-function pagePath(slug: string): string {
-  return slug === '' ? '/' : `/${slug}/`;
+// The docs hub lists every docs page from its own frontmatter, so the list cannot drift from the pages.
+function docsMap(): string {
+  return DOCS.filter((p) => p.route !== '/docs/')
+    .map((p) => {
+      const pkg = p.packageName ? ` — \`${p.packageName}\`` : '';
+      return `- [**${p.navLabel}**](${p.route})${pkg}: ${p.summaryForLlms}`;
+    })
+    .join('\n');
 }
 
-function pageMdPath(slug: string): string {
-  return slug === '' ? '/index.md' : `/${slug}/index.md`;
+// {{version:<docs slug>}} prints that docs page's published version, so a page never quotes a stale one.
+function version(slug: string): string {
+  const doc = DOCS.find((p) => p.route === `/docs/${slug}/`);
+  const v = doc?.packageVersion?.split(',')[0]?.trim();
+  if (!v) throw new Error(`{{version:${slug}}}: no docs page with a packageVersion`);
+  return v;
 }
 
-function buildJsonLd(page: PageSpec): string {
-  const url = `${SITE_ORIGIN}${pagePath(page.slug)}`;
+function expand(page: Page): string {
+  return page.markdown
+    .replace('{{docs-map}}', docsMap())
+    .replace(/\{\{version:([a-z-]+)\}\}/g, (_, slug: string) => version(slug));
+}
+
+function renderMarkdown(markdown: string): string {
+  return Bun.markdown.html(markdown, { headings: { ids: true } });
+}
+
+function breadcrumbItems(page: Page): { name: string; route: string }[] {
+  const items = [{ name: 'rig-c', route: '/' }];
+  if (page.section === 'docs' && page.route !== '/docs/') items.push({ name: 'Docs', route: '/docs/' });
+  if (page.route !== '/') items.push({ name: page.navLabel, route: page.route });
+  return items;
+}
+
+function buildJsonLd(page: Page): string {
+  const url = `${SITE_ORIGIN}${page.route}`;
   const graph: Record<string, unknown>[] = [];
 
-  if (page.slug === '') {
+  if (page.route === '/') {
     graph.push(
       {
         '@type': 'WebSite',
@@ -36,11 +65,7 @@ function buildJsonLd(page: PageSpec): string {
         alternateName: ['rigc', '@rig-c/core'],
         description: page.description,
         inLanguage: 'en',
-        publisher: {
-          '@type': 'Organization',
-          name: 'rig-c',
-          url: 'https://github.com/rig-c',
-        },
+        publisher: { '@type': 'Organization', name: 'rig-c', url: 'https://github.com/rig-c' },
       },
       {
         '@type': 'SoftwareApplication',
@@ -48,16 +73,12 @@ function buildJsonLd(page: PageSpec): string {
         name: 'rig-c',
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'macOS, Linux, Windows, Web Browser',
-        softwareVersion: page.packageVersion ?? '2.61.0',
+        softwareVersion: CORE?.packageVersion,
         url: `${SITE_ORIGIN}/`,
         downloadUrl: 'https://www.npmjs.com/package/rig-c',
         codeRepository: 'https://github.com/rig-c/core',
         description: page.description,
-        offers: {
-          '@type': 'Offer',
-          price: '0',
-          priceCurrency: 'USD',
-        },
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       },
     );
   } else {
@@ -71,34 +92,19 @@ function buildJsonLd(page: PageSpec): string {
         datePublished: TODAY,
         dateModified: TODAY,
         inLanguage: 'en',
-        author: {
-          '@type': 'Organization',
-          name: 'rig-c',
-          url: 'https://github.com/rig-c',
-        },
-        isPartOf: {
-          '@id': `${SITE_ORIGIN}/#website`,
-        },
+        author: { '@type': 'Organization', name: 'rig-c', url: 'https://github.com/rig-c' },
+        isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
       },
       {
         '@type': 'BreadcrumbList',
-        itemListElement: [
-          {
-            '@type': 'ListItem',
-            position: 1,
-            name: 'rig-c',
-            item: `${SITE_ORIGIN}/`,
-          },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: page.navLabel,
-            item: url,
-          },
-        ],
+        itemListElement: breadcrumbItems(page).map((item, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: item.name,
+          item: `${SITE_ORIGIN}${item.route}`,
+        })),
       },
     );
-
     if (page.packageName) {
       graph.push({
         '@type': 'SoftwareSourceCode',
@@ -107,90 +113,29 @@ function buildJsonLd(page: PageSpec): string {
         codeRepository: page.repoUrl,
         url,
         programmingLanguage: 'TypeScript',
-        runtimePlatform: 'Node.js >= 20, Bun, Web Browser',
         description: page.description,
       });
     }
   }
 
-  return JSON.stringify(
-    {
-      '@context': 'https://schema.org',
-      '@graph': graph,
-    },
-    null,
-    2,
-  );
+  return JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }, null, 2);
 }
 
-function renderHtmlPage(page: PageSpec, index: number): string {
-  const route = pagePath(page.slug);
-  const mdRoute = pageMdPath(page.slug);
-  const canonicalUrl = `${SITE_ORIGIN}${route}`;
+function head(page: Page): string {
+  const canonicalUrl = `${SITE_ORIGIN}${page.route}`;
   const ogImageUrl = `${SITE_ORIGIN}/assets/banner.svg`;
-  const jsonLd = buildJsonLd(page);
-
-  const navLinks = PAGES.map((item) => {
-    const href = pagePath(item.slug);
-    const current = item.slug === page.slug ? ' aria-current="page"' : '';
-    return `<a href="${href}"${current}>${escapeHtml(item.navLabel)}</a>`;
-  }).join('\n          ');
-
-  const breadcrumb =
-    page.slug === ''
-      ? ''
-      : `<nav aria-label="Breadcrumb" class="breadcrumb">
-        <ol>
-          <li><a href="/">rig-c</a></li>
-          <li aria-current="page">${escapeHtml(page.navLabel)}</li>
-        </ol>
-      </nav>`;
-
-  const metaItems: string[] = [];
-  if (page.packageName && page.packageVersion) {
-    metaItems.push(
-      `<span>Package: <code>${escapeHtml(page.packageName)}@${escapeHtml(page.packageVersion)}</code></span>`,
-    );
-  }
-  metaItems.push(`<span>GitHub: <a href="${escapeHtml(page.repoUrl)}">${escapeHtml(page.repoUrl.replace('https://github.com/', ''))}</a></span>`);
-  if (page.npmUrl) {
-    metaItems.push(`<span>npm: <a href="${escapeHtml(page.npmUrl)}">registry</a></span>`);
-  }
-  metaItems.push(`<span>Markdown: <a href="${mdRoute}">${mdRoute}</a></span>`);
-  metaItems.push(`<span>LLM Index: <a href="/llms.txt">/llms.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></span>`);
-
-  const prevPage = index > 0 ? PAGES[index - 1] : undefined;
-  const nextPage = index < PAGES.length - 1 ? PAGES[index + 1] : undefined;
-  const paginationParts: string[] = [];
-  if (prevPage) {
-    paginationParts.push(
-      `<span>Previous: <a href="${pagePath(prevPage.slug)}" rel="prev">${escapeHtml(prevPage.navLabel)}</a></span>`,
-    );
-  }
-  if (nextPage) {
-    paginationParts.push(
-      `<span>Next: <a href="${pagePath(nextPage.slug)}" rel="next">${escapeHtml(nextPage.navLabel)}</a></span>`,
-    );
-  }
-  const paginationHtml =
-    paginationParts.length > 0
-      ? `\n      <nav aria-label="Page pagination" class="meta-bar">\n        ${paginationParts.join('\n        ')}\n      </nav>`
-      : '';
-
-  return `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
+  return `<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${escapeHtml(page.title)}</title>
     <meta name="description" content="${escapeHtml(page.description)}">
     <meta name="keywords" content="${escapeHtml(page.keywords.join(', '))}">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="${canonicalUrl}">
-    <link rel="alternate" type="text/markdown" href="${mdRoute}" title="${escapeHtml(page.navLabel)} (Markdown)">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <link rel="alternate" type="text/markdown" href="${mdRoute(page.route)}" title="${escapeHtml(page.navLabel)} (Markdown)">
     <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
     <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
-    <meta property="og:type" content="${page.slug === '' ? 'website' : 'article'}">
+    <meta property="og:type" content="${page.route === '/' ? 'website' : 'article'}">
     <meta property="og:site_name" content="rig-c">
     <meta property="og:title" content="${escapeHtml(page.title)}">
     <meta property="og:description" content="${escapeHtml(page.description)}">
@@ -203,43 +148,160 @@ function renderHtmlPage(page: PageSpec, index: number): string {
     <meta name="twitter:image" content="${ogImageUrl}">
     <link rel="stylesheet" href="/styles.css">
     <script type="application/ld+json">
-${jsonLd}
-    </script>
-  </head>
-  <body>
-    <header class="site-header">
+${buildJsonLd(page)}
+    </script>`;
+}
+
+function siteHeader(page: Page): string {
+  const top: { label: string; href: string; section?: Page['section'] }[] = [
+    { label: 'Docs', href: '/docs/', section: 'docs' },
+    { label: 'Examples', href: '/examples/', section: 'examples' },
+    { label: 'Exam', href: '/exam/', section: 'exam' },
+    { label: 'GitHub', href: 'https://github.com/rig-c' },
+  ];
+  const links = top
+    .map((t) => {
+      const current = t.section === page.section ? ' aria-current="page"' : '';
+      return `<a href="${t.href}"${current}>${t.label}</a>`;
+    })
+    .join('\n          ');
+  return `<header class="site-header">
       <div class="header-inner">
-        <a href="/" class="brand">rig-c<span>v2.61.0</span></a>
+        <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>rig-c</span></a>
         <nav aria-label="Primary" class="site-nav">
-          ${navLinks}
+          ${links}
         </nav>
       </div>
-    </header>
-    <main class="site-main">
-      ${breadcrumb}
-      <div class="meta-bar" role="region" aria-label="Document metadata">
-        ${metaItems.join('\n        ')}
-      </div>
-      <article>
-        <h1>${escapeHtml(page.title)}</h1>
-${page.html}
-      </article>${paginationHtml}
-    </main>
-    <footer class="site-footer">
+    </header>`;
+}
+
+function siteFooter(page: Page): string {
+  return `<footer class="site-footer">
       <div class="footer-inner">
-        <div>
-          <strong>rig-c</strong> — AI-authored 2D rigging and animation toolchain. Static HTML &amp; Markdown built for zero-JS <code>curl</code> and search indexing.
-        </div>
-        <div class="footer-links">
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <nav aria-label="Machine-readable" class="footer-links">
+          <a href="${mdRoute(page.route)}">This page as Markdown</a>
           <a href="/llms.txt">llms.txt</a>
           <a href="/llms-full.txt">llms-full.txt</a>
-          <a href="${mdRoute}">Page Markdown</a>
           <a href="/sitemap.xml">sitemap.xml</a>
           <a href="https://github.com/rig-c">GitHub</a>
           <a href="https://www.npmjs.com/package/rig-c">npm</a>
-        </div>
+        </nav>
       </div>
-    </footer>
+    </footer>`;
+}
+
+function breadcrumb(page: Page): string {
+  if (page.route === '/') return '';
+  const items = breadcrumbItems(page);
+  const lis = items
+    .map((item, i) =>
+      i === items.length - 1
+        ? `<li aria-current="page">${escapeHtml(item.name)}</li>`
+        : `<li><a href="${item.route}">${escapeHtml(item.name)}</a></li>`,
+    )
+    .join('');
+  return `<nav aria-label="Breadcrumb" class="breadcrumb"><ol>${lis}</ol></nav>`;
+}
+
+function packageBar(page: Page): string {
+  const items: string[] = [];
+  if (page.packageName && page.packageVersion) {
+    items.push(`<span class="pkg"><code>${escapeHtml(page.packageName)}</code> <span class="ver">${escapeHtml(page.packageVersion)}</span></span>`);
+  }
+  items.push(`<a href="${escapeHtml(page.repoUrl)}">${escapeHtml(page.repoUrl.replace('https://github.com/', 'github.com/'))}</a>`);
+  if (page.npmUrl) items.push(`<a href="${escapeHtml(page.npmUrl)}">npm</a>`);
+  return `<div class="pkg-bar">${items.join('')}</div>`;
+}
+
+function docsSidebar(page: Page): string {
+  const links = DOCS.map((p) => {
+    const current = p.route === page.route ? ' aria-current="page"' : '';
+    return `<li><a href="${p.route}"${current}>${escapeHtml(p.navLabel)}</a></li>`;
+  }).join('\n            ');
+  return `<nav aria-label="Docs" class="docs-nav">
+          <ol>
+            ${links}
+          </ol>
+        </nav>`;
+}
+
+function onThisPage(html: string): string {
+  const items = [...html.matchAll(/<h2 id="([^"]+)">([\s\S]*?)<\/h2>/g)].map(
+    (m) => `<li><a href="#${m[1]}">${m[2]?.replace(/<[^>]+>/g, '')}</a></li>`,
+  );
+  if (items.length < 2) return '';
+  return `<aside class="toc" aria-label="On this page"><p>On this page</p><ol>${items.join('')}</ol></aside>`;
+}
+
+function pager(page: Page): string {
+  const at = DOCS.indexOf(page);
+  const prev = DOCS[at - 1];
+  const next = DOCS[at + 1];
+  const parts: string[] = [];
+  if (prev) parts.push(`<a href="${prev.route}" rel="prev"><span>Previous</span>${escapeHtml(prev.navLabel)}</a>`);
+  if (next) parts.push(`<a href="${next.route}" rel="next"><span>Next</span>${escapeHtml(next.navLabel)}</a>`);
+  return parts.length ? `<nav aria-label="Docs pages" class="pager">${parts.join('')}</nav>` : '';
+}
+
+function renderPage(page: Page): string {
+  const body = renderMarkdown(expand(page));
+  let main: string;
+  if (page.section === 'home') {
+    main = `<main class="site-main home">
+      <article>
+${body}
+      </article>
+    </main>`;
+  } else if (page.section === 'docs') {
+    main = `<div class="docs-layout">
+        ${docsSidebar(page)}
+      <main class="site-main docs-main">
+        ${breadcrumb(page)}
+        ${page.packageName ? packageBar(page) : ''}
+        <article>
+${body}
+        </article>
+        ${pager(page)}
+      </main>
+      ${onThisPage(body)}
+    </div>`;
+  } else {
+    main = `<main class="site-main page">
+      ${breadcrumb(page)}
+      ${packageBar(page)}
+      <article>
+${body}
+      </article>
+    </main>`;
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    ${head(page)}
+  </head>
+  <body class="section-${page.section}">
+    ${siteHeader(page)}
+    ${main}
+    ${siteFooter(page)}
+  </body>
+</html>
+`;
+}
+
+function renderRedirect(from: string, to: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Moved to ${to}</title>
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href="${SITE_ORIGIN}${to}">
+    <meta http-equiv="refresh" content="0; url=${to}">
+  </head>
+  <body>
+    <p>This page moved from <code>${from}</code> to <a href="${to}">${SITE_ORIGIN}${to}</a>.</p>
   </body>
 </html>
 `;
@@ -249,38 +311,22 @@ function buildLlmsTxt(): string {
   const lines: string[] = [
     '# rig-c',
     '',
-    '> AI-authored 2D character rigging and animation toolchain, verified before a byte is written. Takes one character painting decomposed into RGBA layers (via See-through) and compiles Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and self-contained browser/engine models (`skeleton.model.json`) gated by named assertions (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`).',
+    '> AI-authored 2D character rigging and animation toolchain, verified before a byte is written. Takes one character painting decomposed into RGBA layers (via See-through) and compiles Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and self-contained browser/engine models (`skeleton.model.json`), gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile).',
     '',
-    `All pages on ${SITE_ORIGIN} are served as static semantic HTML (\`/<slug>/\`) with a clean Markdown mirror (\`/<slug>/index.md\`). No JavaScript execution is required to fetch or parse any page.`,
+    `All pages on ${SITE_ORIGIN} are served as static semantic HTML (\`/<path>/\`) with a clean Markdown mirror (\`/<path>/index.md\`). No JavaScript execution is required to fetch or parse any page.`,
     '',
-    '## Documentation Pages',
+    '## Pages',
     '',
   ];
-
   for (const page of PAGES) {
-    const htmlUrl = `${SITE_ORIGIN}${pagePath(page.slug)}`;
-    const mdUrl = `${SITE_ORIGIN}${pageMdPath(page.slug)}`;
-    const pkgBadge =
-      page.packageName && page.packageVersion
-        ? ` (\`${page.packageName}@${page.packageVersion}\`)`
-        : '';
+    const badge = page.packageName && page.packageVersion ? ` (\`${page.packageName}@${page.packageVersion}\`)` : '';
     lines.push(
-      `- [${page.navLabel}](${htmlUrl}) ([Markdown](${mdUrl}))${pkgBadge}: ${page.summaryForLlms}`,
+      `- [${page.navLabel}](${SITE_ORIGIN}${page.route}) ([Markdown](${SITE_ORIGIN}${mdRoute(page.route)}))${badge}: ${page.summaryForLlms}`,
     );
   }
-
   lines.push(
     '',
-    '## Packages & Latest Versions',
-    '',
-    '- `rig-c` / `@rig-c/core` (`2.61.0`): The 2D rig compiler (`rigc`). Commands the published package runs on its own: `build`, `repack`, `explain`, `ingest`, `split`, `diff`, `check`, `render`, `inspect`, `pose`, `chainfit`, `guide`, `skills`, `review`. Commands that run once `@esotericsoftware/spine-core` is installed beside it: `validate`, `preview`, `vote`, `bench`, `bonedist`. `rigc <command> --help` prints each one\'s flags.',
-    '- `@rig-c/parts` (`1.38.0`): Layer assembly, contour/lattice mesh generation, auto-weights, spring chain synthesis, and procedural idle authoring (`rig-parts`).',
-    '- `@rig-c/pose` (`0.33.0`): Body-18 pose cleaning, bone-length normalization, and retargeting (`rig-pose`).',
-    '- `@rig-c/review` (`0.2.1`): Local human inspection workspace and structured JSON feedback exporter (`rig-review`).',
-    '- `@rig-c/play` (`1.12.0`): Spine-free browser player (`<rig-player>`, `mountRig()`, `loadCompiledModel()`) using DOM `matrix()` or single `<canvas>` 2D affine triangular mesh rendering.',
-    '- `@rig-c/pixi` (`0.1.1`), `@rig-c/phaser` (`0.1.1`), `@rig-c/three` (`0.1.1`): Spine-free game engine adapters built on `@rig-c/play/core`.',
-    '',
-    '## Quick Install',
+    '## Install',
     '',
     '```bash',
     '# Authoring toolchain',
@@ -303,7 +349,6 @@ function buildLlmsTxt(): string {
     `- [Full Documentation Bundle (llms-full.txt)](${SITE_ORIGIN}/llms-full.txt): Concatenated Markdown of every page on this site for single-request LLM context ingestion.`,
     '',
   );
-
   return lines.join('\n');
 }
 
@@ -316,40 +361,31 @@ function buildLlmsFullTxt(): string {
     `> Purpose: Single-request Markdown bundle of all documentation pages on ${SITE_ORIGIN} for AI agents, RAG pipelines, and curl inspection.`,
     '',
   ].join('\n');
-
   const sections = PAGES.map((page) => {
-    const route = pagePath(page.slug);
-    const pkgMeta =
-      page.packageName && page.packageVersion
-        ? `\nPackage: ${page.packageName}@${page.packageVersion}`
-        : '';
+    const pkg = page.packageName && page.packageVersion ? `\nPackage: ${page.packageName}@${page.packageVersion}` : '';
     return [
       '================================================================================',
-      `URL: ${SITE_ORIGIN}${route}`,
-      `Markdown: ${SITE_ORIGIN}${pageMdPath(page.slug)}${pkgMeta}`,
+      `URL: ${SITE_ORIGIN}${page.route}`,
+      `Markdown: ${SITE_ORIGIN}${mdRoute(page.route)}${pkg}`,
       `Repository: ${page.repoUrl}`,
       '================================================================================',
       '',
-      page.markdown.trim(),
+      expand(page).trim(),
       '',
     ].join('\n');
   });
-
   return `${header}\n${sections.join('\n')}`;
 }
 
 function buildSitemapXml(): string {
-  const urls = PAGES.map((page) => {
-    const loc = `${SITE_ORIGIN}${pagePath(page.slug)}`;
-    const priority = page.slug === '' ? '1.0' : '0.8';
-    return `  <url>
-    <loc>${loc}</loc>
+  const urls = PAGES.map(
+    (page) => `  <url>
+    <loc>${SITE_ORIGIN}${page.route}</loc>
     <lastmod>${TODAY}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>${priority}</priority>
-  </url>`;
-  });
-
+    <priority>${page.route === '/' ? '1.0' : '0.8'}</priority>
+  </url>`,
+  );
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.join('\n')}
@@ -359,25 +395,10 @@ ${urls.join('\n')}
 
 function buildRobotsTxt(): string {
   const agents = [
-    '*',
-    'GPTBot',
-    'OAI-SearchBot',
-    'ChatGPT-User',
-    'ClaudeBot',
-    'Claude-Web',
-    'anthropic-ai',
-    'Google-Extended',
-    'Googlebot',
-    'Bingbot',
-    'PerplexityBot',
-    'Amazonbot',
-    'Applebot-Extended',
-    'Bytespider',
-    'CCBot',
-    'DuckAssistBot',
-    'cohere-ai',
+    '*', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-Web', 'anthropic-ai',
+    'Google-Extended', 'Googlebot', 'Bingbot', 'PerplexityBot', 'Amazonbot', 'Applebot-Extended',
+    'Bytespider', 'CCBot', 'DuckAssistBot', 'cohere-ai',
   ];
-
   const blocks = agents.map((agent) => `User-agent: ${agent}\nAllow: /`);
   blocks.push(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`);
   return `${blocks.join('\n\n')}\n`;
@@ -390,20 +411,20 @@ function writeOut(relPath: string, content: string): void {
 }
 
 function main(): void {
-  const sourceBanner = resolve(ROOT_DIR, '../rigc/assets/banner.svg');
-  if (existsSync(sourceBanner)) {
-    const targetBanner = join(ROOT_DIR, 'assets/banner.svg');
-    mkdirSync(dirname(targetBanner), { recursive: true });
-    copyFileSync(sourceBanner, targetBanner);
+  for (const asset of ['banner.svg', 'logo.svg']) {
+    const source = resolve(ROOT_DIR, `../rigc/assets/${asset}`);
+    if (existsSync(source)) {
+      mkdirSync(join(ROOT_DIR, 'assets'), { recursive: true });
+      copyFileSync(source, join(ROOT_DIR, 'assets', asset));
+    }
   }
 
-  for (let i = 0; i < PAGES.length; i += 1) {
-    const page = PAGES[i];
-    const htmlRel = page.slug === '' ? 'index.html' : `${page.slug}/index.html`;
-    const mdRel = page.slug === '' ? 'index.md' : `${page.slug}/index.md`;
-
-    writeOut(htmlRel, renderHtmlPage(page, i));
-    writeOut(mdRel, `${page.markdown.trim()}\n`);
+  for (const page of PAGES) {
+    writeOut(htmlRel(page.route), renderPage(page));
+    writeOut(mdRoute(page.route).slice(1), `${expand(page).trim()}\n`);
+  }
+  for (const [from, to] of Object.entries(REDIRECTS)) {
+    writeOut(htmlRel(from), renderRedirect(from, to));
   }
 
   writeOut('llms.txt', buildLlmsTxt());
@@ -413,7 +434,7 @@ function main(): void {
   writeOut('.nojekyll', '');
 
   console.log(
-    `Built ${PAGES.length} HTML pages, ${PAGES.length} Markdown mirrors, llms.txt, llms-full.txt, sitemap.xml, and robots.txt in ${ROOT_DIR}`,
+    `Built ${PAGES.length} pages (HTML + Markdown mirror), ${Object.keys(REDIRECTS).length} redirect stubs, llms.txt, llms-full.txt, sitemap.xml, and robots.txt in ${ROOT_DIR}`,
   );
 }
 
