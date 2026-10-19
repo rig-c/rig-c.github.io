@@ -53,7 +53,7 @@ Nothing is written unless every hard gate passes:
 
 | Check | Refusal Code | Requirement |
 | --- | --- | --- |
-| Base rig & retargeted rig pass `rigc build` | `RIG_GATE_BASE`, `RIG_GATE` | All 50 compiler assertions pass before and after adding the animation. |
+| Base rig & retargeted rig pass `rigc build` | `RIG_GATE_BASE`, `RIG_GATE` | rig-c's gate is green with the rig as it is, and again with the animation in. |
 | Every mapped bone lands on target angle/scale/ankle | `POSE_LANDS` | Posed by `rig-c`'s poser and measured within `0.01°` / `0.01` units on every frame. |
 | Hinges bend only in their anatomically valid direction | `POSE_BEND_ONE_WAY` | Elbows and knees stay on the rest pose's bend side (or clamp with `--bends clamp`). |
 | Every mapped point has valid data | `POSE_POINT_NEVER_GOOD` | Each required joint is good on at least one frame. |

@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>rig-c (@rig-c/core) — 2D Rig Compiler &amp; 50-Assertion Gate for Spine 4.3</title>
-    <meta name="description" content="rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by 50 named assertions held to spine-core round-trip verdicts.">
+    <title>rig-c (@rig-c/core) — 2D Rig Compiler &amp; Named-Assertion Gate for Spine 4.3</title>
+    <meta name="description" content="rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile) held to spine-core round-trip verdicts in CI.">
     <meta name="keywords" content="rig-c, @rig-c/core, spine-rigc, rigc compiler, Spine 4.3 JSON, skeleton.model.json, A18_DETERMINISTIC_EMIT, A20_MESH_WEIGHTS_COHERENT">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://rig-c.github.io/core/">
@@ -13,14 +13,14 @@
     <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="rig-c">
-    <meta property="og:title" content="rig-c (@rig-c/core) — 2D Rig Compiler &amp; 50-Assertion Gate for Spine 4.3">
-    <meta property="og:description" content="rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by 50 named assertions held to spine-core round-trip verdicts.">
+    <meta property="og:title" content="rig-c (@rig-c/core) — 2D Rig Compiler &amp; Named-Assertion Gate for Spine 4.3">
+    <meta property="og:description" content="rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile) held to spine-core round-trip verdicts in CI.">
     <meta property="og:url" content="https://rig-c.github.io/core/">
     <meta property="og:image" content="https://rig-c.github.io/assets/banner.svg">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="rig-c (@rig-c/core) — 2D Rig Compiler &amp; 50-Assertion Gate for Spine 4.3">
-    <meta name="twitter:description" content="rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by 50 named assertions held to spine-core round-trip verdicts.">
+    <meta name="twitter:title" content="rig-c (@rig-c/core) — 2D Rig Compiler &amp; Named-Assertion Gate for Spine 4.3">
+    <meta name="twitter:description" content="rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile) held to spine-core round-trip verdicts in CI.">
     <meta name="twitter:image" content="https://rig-c.github.io/assets/banner.svg">
     <link rel="stylesheet" href="/styles.css">
     <script type="application/ld+json">
@@ -30,8 +30,8 @@
     {
       "@type": "TechArticle",
       "@id": "https://rig-c.github.io/core/#article",
-      "headline": "rig-c (@rig-c/core) — 2D Rig Compiler & 50-Assertion Gate for Spine 4.3",
-      "description": "rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by 50 named assertions held to spine-core round-trip verdicts.",
+      "headline": "rig-c (@rig-c/core) — 2D Rig Compiler & Named-Assertion Gate for Spine 4.3",
+      "description": "rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile) held to spine-core round-trip verdicts in CI.",
       "url": "https://rig-c.github.io/core/",
       "datePublished": "2026-10-19",
       "dateModified": "2026-10-19",
@@ -70,7 +70,7 @@
       "url": "https://rig-c.github.io/core/",
       "programmingLanguage": "TypeScript",
       "runtimePlatform": "Node.js >= 20, Bun, Web Browser",
-      "description": "rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by 50 named assertions held to spine-core round-trip verdicts."
+      "description": "rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile) held to spine-core round-trip verdicts in CI."
     }
   ]
 }
@@ -109,7 +109,7 @@
         <span>LLM Index: <a href="/llms.txt">/llms.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></span>
       </div>
       <article>
-        <h1>rig-c (@rig-c/core) — 2D Rig Compiler &amp; 50-Assertion Gate for Spine 4.3</h1>
+        <h1>rig-c (@rig-c/core) — 2D Rig Compiler &amp; Named-Assertion Gate for Spine 4.3</h1>
 <p class="lead"><strong>AI-authored 2D rigging and animation, verified before it is written.</strong></p>
 
 <div class="meta-bar">
@@ -119,7 +119,7 @@
   <span>License: <code>MIT</code></span>
 </div>
 
-<p><code>rigc</code> is a deterministic rig compiler: a rig spec (<code>rig.json</code>), a motion spec (<code>motion.json</code>), and loose part PNGs go in; <strong>Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>skeleton.atlas</code>) and <code>skeleton.model.json</code> come out</strong> — gated by 50 named assertions before a single byte is written to disk.</p>
+<p><code>rigc</code> is a deterministic rig compiler: a rig spec (<code>rig.json</code>), a motion spec (<code>motion.json</code>), and loose part PNGs go in; <strong>Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>skeleton.atlas</code>) and <code>skeleton.model.json</code> come out</strong> — gated by named assertions before a single byte is written to disk (36 under the default <code>--profile spine</code>, all 50 under the opt-in <code>--profile rig-play</code>).</p>
 
 <h2>Install</h2>
 <pre><code>bunx rig-c --help    # run without installing
@@ -170,7 +170,7 @@ bun add -d rig-c     # pin in a project</code></pre>
       <tr>
         <td>2 to 4 candidate rigs</td>
         <td><code>rigc vote</code></td>
-        <td>Human A/B ballot page with verdicts recorded into a ledger.</td>
+        <td>Human A/B ballot page with verdicts recorded into a ledger (when <code>@esotericsoftware/spine-core</code> is installed beside it).</td>
       </tr>
       <tr>
         <td>A key-pose image and part PNGs</td>
@@ -186,13 +186,13 @@ bun add -d rig-c     # pin in a project</code></pre>
   </table>
 </div>
 
-<h2>The 50-Assertion Gate &amp; Structural Invariants</h2>
+<h2>The Named-Assertion Gate &amp; Structural Invariants</h2>
 <ul>
   <li><strong>Validation is a structural invariant, never an option.</strong> There is no <code>--no-validate</code> or <code>--emit-anyway</code> flag.</li>
   <li><strong>Two suppliers, one oracle</strong>:
     <ol>
-      <li>Where <code>@esotericsoftware/spine-core</code> is installed (CI, repository clones, or optional dev install), <code>rigc</code> runs the full Spine 4.3 parser round-trip (<code>A00_ROUNDTRIP_PARSE</code>) plus 49 assertions.</li>
-      <li>In the standalone published package (which links zero Spine runtime code), <code>rigc</code> runs its own validator over the model document and emitted text — 49 shared rules plus <code>A00_MODEL_READ</code> and <code>A00_MODEL_REGIONS_ON_PAGES</code> (52 total lines), held equal to the <code>spine-core</code> round-trip verdicts on every commit in CI by <code>verdict_gate</code>, <code>RC28</code>, and <code>core_gate</code> (pose tolerance <code>0</code>).</li>
+      <li>The published package links no Spine runtime: <code>rigc</code> runs its own validator. Of the 50 assertions, 49 run there; <code>A00_ROUNDTRIP_PARSE</code>, the official parser's own parse, is reported as a SKIP, and the model side's own two parse rules, <code>A00_MODEL_READ</code> and <code>A00_MODEL_REGIONS_ON_PAGES</code>, run in its place — so the report's summary totals 52.</li>
+      <li>With <code>@esotericsoftware/spine-core</code> installed beside it (<code>bun add -d @esotericsoftware/spine-core</code>), the same <code>rigc</code> also runs the Spine 4.3 round trip, <code>A00_ROUNDTRIP_PARSE</code>, on every build. The rig-c/core repository holds the validator to the round trip's verdicts in its CI.</li>
     </ol>
   </li>
   <li><strong>Byte-for-byte determinism (<code>A18_DETERMINISTIC_EMIT</code>)</strong>: Every <code>build</code> compiles twice independently and compares the output byte for byte before emitting.</li>
