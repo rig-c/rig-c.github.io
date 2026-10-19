@@ -65,11 +65,13 @@ function hero(page: Page): string {
           <pre class="install"><code>bunx rig-c --help</code></pre>
         </div>
         <figure class="hero-media">
-          <video autoplay muted loop playsinline preload="auto" poster="/assets/trailer-poster.jpg" width="960" height="540">
-            <source src="/assets/trailer.mp4" type="video/mp4">
-            <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, smiles, kicks her legs and waves" width="960" height="540">
-          </video>
-          <figcaption>One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a></figcaption>
+          <div class="media">
+            <video data-loop="the trailer loop" controls muted loop playsinline preload="metadata" poster="/assets/trailer-poster.jpg" width="960" height="540" aria-label="Recorded video: a rigged character on a swing breathes, smiles, kicks her legs and waves">
+              <source src="/assets/trailer.mp4" type="video/mp4">
+              <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, smiles, kicks her legs and waves" width="960" height="540">
+            </video>
+          </div>
+          <figcaption><span class="media-kind">Recorded video</span> One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a></figcaption>
         </figure>
       </section>`;
 }
@@ -181,6 +183,7 @@ function head(page: Page): string {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
     <link rel="stylesheet" href="/styles.css">
+    <script src="/assets/media.js" defer></script>
     <script type="application/ld+json">
 ${buildJsonLd(page)}
     </script>`;
