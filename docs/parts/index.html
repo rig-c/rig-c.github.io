@@ -77,7 +77,7 @@
     {
       "@type": "SoftwareSourceCode",
       "name": "@rig-c/parts",
-      "version": "1.40.0",
+      "version": "1.41.0",
       "codeRepository": "https://github.com/rig-c/parts",
       "url": "https://rig-c.org/docs/parts/",
       "programmingLanguage": "TypeScript",
@@ -115,66 +115,108 @@
         </nav>
       <main class="site-main docs-main">
         <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Parts</li></ol></nav>
-        <div class="pkg-bar"><span class="pkg"><code>@rig-c/parts</code> <span class="ver">1.40.0</span></span><a href="https://github.com/rig-c/parts">github.com/rig-c/parts</a><a href="https://www.npmjs.com/package/@rig-c/parts">npm</a></div>
+        <div class="pkg-bar"><span class="pkg"><code>@rig-c/parts</code> <span class="ver">1.41.0</span></span><a href="https://github.com/rig-c/parts">github.com/rig-c/parts</a><a href="https://www.npmjs.com/package/@rig-c/parts">npm</a></div>
         <article>
 <h1 id="rig-cparts">@rig-c/parts</h1>
-<p>Turn one anime character painting into a rigged, idling 2D character. Every stage is checked before anything is written.</p>
-<h2 id="what-it-is">What it is</h2>
-<p><code>@rig-c/parts</code> (command <code>rig-parts</code>) is a command-line tool. It takes a single character painting and the layers See-through decomposed it into. It merges them into measured parts, authors weighted meshes, bone chains and a looping idle, and hands that spec to rig-c to compile, gate, pack, render and check.</p>
-<h2 id="when-to-use-it">When to use it</h2>
-<p>Use it when you start from a painting, not from a finished rig. It is built for agents that cannot see the image: every stage prints named, numeric findings instead of asking you to look.</p>
-<p>It also reads an artist's own layered PSD, one layer per part, with no See-through step.</p>
-<p>Do not use it to write Spine data directly. rig-parts never does that itself. Compiling, gating and packing belong to <a href="/docs/core/">rig-c</a>. Drawing the result on a web page belongs to <a href="/docs/play/">rig-play</a>. To set up the machine that makes the painting and the layers, start at <a href="/docs/getting-started/">Getting started</a>.</p>
-<h2 id="what-it-solves">What it solves</h2>
-<p>Cutting a painted character into rig parts is slow, and the mistakes show up late: a layer holds the wrong pixels, a part leaves a hole, a chain swings a skirt about its middle. rig-parts measures these. A refusal names the object, the value found and the value required. Nothing is written after a red, and no value is invented where the input is silent.</p>
-<h2 id="what-you-get">What you get</h2>
-<p>A green <code>build</code> ends like a Spine editor export, with one packed atlas page:</p>
-<ul>
-<li><strong>The artifact</strong>: <code>skeleton.json</code>, <code>skeleton.atlas</code> and <code>skeleton.png</code> under <code>check/build/</code>. This is Spine 4.3 skeleton data, written by rig-c and gated under the <code>rig-play</code> profile.</li>
-<li><strong>The intermediates</strong>: the loose <code>parts/</code>, <code>parts.json</code> (where every part came from), the recomposite and its error map.</li>
-<li><strong>The rig spec</strong>: <code>rig.json</code> and <code>motion.json</code> in rig-c's spec.</li>
-<li><strong>The checks</strong>: both gate files, the idle's frames and <code>check.json</code>.</li>
-<li><strong>With <code>--loop</code></strong>: the idle as a lossless APNG, an indexed APNG and a GIF.</li>
-</ul>
+<p class="mod-role">One painting and its See-through layers in — measured parts, a drafted rig and a looping idle out.</p>
+<figure class="mod-hero">
+  <div class="media">
+    <video data-loop="the parts coming together" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-explode-poster.jpg" width="1280" height="720" aria-label="Recorded video: Character 1's seventeen parts laid out in a grid, then moving to their places in the rig">
+      <source src="/assets/docs/parts-explode.mp4" type="video/mp4">
+      <img src="/assets/docs/parts-explode-poster.jpg" alt="Character 1's seventeen parts laid out in a grid" width="1280" height="720">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Character 1's 17 parts as rig-parts assembled them, drawn from <code>out/parts/</code> at the positions <code>parts.json</code> records, in the rig's draw order.</figcaption>
+</figure>
+<p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
+<nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol><li><a href="/docs/parts/" aria-current="step"><strong>Parts</strong><span>split into parts</span></a></li><li><a href="/docs/pose/"><strong>Pose</strong><span>given a motion</span></a></li><li><a href="/docs/core/"><strong>Core</strong><span>checked</span></a></li><li><a href="/docs/review/"><strong>Review</strong><span>looked at</span></a></li><li><a href="/docs/play/"><strong>Play</strong><span>played</span></a></li></ol></nav>
+<p>Cutting a painted character into rig parts is slow, and the mistakes show up late: a layer holds the wrong pixels, a part leaves a hole, a chain swings a skirt about its middle. <code>rig-parts</code> measures each of these and prints the number, so an agent that cannot see the image can still tell where it went wrong. A refusal names the object, the value found and the value required; nothing is written after a red, and no value is invented where the input is silent.</p>
+<h2 id="how-character-1-was-made">How Character 1 was made</h2>
+<h3 id="1-two-see-through-runs">1. Two See-through runs</h3>
+<figure class="figure-wide">
+  <img src="/assets/docs/parts-layers.jpg" alt="A sheet of every See-through layer of Character 1, each labelled with its tag, size and opaque pixel count" width="1400" height="1225" loading="lazy">
+  <figcaption>The layers See-through returned — one run on the full figure, one on a square crop around the head, because a full-figure run leaves the eyes too small to separate. Each tile is labelled with its tag, size and opaque pixels.</figcaption>
+</figure>
+<h3 id="2-parts-and-what-they-miss">2. Parts, and what they miss</h3>
+<p><code>assemble</code> merges the two runs into rig-space parts, then lays them back together and compares the result with the painting. The error map is the point of that step: it shows, in colour, the painting that no part holds.</p>
+<div class="compare cols-3">
+  <figure><img src="/assets/docs/parts-painting.jpg" alt="Character 1's painting" width="315" height="900" loading="lazy"><figcaption>The painting</figcaption></figure>
+  <figure><img src="/assets/docs/parts-recomposite.jpg" alt="The 17 parts laid back together" width="315" height="900" loading="lazy"><figcaption>The 17 parts, recomposited</figcaption></figure>
+  <figure><img src="/assets/docs/parts-errormap.jpg" alt="Error map: the figure in grey with thin red and blue edges where the parts and the painting differ" width="315" height="900" loading="lazy"><figcaption>The error map</figcaption></figure>
+</div>
+<div class="compare">
+  <figure><img src="/assets/docs/parts-painting-zoom.jpg" alt="Close-up of the painting: Character 1's left hand resting on her forearm" width="660" height="660" loading="lazy"><figcaption>The painting, around the resting hand</figcaption></figure>
+  <figure><img src="/assets/docs/parts-errormap-zoom.jpg" alt="The same close-up on the error map: a thin red line along the hand and sleeve edge, with a few blue pixels" width="660" height="660" loading="lazy"><figcaption>The error map there: <strong>red</strong> is painting no part holds, <strong>blue</strong> is a part whose colour is more than 40 off</figcaption></figure>
+</div>
+<p>For this build <code>parts.json</code> records a mean difference of 0.873 per pixel, 98.3% of pixels within 8, and 6,041 uncovered error pixels. The largest hole it lists is 834 px along the edge of <code>bottomwear</code>. A clean recomposite is what lets the rig move without showing the background through.</p>
+<h3 id="3-a-drafted-rig-that-idles">3. A drafted rig that idles</h3>
+<p><code>propose</code> drafts bones, weighted meshes, regions and a looping idle over those parts, for a person or an agent to correct; <code>build</code> runs assemble, rig and check in one process and stops at the first refusal.</p>
+<div class="compare">
+  <figure>
+    <div class="media">
+      <video data-loop="the idle" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-idle-poster.jpg" width="246" height="640" aria-label="Recorded video: Character 1 breathing in its idle loop">
+        <source src="/assets/docs/parts-idle.mp4" type="video/mp4">
+        <img src="/assets/docs/parts-idle-poster.jpg" alt="Character 1 standing" width="246" height="640">
+      </video>
+    </div>
+    <figcaption><span class="media-kind">Recorded video</span> The idle, as <code>build --loop</code> wrote it: 41 frames at 12 fps.</figcaption>
+  </figure>
+  <figure><img src="/assets/docs/parts-contact.jpg" alt="A contact sheet of the idle's 41 frames" width="401" height="775" loading="lazy"><figcaption><code>check</code>'s contact sheet of the same idle — what the measured bars read.</figcaption></figure>
+</div>
+<p>The idle then goes on: <a href="/docs/pose/">Pose</a> gives the same rig a recorded motion, and <a href="/docs/core/">Core</a> is the compiler every one of these builds went through.</p>
 <h2 id="how-it-works">How it works</h2>
 <ol>
-<li><strong>Inputs.</strong> <code>inputs</code> cuts the two images See-through is fed: the painting on a white square, and a square crop around the head. The head run exists because a full-figure run leaves the eyes too small to separate.</li>
-<li><strong>Layers.</strong> You run See-through by any route: a hosted demo, the upstream CLI, or ComfyUI. rig-parts reads its <code>.psd</code> or the ComfyUI wrapper form. An optional <code>comfy</code> adapter drives a ComfyUI box; nothing else needs one.</li>
-<li><strong>Assemble.</strong> The two runs merge into rig-space parts. Uncovered holes are listed, and the error map shows them in red.</li>
-<li><strong>Propose.</strong> <code>propose</code> drafts bones, meshes, regions and an idle, with an overlay to correct against. It is a draft, not a step of <code>build</code>. You copy its sections into <code>config.json</code>, and LINT lines flag what still looks wrong.</li>
-<li><strong>Build.</strong> <code>build</code> runs assemble, rig and check in one process and stops at the first refusal.</li>
+<li><strong>Inputs.</strong> <code>inputs</code> cuts the two images See-through is fed: the painting on a white square, and a square crop around the head.</li>
+<li><strong>Layers.</strong> You run See-through by any route — a hosted demo, the upstream CLI, or ComfyUI. rig-parts reads its <code>.psd</code> or the ComfyUI wrapper form; an artist's own layered PSD works too, with no See-through step.</li>
+<li><strong>Assemble.</strong> The two runs merge into rig-space parts; uncovered holes are listed and the error map shows them.</li>
+<li><strong>Propose.</strong> Bones, meshes, regions and an idle are drafted with an overlay to correct against. It is a draft, not a step of <code>build</code>: you copy its sections into <code>config.json</code>, and LINT lines flag what still looks wrong.</li>
+<li><strong>Build.</strong> Assemble, rig and check in one process; compiling, gating and packing are rig-c's.</li>
 </ol>
-<h2 id="key-concepts">Key concepts</h2>
-<ul>
-<li><strong>See-through layers</strong>: the decomposition of the painting into tagged layers, one run on the full figure and one on the head.</li>
-<li><strong>Parts</strong>: the merged, measured pieces in rig space, recorded in <code>parts.json</code>.</li>
-<li><strong>Proposal</strong>: the drafted bones, meshes, regions and motion in <code>proposal.json</code>, to be corrected.</li>
-<li><strong>Config</strong>: <code>config.json</code>, the character's part plan, head box, bones and idle. Unknown or missing fields are refused by name.</li>
-<li><strong>FAIL line</strong>: a refusal; it names a rule and ends with <code>(see rig-parts guide &lt;RULE&gt;)</code>.</li>
-<li><strong>Gate</strong>: rig-c's validation of the compiled rig, here under the <code>rig-play</code> profile.</li>
-</ul>
+<p><strong>Key terms.</strong> <em>See-through layers</em> — the painting's decomposition, one run on the full figure and one on the head. <em>Parts</em> — the merged, measured pieces in rig space (<code>parts.json</code>). <em>Proposal</em> — the drafted bones, meshes, regions and motion, to be corrected. <em>Config</em> — <code>config.json</code>, the character's part plan, head box, bones and idle; unknown or missing fields are refused by name. <em>FAIL line</em> — a refusal that names a rule and ends with <code>(see rig-parts guide &lt;RULE&gt;)</code>.</p>
+<section class="tech" aria-label="Technical details">
 <h2 id="install">Install</h2>
-<p>Requires <a href="https://bun.sh">Bun</a> 1.2 or later. rig-c comes with it as a dependency.</p>
 <pre><code class="language-sh">npm i -D @rig-c/parts
 rig-parts --help
 </code></pre>
-<p>Which Spine terms apply depends on what plays the output — rig-c's own model in <code>@rig-c/play</code> or an engine adapter, or the Spine data in a Spine Runtime or the editor. See <a href="/docs/licensing/">Licensing</a>.</p>
+<p>Requires <a href="https://bun.sh">Bun</a> 1.2 or later; rig-c comes with it as a dependency. Which Spine terms apply depends on what plays the output: see <a href="/docs/licensing/">Licensing</a>.</p>
+<h2 id="inputs-and-outputs">Inputs and outputs</h2>
+<table>
+<thead>
+<tr><th>In</th><th>Out</th></tr>
+</thead>
+<tbody>
+<tr><td>One character painting (<code>painting.png</code>)</td><td><code>check/build/skeleton.json</code>, <code>skeleton.atlas</code>, <code>skeleton.png</code> — Spine 4.3 data and one packed page</td></tr>
+<tr><td>Two See-through layer sets (<code>full</code>, <code>head</code>), as the ComfyUI wrapper form or a <code>.psd</code></td><td><code>parts/*.png</code>, <code>parts.json</code>, the recomposite and its error map</td></tr>
+<tr><td>A character config (<code>config.json</code>)</td><td><code>rig/rig.json</code>, <code>rig/motion.json</code> in rig-c's spec</td></tr>
+<tr><td>Optional body-18 keypoints for <code>propose --keypoints</code></td><td><code>check/</code>: both gate files, the idle's frames, <code>contact.png</code>, <code>check.json</code>; with <code>--loop</code>, the idle as APNG and GIF</td></tr>
+</tbody>
+</table>
+<h2 id="limits">Limits</h2>
+<p>From the README's own <em>What it does not do</em>:</p>
+<ul>
+<li><strong>One depth value per layer.</strong> A layer that is in front of another in one place and behind it in another is right in the still and wrong once it moves.</li>
+<li><strong>No expression or lip-sync, and no jiggle.</strong> The mouth is one layer; nothing here proposes, keys or judges a soft region.</li>
+<li><strong>Occluded pixels are See-through's synthesis</strong>, not the artist's.</li>
+<li><strong>No success rate is claimed</strong> — ten characters measured stage by stage is an existence proof, not a rate.</li>
+<li><strong>No WebP</strong>: <code>loop</code> writes GIF and APNG.</li>
+<li><strong>The proposer reads tags, not pictures</strong>, and reads the torso by screen y unless it is given keypoints; it does not estimate a pose itself.</li>
+</ul>
 <h2 id="go-deeper">Go deeper</h2>
 <ul>
 <li><a href="https://github.com/rig-c/parts#what-it-takes-in">README: What it takes in</a> and <a href="https://github.com/rig-c/parts#what-it-gives-out">What it gives out</a></li>
 <li><a href="https://github.com/rig-c/parts#the-loop-for-an-agent">README: The loop, for an agent</a>, the full command sequence</li>
+<li><a href="https://github.com/rig-c/parts#what-it-does-not-do">README: What it does not do</a></li>
 <li><a href="https://github.com/rig-c/parts/blob/main/docs/AUTHORING.md">docs/AUTHORING.md</a>: every config field, what to read after each stage, every refusal</li>
 <li><a href="https://github.com/rig-c/parts/blob/main/docs/PAINTING.md">docs/PAINTING.md</a>: what makes a painting riggable</li>
-<li><a href="https://github.com/rig-c/parts/blob/main/docs/STABILITY.md">docs/STABILITY.md</a>: what 1.0.0 holds stable</li>
-<li><a href="https://github.com/rig-c/parts/blob/main/NOTICE.md">NOTICE.md</a>: third-party terms, See-through's included</li>
-<li><a href="https://github.com/rig-c/parts/blob/main/CHANGELOG.md">CHANGELOG.md</a></li>
-<li><a href="https://www.npmjs.com/package/@rig-c/parts">npm: @rig-c/parts</a></li>
+<li><a href="https://github.com/rig-c/parts/blob/main/docs/STABILITY.md">docs/STABILITY.md</a> · <a href="https://github.com/rig-c/parts/blob/main/NOTICE.md">NOTICE.md</a> · <a href="https://github.com/rig-c/parts/blob/main/CHANGELOG.md">CHANGELOG.md</a> · <a href="https://www.npmjs.com/package/@rig-c/parts">npm</a></li>
+<li>Character 1's own files: <a href="https://github.com/rig-c/parts-examples/tree/c239b09328ca7364361b9761fac817502c09ede0/family/roa">its folder in rig-c/parts-examples</a></li>
 </ul>
+</section>
 
         </article>
         <nav aria-label="Docs pages" class="pager"><a href="/docs/getting-started/" rel="prev"><span>Previous</span>Getting Started</a><a href="/docs/pose/" rel="next"><span>Next</span>Pose</a></nav>
       </main>
-      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#install">Install</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#how-character-1-was-made">How Character 1 was made</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#install">Install</a></li><li><a href="#inputs-and-outputs">Inputs and outputs</a></li><li><a href="#limits">Limits</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
     </div>
     <footer class="site-footer">
       <div class="footer-inner">

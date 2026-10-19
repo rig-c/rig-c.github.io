@@ -77,7 +77,7 @@
     {
       "@type": "SoftwareSourceCode",
       "name": "@rig-c/pose",
-      "version": "0.33.0",
+      "version": "0.35.0",
       "codeRepository": "https://github.com/rig-c/pose",
       "url": "https://rig-c.org/docs/pose/",
       "programmingLanguage": "TypeScript",
@@ -115,66 +115,106 @@
         </nav>
       <main class="site-main docs-main">
         <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Pose</li></ol></nav>
-        <div class="pkg-bar"><span class="pkg"><code>@rig-c/pose</code> <span class="ver">0.33.0</span></span><a href="https://github.com/rig-c/pose">github.com/rig-c/pose</a><a href="https://www.npmjs.com/package/@rig-c/pose">npm</a></div>
+        <div class="pkg-bar"><span class="pkg"><code>@rig-c/pose</code> <span class="ver">0.35.0</span></span><a href="https://github.com/rig-c/pose">github.com/rig-c/pose</a><a href="https://www.npmjs.com/package/@rig-c/pose">npm</a></div>
         <article>
 <h1 id="rig-cpose">@rig-c/pose</h1>
-<p>Pose moves a rig. It takes joint positions over time and writes them onto a rig-c rig as bone keys, and it checks those keys before it writes anything.</p>
-<h2 id="what-it-is">What it is</h2>
-<p>A command-line tool, <code>rig-pose</code>, that turns a body-18 pose sequence into an animation in rig-c's motion format. In the rig-c toolchain, <a href="/docs/core/">core</a> gates the rig, <a href="/docs/parts/">parts</a> builds it, <a href="/docs/play/">play</a> plays it, and pose moves it. Version 0.x is a prototype: the format, the commands and the output can change in any release before 1.0.</p>
-<h2 id="when-to-use-it">When to use it</h2>
-<p>Use it when you already have joint positions (from a pose model, a dataset, or placed by hand) and a rig-c rig with limb chains, and you want an animation that follows them.</p>
-<p>Do not use it to:</p>
-<ul>
-<li><strong>Get the poses.</strong> It does not extract poses from video; how you get joint positions is up to you.</li>
-<li><strong>Build the rig.</strong> The rig must have chains: a thigh with a shin below it, an upper arm with a forearm below it. <a href="/docs/parts/">@rig-c/parts</a> builds such a rig from a painting. A rig whose arm is one bone is refused.</li>
-<li><strong>Animate hands, fingers or depth.</strong> It works in 2D. A limb pointing at the camera foreshortens, and the rig matches its direction, not its length.</li>
-</ul>
-<h2 id="what-it-solves">What it solves</h2>
-<p>A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones also has traps: setup rotations, and parents that turn their children. Pose cleans the sequence once, where it can be inspected, and then refuses to write keys that do not land where the pose asked.</p>
-<h2 id="what-you-get">What you get</h2>
-<ul>
-<li>A cleaned <code>rig-pose-sequence/1</code> file that carries a <code>cleaned</code> record of what was done.</li>
-<li>A motion file with the new animation, for the rig's motion spec.</li>
-<li>With <code>--report</code>, a <code>rig-pose-report/1</code> JSON file of everything the run found.</li>
-<li>With <code>--build</code>, the gated build, which <code>rigc preview</code> can play.</li>
-<li>From <code>compare</code>, a <code>rig-pose-compare/1</code> report and an optional PNG sheet.</li>
-</ul>
+<p class="mod-role">Joint positions over time in — bone keys on a rig-c rig out, checked before they are written.</p>
+<figure class="mod-hero">
+  <div class="media">
+    <video data-loop="the wave comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-wave-poster.jpg" width="978" height="792" aria-label="Recorded video: on the left a stick-figure pose raising and waving its right arm; on the right Character 1 doing the same wave">
+      <source src="/assets/docs/pose-wave.mp4" type="video/mp4">
+      <img src="/assets/docs/pose-wave-peak.jpg" alt="Side by side at the top of the wave: the source pose's raised arm and Character 1's raised arm" width="978" height="792">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right arm raised and waved. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
+</figure>
+<p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
+<nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol><li><a href="/docs/parts/"><strong>Parts</strong><span>split into parts</span></a></li><li><a href="/docs/pose/" aria-current="step"><strong>Pose</strong><span>given a motion</span></a></li><li><a href="/docs/core/"><strong>Core</strong><span>checked</span></a></li><li><a href="/docs/review/"><strong>Review</strong><span>looked at</span></a></li><li><a href="/docs/play/"><strong>Play</strong><span>played</span></a></li></ol></nav>
+<p>A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones has traps of its own: setup rotations, and parents that turn their children. <code>rig-pose</code> cleans the sequence once, where it can be inspected, then turns each mapped bone to point along its segment — and refuses to write keys that do not land where the pose asked.</p>
+<h2 id="how-the-wave-reached-character-1">How the wave reached Character 1</h2>
+<h3 id="what-was-carried-and-what-was-not">What was carried, and what was not</h3>
+<p>The map names two chains: the <strong>trunk</strong> (hip to neck) on the <code>chest</code> bone, and the <strong>right arm</strong> (shoulder, elbow, wrist) on the two sleeve bones. Character 1's rig has no left-arm bones (no <code>sleeve_l</code> in its <code>rig.json</code>), so the map leaves that arm out, and the hand with the cup is not mapped either: it turns with the forearm.</p>
+<table>
+<thead>
+<tr><th>Track the rig received</th><th>From the pose</th><th>First key</th><th>Top of the wave</th></tr>
+</thead>
+<tbody>
+<tr><td><code>sleeve_r0</code> rotate</td><td>shoulder → elbow</td><td>−3.7°</td><td>−114.7°</td></tr>
+<tr><td><code>sleeve_r1</code> rotate</td><td>elbow → wrist</td><td>0.4°</td><td>−71.0°</td></tr>
+<tr><td><code>chest</code> rotate</td><td>hip → neck</td><td>2.6°</td><td>2.6° (held)</td></tr>
+<tr><td><code>hip</code> translate</td><td>hip</td><td>0, 0</td><td>0, 0 (held)</td></tr>
+</tbody>
+</table>
+<p><strong>Direction, not length.</strong> Each bone points the way its segment points in the picture but keeps the rig's own length: the upper arm is 300 px in the pose and 267 units on the rig, the forearm 335 px and 303 units. That is why the raised cup ends up above the source's wrist dot.</p>
+<div class="compare">
+  <figure><img src="/assets/docs/pose-keypoints.jpg" alt="Character 1's painting with 18 labelled body joints drawn over it" width="400" height="1142" loading="lazy"><figcaption>Where the wave starts: 18 body joints placed by hand on the painting (shoulders, hips, knees and ankles under the clothes marked occluded).</figcaption></figure>
+  <figure><img src="/assets/docs/pose-wave-peak.jpg" alt="Side by side at the top of the wave: the source pose's raised arm in orange and Character 1's raised arm holding the cup" width="978" height="792" loading="lazy"><figcaption>The top of the wave, t = 0.50 s. Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
+</div>
+<h3 id="what-it-checked-before-writing">What it checked before writing</h3>
+<pre><code>rig-pose clean: SPIKES 0 replaced
+  JITTER mean |second difference| of y over 1207 joint-frame triple(s): 1.260 → 1.222 px/f² (3.1% lower)
+rig-pose retarget:
+  GATE   rigc build --profile spine-html: green — 52 assertions: 26 measured (26 passed, 0 failed), 26 skipped, 0 not in profile &quot;rig-play&quot;
+  LAND   bone &quot;sleeve_r0&quot; aim — worst |reached − asked| 0.000652° at frame 65 (t=2.708s); the tolerance is 0.01°
+  LAND   bone &quot;sleeve_r1&quot; aim — worst |reached − asked| 0.000983° at frame 4 (t=0.167s); the tolerance is 0.01°
+  FOLD   rigc render --folds at 24 fps: no mesh folds
+  wrote wave.motion.json — animations: idle, wave
+</code></pre>
+<p>The rig is built with the new animation and gated before anything is written; every mapped bone, posed by rig-c's own poser, has to land within 0.01° of what the pose asked on every frame. The run also says what it left out: 26 <code>IDLE-DROPPED</code> lines name the breathing, hair and skirt tracks that were not carried into <code>wave</code> — which is why only the arm moves.</p>
+<p>The joints were placed by hand on the painting (the way the guide's <code>docs/KEYPOINTS.md</code> describes), and the wave itself comes from the getting-started guide's <code>scripts/wave.ts</code>. Next, <a href="/docs/core/">Core</a> is the compiler that gated this build, and <a href="/docs/review/">Review</a> is where a person checks a motion like this one against footage.</p>
 <h2 id="how-it-works">How it works</h2>
 <ol>
-<li><strong>Clean.</strong> <code>rig-pose clean</code> removes spikes, fills low-score or occluded joints from their neighbours, smooths each joint, and holds joints that have stopped. <code>retarget</code> reads only a sequence that <code>clean</code> wrote. COCO-17 input is converted here with <code>--coco</code>.</li>
-<li><strong>Map.</strong> You write a map that says which bones carry which joints, chain by chain.</li>
-<li><strong>Retarget.</strong> For every frame and every mapped bone, the bone is turned so it points the way its segment points in the picture, minus its setup angle and its parent's turn.</li>
-<li><strong>Check.</strong> rig-c's gate must be green with the rig as it is and with the animation in. Every mapped bone must land on its asked angle on every frame, posed by rig-c's own poser. Hinges must bend only one way. If any check fails, nothing is written and every reason is printed.</li>
-<li><strong>List what it cannot decide.</strong> Lines such as <code>HOLD</code>, <code>END-ON</code> and <code>IDLE-DROPPED</code> name what you should look at.</li>
+<li><strong>Clean.</strong> <code>rig-pose clean</code> removes spikes, fills low-score or occluded joints from their neighbours, smooths each joint and holds joints that have stopped. <code>retarget</code> reads only a sequence <code>clean</code> wrote; COCO-17 input is converted with <code>--coco</code>.</li>
+<li><strong>Map.</strong> You write which bones carry which joints, chain by chain.</li>
+<li><strong>Retarget.</strong> For every frame and every mapped bone, the bone is turned so it points the way its segment points, minus its setup angle and its parent's turn.</li>
+<li><strong>Check.</strong> The gate must be green with and without the animation, every mapped bone must land on its angle, hinges must bend one way; otherwise nothing is written and every reason is printed.</li>
+<li><strong>Say what it cannot decide.</strong> Lines such as <code>HOLD</code>, <code>END-ON</code> and <code>IDLE-DROPPED</code> name what to look at.</li>
 </ol>
-<pre><code class="language-sh">bun add @rig-c/pose
-rig-pose retarget --rig out/rig --map map.json --sequence dance.pose.json --out motion.json --animation dance
+<p><strong>Key terms.</strong> <em>body-18</em> — the 18 joints the sequence uses; <code>r</code>/<code>l</code> are the subject's sides. <em>Chain</em> — a limb in the map, as bones that descend from one another. <em>Lands</em> — a mapped bone within 0.01° of the angle the pose asks for. <em>Cleaned record</em> — the block <code>clean</code> writes into the sequence, which <code>retarget</code> requires.</p>
+<section class="tech" aria-label="Technical details">
+<h2 id="install">Install</h2>
+<pre><code class="language-sh">npm i -D @rig-c/pose
+bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json --out wave.motion.json --name wave --build wave-build
 </code></pre>
-<h2 id="key-concepts">Key concepts</h2>
+<p>Needs <a href="https://bun.sh">Bun</a> 1.2 or later on <code>PATH</code>; rig-c comes as a dependency.</p>
+<h2 id="inputs-and-outputs">Inputs and outputs</h2>
+<table>
+<thead>
+<tr><th>In</th><th>Out</th></tr>
+</thead>
+<tbody>
+<tr><td>A body-18 pose sequence, <code>rig-pose-sequence/1</code> (COCO-17 with <code>--coco</code>)</td><td>A cleaned sequence carrying its <code>cleaned</code> record (<code>rig-pose clean</code>)</td></tr>
+<tr><td>A rig built with rig-c: the <code>rig/</code> directory with <code>rig.json</code> and <code>motion.json</code></td><td>A motion spec (<code>--out</code>, e.g. <code>motion.json</code>) with the bone keys</td></tr>
+<tr><td>A map, <code>rig-pose-map/1</code> — which bones carry which joints</td><td>A JSON report, <code>rig-pose-report/1</code> (<code>--report</code>), and a gated build (<code>--build</code>)</td></tr>
+<tr><td>For <code>compare</code>: a reference and a render sequence on one time base</td><td><code>compare.json</code> and a <code>compare.png</code> sheet, differences per body unit, worst first</td></tr>
+</tbody>
+</table>
+<h2 id="limits">Limits</h2>
 <ul>
-<li><strong>body-18</strong>: the 18 joints the sequence uses (<code>nose</code>, <code>neck</code>, shoulders, elbows, wrists, hips, knees, ankles, eyes, ears); <code>r</code>/<code>l</code> are the subject's sides.</li>
-<li><strong>chain</strong>: a limb in the map, as bones that descend from one another; bone <em>k</em> carries the segment from joint <em>k</em> to joint <em>k</em>+1.</li>
-<li><strong>lands</strong>: a mapped bone, posed by rig-c's poser, is within 0.01° of the angle the pose asks for.</li>
-<li><strong>cleaned record</strong>: the <code>cleaned</code> block <code>clean</code> writes into the sequence; <code>retarget</code> requires it.</li>
-<li><strong>alternates</strong>: sets of slots switched together to show a second drawing for a pose bone rotation cannot carry.</li>
+<li><strong>&quot;0.x is the prototype.&quot;</strong> The format, the command and the output can change in any release until 1.0 (README, intro).</li>
+<li><strong>Does not extract poses from video</strong>: the input is joint positions, from a pose model, a dataset or by hand (README §&quot;What it does not do&quot;).</li>
+<li><strong>2D only — does not turn the body</strong>: a segment pointing at the camera foreshortens and &quot;the rig cannot&quot;; the direction is matched, not the length (README §&quot;What it does not do&quot;).</li>
+<li><strong>No front/behind order per segment, no blinks or mouth shapes</strong>, and cloth physics is not fitted to the reference (README §&quot;What it does not do&quot;).</li>
+<li><strong>No hands or fingers</strong> — there are no bones for them yet (README §&quot;What it does not do&quot;).</li>
+<li>No importable API: the supported surface is the <code>rig-pose</code> command (README §&quot;Requirements&quot;).</li>
 </ul>
 <h2 id="go-deeper">Go deeper</h2>
 <ul>
-<li><a href="https://github.com/rig-c/pose#try-it">Try it</a> and the <a href="https://github.com/rig-c/pose/tree/main/examples/wave">wave example</a>, with no art and no video</li>
-<li><a href="https://github.com/rig-c/pose#clean-first-rig-pose-clean">Clean first</a></li>
-<li><a href="https://github.com/rig-c/pose#what-it-does">What it does</a>: every check and every listed line</li>
-<li><a href="https://github.com/rig-c/pose#the-pose-rig-pose-sequence1">The pose format</a> and <a href="https://github.com/rig-c/pose#the-map-rig-pose-map1">the map format</a></li>
-<li><a href="https://github.com/rig-c/pose#alternate-drawings-alternates">Alternate drawings</a></li>
-<li><a href="https://github.com/rig-c/pose#compare-the-rigs-render-against-the-video">Compare</a></li>
-<li><a href="https://github.com/rig-c/pose#what-it-does-not-do">What it does not do</a> and <a href="https://github.com/rig-c/pose#requirements">Requirements</a></li>
-<li><a href="https://github.com/rig-c/pose/blob/main/CHANGELOG.md">CHANGELOG</a> and the <a href="https://www.npmjs.com/package/@rig-c/pose">npm page</a></li>
-<li><code>rig-pose --help</code> lists every flag.</li>
+<li><a href="https://github.com/rig-c/pose#try-it">Try it</a> — a self-contained wave example in the repository</li>
+<li><a href="https://github.com/rig-c/pose#clean-first-rig-pose-clean">Clean first: <code>rig-pose clean</code></a></li>
+<li><a href="https://github.com/rig-c/pose#what-it-does">What it does</a></li>
+<li><a href="https://github.com/rig-c/pose#the-pose-rig-pose-sequence1">The pose: <code>rig-pose-sequence/1</code></a></li>
+<li><a href="https://github.com/rig-c/pose#the-map-rig-pose-map1">The map: <code>rig-pose-map/1</code></a></li>
+<li><a href="https://github.com/rig-c/pose#compare-the-rigs-render-against-the-video">Compare: the rig's render against the video</a></li>
+<li><a href="https://github.com/rig-c/pose#what-it-does-not-do">What it does not do</a></li>
+<li><a href="https://www.npmjs.com/package/@rig-c/pose">npm</a> · <a href="https://github.com/rig-c/pose/blob/main/CHANGELOG.md">CHANGELOG</a></li>
 </ul>
+</section>
 
         </article>
         <nav aria-label="Docs pages" class="pager"><a href="/docs/parts/" rel="prev"><span>Previous</span>Parts</a><a href="/docs/core/" rel="next"><span>Next</span>Core</a></nav>
       </main>
-      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#how-the-wave-reached-character-1">How the wave reached Character 1</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#install">Install</a></li><li><a href="#inputs-and-outputs">Inputs and outputs</a></li><li><a href="#limits">Limits</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
     </div>
     <footer class="site-footer">
       <div class="footer-inner">

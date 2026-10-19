@@ -67,8 +67,55 @@ function liveDemo(target: 'html' | 'md'): string {
 <script type="module" src="/assets/demo.js"></script>`;
 }
 
+// One Family character runs through the module pages; the strip says which stage this page shows.
+const THREAD: readonly [slug: string, label: string, stage: string][] = [
+  ['parts', 'Parts', 'split into parts'],
+  ['pose', 'Pose', 'given a motion'],
+  ['core', 'Core', 'checked'],
+  ['review', 'Review', 'looked at'],
+  ['play', 'Play', 'played'],
+];
+
+function thread(slug: string, target: 'html' | 'md'): string {
+  if (target === 'md') {
+    const stage = THREAD.find(([s]) => s === slug)?.[2] ?? '';
+    return `*This page follows Character 1 from the Family set: here it is ${stage}. Every module works on its own; this order is one path, not a requirement.*`;
+  }
+  const steps = THREAD.map(([s, label, stage]) => {
+    const current = s === slug ? ' aria-current="step"' : '';
+    return `<li><a href="/docs/${s}/"${current}><strong>${label}</strong><span>${stage}</span></a></li>`;
+  }).join('');
+  return `<nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol>${steps}</ol></nav>`;
+}
+
+// The Play page's player: Character 1 with the idle and the wave Pose wrote, served from this site.
+function playDemo(target: 'html' | 'md'): string {
+  if (target === 'md') {
+    return 'The live player on this page plays Character 1 with two motions (idle and the wave from the Pose page), with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.';
+  }
+  return `<section class="live-demo live-demo-play" data-model-url="/assets/rigs/character-1-wave/skeleton.model.json" data-character="Character 1" data-label="Character 1" data-fit="0.78" aria-label="Live player">
+<div class="demo-head"><span class="badge-live">Live</span><span>@rig-c/play 1.12.0 running in your browser — not a recording</span></div>
+<div class="demo-body">
+<div class="demo-stage" id="demo-stage-play" data-part="demo-stage"><button type="button" class="btn btn-primary demo-start" data-part="demo-start">Start the player</button><canvas class="demo-overlay" data-part="demo-overlay" aria-hidden="true"></canvas></div>
+<div class="demo-panel">
+<div class="demo-controls" role="group" aria-label="Player controls">
+<label>Motion <select data-part="demo-motion"><option>idle</option></select></label>
+<label>Render mode <select data-part="demo-mode"><option value="dom">DOM (default)</option><option value="canvas">One canvas</option></select></label>
+<div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
+</div>
+<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 (about 2.2 MB).</p>
+<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted wave added.</p>
+<noscript><p class="demo-status" data-kind="error">The live player needs JavaScript.</p></noscript>
+</div>
+</div>
+</section>
+<script type="module" src="/assets/demo.js"></script>`;
+}
+
 function expand(page: Page, target: 'html' | 'md' = 'md'): string {
   return page.markdown
+    .replace('{{play-demo}}', playDemo(target))
+    .replace(/\{\{thread:([a-z-]+)\}\}/g, (_, slug: string) => thread(slug, target))
     .replace('{{live-demo}}', liveDemo(target))
     .replace('{{docs-map}}', docsMap())
     .replace(/\{\{version:([a-z-]+)\}\}/g, (_, slug: string) => version(slug));
@@ -328,13 +375,16 @@ ${rest}
       </article>
     </main>`;
   } else if (page.section === 'docs') {
+    // A module page ends in the shared technical block: Install, Inputs and outputs, Limits, Go deeper.
+    const at = body.indexOf('<h2 id="install">');
+    const article = at < 0 ? body : `${body.slice(0, at)}<section class="tech" aria-label="Technical details">\n${body.slice(at)}</section>\n`;
     main = `<div class="docs-layout">
         ${docsSidebar(page)}
       <main class="site-main docs-main">
         ${breadcrumb(page)}
         ${page.packageName ? packageBar(page) : ''}
         <article>
-${body}
+${article}
         </article>
         ${pager(page)}
       </main>
