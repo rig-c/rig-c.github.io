@@ -106,7 +106,7 @@
 <p>rig-c is a set of small packages that hand files to each other: a painting split into layers goes in at one end, and a rig that plays in a browser, a game engine, or the Spine editor comes out at the other. These pages explain what each package is for and how it works. Flags, schemas, and every rule live in the package's own repository — each page links there.</p>
 <h2 id="start-here">Start here</h2>
 <ul>
-<li><a href="/docs/getting-started/"><strong>Getting Started</strong></a>: 10-step no-GPU walkthrough from pre-decomposed character layers to a compiled rig with idle and wave animations playing in the browser, plus downstream export routes.</li>
+<li><a href="/docs/getting-started/"><strong>Getting Started</strong></a>: Tested 10-step no-GPU, no-Python walkthrough (about a minute of commands on an Apple M4) from pre-decomposed character layers to a compiled rig with idle and wave animations playing in the browser, plus downstream export routes.</li>
 <li><a href="/docs/parts/"><strong>Parts</strong></a> — <code>@rig-c/parts</code>: @rig-c/parts is a Bun CLI that turns one character painting and its See-through layer decomposition into measured parts, a rig-c rig spec and an idle, gated and packed by rig-c into Spine 4.3 skeleton data.</li>
 <li><a href="/docs/pose/"><strong>Pose</strong></a> — <code>@rig-c/pose</code>: @rig-c/pose is a Bun CLI that cleans a body-18 joint-position sequence and retargets it onto a rig-c rig as gated, verified bone keys.</li>
 <li><a href="/docs/core/"><strong>Core</strong></a> — <code>rig-c</code>: rig-c (also @rig-c/core, CLI rigc) compiles a JSON rig spec and motion spec plus loose part PNGs into Spine 4.3 skeleton data, gated by named assertions so nothing invalid is written.</li>

@@ -1,10 +1,10 @@
 ---
 navLabel: Getting Started
-title: Getting Started with rig-c — One Painting to a Browser Rig in 3 Minutes
+title: Getting Started with rig-c — One Painting to a Browser Rig, No GPU
 description: Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.
 keywords: rig-c tutorial, getting started, 2D character rigging tutorial, See-through layers, rig-parts build, rig-pose retarget
 repoUrl: https://github.com/rig-c/getting-started
-summaryForLlms: 10-step no-GPU walkthrough from pre-decomposed character layers to a compiled rig with idle and wave animations playing in the browser, plus downstream export routes.
+summaryForLlms: Tested 10-step no-GPU, no-Python walkthrough (about a minute of commands on an Apple M4) from pre-decomposed character layers to a compiled rig with idle and wave animations playing in the browser, plus downstream export routes.
 ---
 # Getting Started with rig-c
 
@@ -12,17 +12,26 @@ You start with one painting of a character. You end with that character rigged �
 
 Repository: <https://github.com/rig-c/getting-started>
 
-## The Whole Pipeline in Three Steps
+## The whole pipeline in three steps
 
 1. **Paint one character.** Any image model or illustration workflow produces a front-facing, full-body character PNG on a plain white background with arms clear of the body.
 2. **Split it into layers, and mark the joints.** [See-through](https://github.com/shitagaki-lab/see-through) cuts the painting into layered parts (twice: full figure + head crop). Body-18 joints come from a lightweight CPU script (`rtmlib`) or hand placement.
 3. **Run the rig-c packages on the CPU.** `@rig-c/parts`, `rig-c`, `@rig-c/pose`, and `@rig-c/play` assemble the parts, author meshes and bones, gate the build, retarget motion, and play it in the browser. **No GPU is used in step 3.**
 
-## Try It First — No GPU, About 3 Minutes
+## Try it first — no GPU, no Python
 
-This walkthrough builds a published example character whose painting and See-through layers are already prepared. Requires [Bun](https://bun.sh) 1.2+ and optionally [uv](https://docs.astral.sh/uv/) for step 6.
+This builds a published example character whose painting and See-through layers are already made, then plays it in your browser. The joints come from a hand-placed file that ships with the guide, so the only tools you need are [Bun](https://bun.sh) 1.2 or later, `git` and `curl`, on macOS or Linux (Windows is not tested).
 
-### 1. Install the Packages
+**How long it takes.** Every command below was run as written, in order, from an empty folder on 2026-10-19 — Apple M4, Bun 1.4.2, and whatever `bun add` resolved that day (`rig-c` 2.61.0, `@rig-c/parts` 1.41.0, `@rig-c/pose` 0.35.0, `@rig-c/play` 1.12.0):
+
+| Run | Steps 1–10 |
+| --- | --- |
+| Empty Bun cache (includes downloading the packages and the 41 MB example) | 56 s |
+| A second run, caches warm | 62 s |
+
+Steps 5 (assemble) and 8 (build) are most of it. A slower machine or network takes longer; the two runs above are the only measurements.
+
+### 1. Install the packages
 
 ```sh
 mkdir rig-c-start && cd rig-c-start
@@ -31,7 +40,9 @@ mkdir my-rig && cd my-rig
 bun add @rig-c/parts rig-c @rig-c/pose @rig-c/play
 ```
 
-### 2. Fetch the Example Inputs
+Every command from here on runs in `my-rig`.
+
+### 2. Get the example inputs
 
 ```sh
 curl -L -o exam.tar.gz https://codeload.github.com/rig-c/exam/tar.gz/01436ee3f02c189fe1a1e9656fe62068889837f5
@@ -40,7 +51,9 @@ tar -xzf exam.tar.gz --strip-components=1 exam-01436ee3f02c189fe1a1e9656fe620688
 rm exam.tar.gz
 ```
 
-### 3. Initialize `config.json`
+You now have `inputs/` with `painting.png`, `layers/full/` and `layers/head/`. These inputs are **CC BY-NC 4.0** — see [Licensing](/docs/licensing/).
+
+### 3. Start the config
 
 ```sh
 cat > config.json <<'EOF'
@@ -53,7 +66,9 @@ EOF
 bunx rig-parts inputs --source inputs/painting.png --config config.json --out work
 ```
 
-### 4. Propose the Head Box
+You should see `st_input_full.png 2432x2432` and a note that there is no head box yet.
+
+### 4. Find the head box
 
 ```sh
 bunx rig-parts layers inputs/layers/full
@@ -62,7 +77,9 @@ bun ../getting-started/scripts/take.ts work/head_box.json config.json seethrough
 bunx rig-parts inputs --source inputs/painting.png --config config.json --out work
 ```
 
-### 5. Assemble the Parts
+You should see `29 layer(s): 29 with opaque pixels`, `0 WARN line(s)`, `work/head_box.json` holding `{"head_box":[616,32,1132,548]}`, then `st_input_head.png 516x516`.
+
+### 5. Assemble the parts
 
 ```sh
 bunx rig-parts assemble --propose-plan --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json > work/plan.json
@@ -70,31 +87,46 @@ bun ../getting-started/scripts/take.ts work/plan.json config.json assemble.plan=
 bunx rig-parts assemble --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json --out work
 ```
 
-### 6. Detect Body-18 Keypoints
+You should see `22 part(s) on a 832x1216 rig`, then `recomposite vs source: mean |d|=1.13, within 8: 97.8%`.
+
+### 6. Put the joints in place
+
+~~~sh
+sed -n '/^```json$/,/^```$/p' ../getting-started/docs/KEYPOINTS.md | sed '1d;$d' > keypoints.json
+~~~
+
+This copies the hand-placed body-18 joints for this painting out of the guide's [`docs/KEYPOINTS.md`](https://github.com/rig-c/getting-started/blob/main/docs/KEYPOINTS.md), which also explains how to place them for a painting of your own.
+
+**Detecting the joints with a script instead** needs [uv](https://docs.astral.sh/uv/) and downloads about 300 MB of pose models on first run:
 
 ```sh
 uv run --with rtmlib --with onnxruntime python ../getting-started/scripts/keypoints.py inputs/painting.png --out keypoints.json
 ```
 
-### 7. Draft Bones, Meshes, Regions, and Idle Motion
+On 2026-10-19 this resolved rtmlib 0.0.16 and onnxruntime 1.27.0. It placed both ankles about 44 px lower than the hand-placed file, and step 8 then refused with `ASSEMBLE_LIMB_JOINT_ON_ART` on `foot_l`. Until that is fixed upstream, use the hand-placed file for this example.
+
+### 7. Draft the bones
 
 ```sh
 bunx rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json
-bun ../getting-started/scripts/take.ts work/proposal.json config.json bones meshes regions motion
+bun ../getting-started/scripts/take.ts work/proposal.json config.json bones meshes regions motion limbs
 ```
 
-### 8. Build and Gate the Rig
+You should see a coverage line starting `coverage: 42 bone(s) — 29 checked and clean`. This is where a person would correct the draft; the example uses it as is.
+
+### 8. Build the rig
 
 ```sh
 bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
 ```
 
-Expected verdict: `[check] check: PASS; 10 of 10 bar(s) measured`, followed by `build: PASS` and `out/idle.gif`.
+You should see `check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)`, then `build: PASS`. Open `out/idle.gif`: the character breathes and blinks in a loop. A skipped bar is named with its reason; any `FAIL` line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (`out/idle.gif`, or [Review](/docs/review/)).
 
-### 9. Retarget a 3-Second Wave with `@rig-c/pose`
+### 9. Give it a wave
 
 ```sh
 bun ../getting-started/scripts/wave.ts keypoints.json wave.pose.json
+bunx rig-pose clean --pose wave.pose.json --out wave.pose.clean.json
 cat > map.json <<'EOF'
 {
   "spec": "rig-pose-map/1",
@@ -106,17 +138,22 @@ cat > map.json <<'EOF'
   "translate": { "bone": "hip", "joint": "mid_hip", "scale": { "pose": ["mid_hip", "neck"], "rig": ["hip", "neck"] } }
 }
 EOF
-bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.json --out wave.motion.json --name wave --profile spine-html --build wave-build
+bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json --out wave.motion.json --name wave --profile spine-html --build wave-build
 ```
 
-### 10. Play It in the Browser
+You should see `wave.ts: 73 frame(s), 3 s at 24 fps`, a `GATE … green` line, and `wrote wave.motion.json — animations: idle, wave`. `wave-build/` holds the rig with both animations.
+
+### 10. Play it in your browser
 
 ```sh
 bun ../getting-started/scripts/serve.ts
-# Open http://localhost:3000/?model=wave-build/skeleton.model.json&anim=wave
 ```
 
-## Three Ways to Use the Output
+Open <http://localhost:3000/?model=wave-build/skeleton.model.json&anim=wave>: the character raises her right arm and waves; the menu switches to `idle`. Ctrl+C stops the server.
+
+The full guide — making your own character, the GPU routes, troubleshooting and every measured figure — is the [rig-c/getting-started README](https://github.com/rig-c/getting-started#readme) and its [docs/REFERENCE.md](https://github.com/rig-c/getting-started/blob/main/docs/REFERENCE.md).
+
+## Three ways to use the output
 
 1. **On the web with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/)**: Load `skeleton.model.json` and part PNGs directly. The packages are MIT and integrate no Spine Runtime.
 2. **In the Spine 4.3 Editor**: Import `out/check/build/skeleton.json` via `Import Data` and point `Images` to `out/rig/images/` to refine timelines by hand (requires rig-c 2.51.1+; the editor is under the Spine Editor License Agreement).
