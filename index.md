@@ -1,6 +1,6 @@
 # rig-c — AI-Authored 2D Rigging and Animation, Verified Before It Is Written
 
-One character painting goes in; a rigged, animated 2D character that plays in the browser or imports into the Spine 4.3 editor comes out. Every stage prints named, numeric findings and refuses by name what it cannot verify, so a broken file never reaches the disk.
+One character painting goes in; a rigged, animated 2D character that plays in the browser or imports into the Spine 4.3 editor comes out. Every stage prints named, numeric findings and refuses by name what it cannot verify, so a file that fails a check never reaches the disk. A pass is a structural fact about the data, not a verdict on how the character looks.
 
 **rig-c makes no images.** The painting and its layer split ([See-through](https://github.com/shitagaki-lab/see-through)) come from image models you run yourself — on your own GPU, or a free web demo. rig-c starts from those files, ships no model weights, and runs every one of its own steps on the CPU.
 
@@ -37,7 +37,7 @@ Try it end to end in about three minutes with no GPU: **[Getting started](/docs/
 
 An AI agent asked to author a 2D rig cannot see the screen, and standard JSON parsers accept broken rigs in silence — a 4.2-shaped constraint vanishes in 4.3, a mismatched `size:` collapses every UV, a four-number curve array yields `NaN`, and a mesh whose vertex count equals its UV count silently loses its bone weights.
 
-rig-c replaces that silence with four structural invariants:
+rig-c replaces that silence with five rules:
 
 1. **The messages are the UI.** Every refusal names the object, the value found, and the value required. An agent reads one line and knows which field in which file to change — this is rig-c core's own example, a renamed page image:
 
@@ -47,8 +47,9 @@ rig-c replaces that silence with four structural invariants:
    ```
 
 2. **Nothing is invented.** The compiler never guesses defaults from art or fills in missing numbers. Where the input is silent, it raises a named `CompileError`.
-3. **Emit only after green.** `rigc build` compiles, runs its assertion gate, and writes to disk **only** if every assertion passes. No broken file ever outlives the console output that warned about it.
-4. **A person can still look.** [`@rig-c/review`](/docs/review/) lets a human inspect the agent's output against reference footage and export structured feedback bound to a frame, bone, or slot.
+3. **Emit only after green — and green means structural.** `rigc build` writes to disk **only** if every named assertion of its profile passes: 36 under the default `spine` profile (*is this valid Spine 4.3 that any runtime plays correctly?*), all 50 under the opt-in `rig-play` profile. `rig-parts build` adds its own measured bars (seam, loop, folds and more) on top. None of this judges the picture: in rig-c core's words, *a rig with its head off its torso passes the gate*.
+4. **What was not checked is printed too.** Every gate report names the profile that judged it and lists, on `PROF` lines, the rules that profile left out. `rig-parts check` names each bar that said `SKIP` and why, and a build accepted with failing bars (`compose --accept`) is, in its own words, for looking, not shipping.
+5. **A person looks.** `rigc render` and `rigc inspect` draw what was built; [`@rig-c/review`](/docs/review/) puts it beside the source footage and exports feedback bound to a frame, bone or slot. The checks keep broken data off the disk; Review is where someone judges whether it looks right.
 
 ## Install
 

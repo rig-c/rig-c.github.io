@@ -87,7 +87,7 @@
         <div class="hero-copy">
           <p class="eyebrow">2D character rigging, authored by agents</p>
           <h1 id="hero-title">One painting in. A verified rig out.</h1>
-          <p class="lede">rig-c turns a character painting, split into layers, into a rigged and animated character — Spine 4.3 skeleton data and a model a web page can play — and writes nothing until every named check passes.</p>
+          <p class="lede">rig-c turns a character painting, split into layers, into a rigged and animated character — Spine 4.3 skeleton data and a model a web page can play — and writes nothing until its named structural checks pass. How the result looks is still a person&#39;s call.</p>
           <div class="cta">
             <a class="btn btn-primary" href="/docs/getting-started/">Get started</a>
             <a class="btn" href="/docs/">Read the docs</a>
@@ -103,7 +103,7 @@
         </figure>
       </section>
       <article class="home-body">
-<p>One character painting goes in; a rigged, animated 2D character that plays in the browser or imports into the Spine 4.3 editor comes out. Every stage prints named, numeric findings and refuses by name what it cannot verify, so a broken file never reaches the disk.</p>
+<p>One character painting goes in; a rigged, animated 2D character that plays in the browser or imports into the Spine 4.3 editor comes out. Every stage prints named, numeric findings and refuses by name what it cannot verify, so a file that fails a check never reaches the disk. A pass is a structural fact about the data, not a verdict on how the character looks.</p>
 <p><strong>rig-c makes no images.</strong> The painting and its layer split (<a href="https://github.com/shitagaki-lab/see-through">See-through</a>) come from image models you run yourself — on your own GPU, or a free web demo. rig-c starts from those files, ships no model weights, and runs every one of its own steps on the CPU.</p>
 <h2 id="from-loose-parts-to-a-living-rig">From loose parts to a living rig</h2>
 <figure class="figure-media">
@@ -137,7 +137,7 @@
 </table>
 <h2 id="built-for-agents-that-cannot-see">Built for agents that cannot see</h2>
 <p>An AI agent asked to author a 2D rig cannot see the screen, and standard JSON parsers accept broken rigs in silence — a 4.2-shaped constraint vanishes in 4.3, a mismatched <code>size:</code> collapses every UV, a four-number curve array yields <code>NaN</code>, and a mesh whose vertex count equals its UV count silently loses its bone weights.</p>
-<p>rig-c replaces that silence with four structural invariants:</p>
+<p>rig-c replaces that silence with five rules:</p>
 <ol>
 <li>
 <p><strong>The messages are the UI.</strong> Every refusal names the object, the value found, and the value required. An agent reads one line and knows which field in which file to change — this is rig-c core's own example, a renamed page image:</p>
@@ -149,10 +149,13 @@ rigc: 1 assertion(s) failed
 <p><strong>Nothing is invented.</strong> The compiler never guesses defaults from art or fills in missing numbers. Where the input is silent, it raises a named <code>CompileError</code>.</p>
 </li>
 <li>
-<p><strong>Emit only after green.</strong> <code>rigc build</code> compiles, runs its assertion gate, and writes to disk <strong>only</strong> if every assertion passes. No broken file ever outlives the console output that warned about it.</p>
+<p><strong>Emit only after green — and green means structural.</strong> <code>rigc build</code> writes to disk <strong>only</strong> if every named assertion of its profile passes: 36 under the default <code>spine</code> profile (<em>is this valid Spine 4.3 that any runtime plays correctly?</em>), all 50 under the opt-in <code>rig-play</code> profile. <code>rig-parts build</code> adds its own measured bars (seam, loop, folds and more) on top. None of this judges the picture: in rig-c core's words, <em>a rig with its head off its torso passes the gate</em>.</p>
 </li>
 <li>
-<p><strong>A person can still look.</strong> <a href="/docs/review/"><code>@rig-c/review</code></a> lets a human inspect the agent's output against reference footage and export structured feedback bound to a frame, bone, or slot.</p>
+<p><strong>What was not checked is printed too.</strong> Every gate report names the profile that judged it and lists, on <code>PROF</code> lines, the rules that profile left out. <code>rig-parts check</code> names each bar that said <code>SKIP</code> and why, and a build accepted with failing bars (<code>compose --accept</code>) is, in its own words, for looking, not shipping.</p>
+</li>
+<li>
+<p><strong>A person looks.</strong> <code>rigc render</code> and <code>rigc inspect</code> draw what was built; <a href="/docs/review/"><code>@rig-c/review</code></a> puts it beside the source footage and exports feedback bound to a frame, bone or slot. The checks keep broken data off the disk; Review is where someone judges whether it looks right.</p>
 </li>
 </ol>
 <h2 id="install">Install</h2>
