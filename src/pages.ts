@@ -13,8 +13,7 @@ export interface PageSpec {
   html: string;
 }
 
-// rig-c.org has no DNS yet; canonicals point at the live GitHub Pages host until the custom domain is connected.
-export const SITE_ORIGIN = 'https://rig-c.github.io';
+export const SITE_ORIGIN = 'https://rig-c.org';
 
 export const PAGES: readonly PageSpec[] = [
   {
