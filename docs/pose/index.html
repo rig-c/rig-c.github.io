@@ -121,9 +121,9 @@
 <p class="mod-role">Joint positions over time in — bone keys on a rig-c rig out, checked before they are written.</p>
 <figure class="mod-hero">
   <div class="media">
-    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="638" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right arm loosely; on the right Character 1 swinging her coffee cup the same way">
+    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="648" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right arm loosely; on the right Character 1 swinging her coffee cup the same way">
       <source src="/assets/docs/pose-swing.mp4" type="video/mp4">
-      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm and Character 1 holding her cup" width="638" height="792">
+      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm and Character 1 holding her cup" width="648" height="792">
     </video>
   </div>
   <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right arm swinging the cup like a pendulum, the forearm trailing the upper arm. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
@@ -133,16 +133,16 @@
 <p>A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones has traps of its own: setup rotations, and parents that turn their children. <code>rig-pose</code> cleans the sequence once, where it can be inspected, then turns each mapped bone to point along its segment — and refuses to write keys that do not land where the pose asked.</p>
 <h2 id="how-the-swing-reached-character-1">How the swing reached Character 1</h2>
 <h3 id="a-motion-that-fits-the-rig">A motion that fits the rig</h3>
-<p>The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, the coffee cup she is already holding, swung loosely like a pendulum — the upper arm sways about the shoulder and the forearm follows 0.18 s later, two swings in three seconds so the loop closes.</p>
-<p>Even that needed one more look: swung outward, the arm uncovered the edge of the trousers it hides in the painting, which See-through had to synthesize. So the swing is centred toward the body and never goes further out than the arm's resting angle.</p>
+<p>The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, the coffee cup she is already holding, swung loosely like a pendulum — the upper arm sways a little about the shoulder and the forearm, trailing it by 0.18 s, does most of the swinging; two swings in three seconds, so the loop closes.</p>
+<p>Even that took two more looks. Swung outward, the arm uncovered the edge of the trousers it hides in the painting, which See-through had to synthesize; swung inward, it slid under the shirt, because the arm part is drawn beneath <code>topwear</code>. So the upper arm now moves only within a few degrees inward of where it hangs, and never further out.</p>
 <p>The map names two chains: the <strong>trunk</strong> (hip to neck) on the <code>chest</code> bone, and the <strong>right arm</strong> (shoulder, elbow, wrist) on the two sleeve bones. The rig has no left-arm bones (no <code>sleeve_l</code> in its <code>rig.json</code>), so that arm stays as painted, and the hand with the cup is not mapped: it turns with the forearm.</p>
 <table>
 <thead>
 <tr><th>Track the rig received</th><th>From the pose</th><th>Range over the loop</th></tr>
 </thead>
 <tbody>
-<tr><td><code>sleeve_r0</code> rotate</td><td>shoulder → elbow</td><td>−3.9° to 6.5°</td></tr>
-<tr><td><code>sleeve_r1</code> rotate</td><td>elbow → wrist</td><td>−3.7° to 16.4°</td></tr>
+<tr><td><code>sleeve_r0</code> rotate</td><td>shoulder → elbow</td><td>−2.9° to 1.6°</td></tr>
+<tr><td><code>sleeve_r1</code> rotate</td><td>elbow → wrist</td><td>−7.6° to 14.0°</td></tr>
 <tr><td><code>chest</code> rotate</td><td>hip → neck</td><td>2.6° (held)</td></tr>
 <tr><td><code>hip</code> translate</td><td>hip</td><td>0, 0 (held)</td></tr>
 </tbody>
@@ -150,13 +150,13 @@
 <p><strong>Direction, not length.</strong> Each bone points the way its segment points in the picture but keeps the rig's own length (upper arm 300 px in the pose, 267 units on the rig; forearm 335 px and 303 units).</p>
 <div class="compare">
   <figure><img src="/assets/docs/pose-keypoints.jpg" alt="Character 1's painting with 18 labelled body joints drawn over it" width="400" height="1142" loading="lazy"><figcaption>Where the motion starts: 18 body joints placed by hand on the painting (joints under the clothes marked occluded).</figcaption></figure>
-  <figure><img src="/assets/docs/pose-swing-ends.jpg" alt="Two side-by-side frames: the swing at its outermost and its innermost, source pose and rig each" width="1276" height="792" loading="lazy"><figcaption>The two ends of the swing (t = 0.13 s and 1.00 s). Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
+  <figure><img src="/assets/docs/pose-swing-ends.jpg" alt="Two side-by-side frames: the swing at its outermost and its innermost, source pose and rig each" width="1296" height="792" loading="lazy"><figcaption>The two ends of the swing (t = 1.71 s and 2.46 s). Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
 </div>
 <h3 id="what-it-checked-before-writing">What it checked before writing</h3>
 <pre><code>rig-pose retarget: 73 frame(s), 3.000s — 4 track(s); min-score 0.3, flip off, short off, bends refuse (tolerance 0°)
   GATE   rigc build --profile spine-html: green — 52 assertions: 26 measured (26 passed, 0 failed), 26 skipped, 0 not in profile &quot;rig-play&quot;
-  LAND   bone &quot;sleeve_r0&quot; aim — worst |reached − asked| 0.000660° at frame 19 (t=0.792s); the tolerance is 0.01°
-  LAND   bone &quot;sleeve_r1&quot; aim — worst |reached − asked| 0.000919° at frame 15 (t=0.625s); the tolerance is 0.01°
+  LAND   bone &quot;sleeve_r0&quot; aim — worst |reached − asked| 0.000653° at frame 37 (t=1.542s); the tolerance is 0.01°
+  LAND   bone &quot;sleeve_r1&quot; aim — worst |reached − asked| 0.00106° at frame 37 (t=1.542s); the tolerance is 0.01°
   FOLD   rigc render --folds at 24 fps: no mesh folds
   wrote swing.motion.json — animations: idle, swing
 </code></pre>

@@ -4,9 +4,9 @@
 
 <figure class="mod-hero">
   <div class="media">
-    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="638" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right arm loosely; on the right Character 1 swinging her coffee cup the same way">
+    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="648" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right arm loosely; on the right Character 1 swinging her coffee cup the same way">
       <source src="/assets/docs/pose-swing.mp4" type="video/mp4">
-      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm and Character 1 holding her cup" width="638" height="792">
+      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm and Character 1 holding her cup" width="648" height="792">
     </video>
   </div>
   <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right arm swinging the cup like a pendulum, the forearm trailing the upper arm. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
@@ -22,16 +22,16 @@ A pose model reads each frame alone, so joints shake from frame to frame, and ev
 
 ### A motion that fits the rig
 
-The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, the coffee cup she is already holding, swung loosely like a pendulum — the upper arm sways about the shoulder and the forearm follows 0.18 s later, two swings in three seconds so the loop closes.
+The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, the coffee cup she is already holding, swung loosely like a pendulum — the upper arm sways a little about the shoulder and the forearm, trailing it by 0.18 s, does most of the swinging; two swings in three seconds, so the loop closes.
 
-Even that needed one more look: swung outward, the arm uncovered the edge of the trousers it hides in the painting, which See-through had to synthesize. So the swing is centred toward the body and never goes further out than the arm's resting angle.
+Even that took two more looks. Swung outward, the arm uncovered the edge of the trousers it hides in the painting, which See-through had to synthesize; swung inward, it slid under the shirt, because the arm part is drawn beneath `topwear`. So the upper arm now moves only within a few degrees inward of where it hangs, and never further out.
 
 The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and the **right arm** (shoulder, elbow, wrist) on the two sleeve bones. The rig has no left-arm bones (no `sleeve_l` in its `rig.json`), so that arm stays as painted, and the hand with the cup is not mapped: it turns with the forearm.
 
 | Track the rig received | From the pose | Range over the loop |
 | --- | --- | --- |
-| `sleeve_r0` rotate | shoulder → elbow | −3.9° to 6.5° |
-| `sleeve_r1` rotate | elbow → wrist | −3.7° to 16.4° |
+| `sleeve_r0` rotate | shoulder → elbow | −2.9° to 1.6° |
+| `sleeve_r1` rotate | elbow → wrist | −7.6° to 14.0° |
 | `chest` rotate | hip → neck | 2.6° (held) |
 | `hip` translate | hip | 0, 0 (held) |
 
@@ -39,7 +39,7 @@ The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and t
 
 <div class="compare">
   <figure><img src="/assets/docs/pose-keypoints.jpg" alt="Character 1's painting with 18 labelled body joints drawn over it" width="400" height="1142" loading="lazy"><figcaption>Where the motion starts: 18 body joints placed by hand on the painting (joints under the clothes marked occluded).</figcaption></figure>
-  <figure><img src="/assets/docs/pose-swing-ends.jpg" alt="Two side-by-side frames: the swing at its outermost and its innermost, source pose and rig each" width="1276" height="792" loading="lazy"><figcaption>The two ends of the swing (t = 0.13 s and 1.00 s). Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
+  <figure><img src="/assets/docs/pose-swing-ends.jpg" alt="Two side-by-side frames: the swing at its outermost and its innermost, source pose and rig each" width="1296" height="792" loading="lazy"><figcaption>The two ends of the swing (t = 1.71 s and 2.46 s). Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
 </div>
 
 ### What it checked before writing
@@ -47,8 +47,8 @@ The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and t
 ```
 rig-pose retarget: 73 frame(s), 3.000s — 4 track(s); min-score 0.3, flip off, short off, bends refuse (tolerance 0°)
   GATE   rigc build --profile spine-html: green — 52 assertions: 26 measured (26 passed, 0 failed), 26 skipped, 0 not in profile "rig-play"
-  LAND   bone "sleeve_r0" aim — worst |reached − asked| 0.000660° at frame 19 (t=0.792s); the tolerance is 0.01°
-  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.000919° at frame 15 (t=0.625s); the tolerance is 0.01°
+  LAND   bone "sleeve_r0" aim — worst |reached − asked| 0.000653° at frame 37 (t=1.542s); the tolerance is 0.01°
+  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.00106° at frame 37 (t=1.542s); the tolerance is 0.01°
   FOLD   rigc render --folds at 24 fps: no mesh folds
   wrote swing.motion.json — animations: idle, swing
 ```
