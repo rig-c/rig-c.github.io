@@ -23,6 +23,10 @@
     <meta name="twitter:title" content="rig-c — AI-Authored 2D Rigging and Animation Toolchain">
     <meta name="twitter:description" content="AI-authored 2D character rigging and animation, verified before a byte is written. Compile Spine 4.3 skeleton data and model documents from one painting with named assertions.">
     <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <meta name="theme-color" content="#070b18">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
     <link rel="stylesheet" href="/styles.css">
     <script type="application/ld+json">
 {
@@ -79,32 +83,79 @@
       </div>
     </header>
     <main class="site-main home">
-      <article>
-<h1 id="rig-c-ai-authored-2d-rigging-and-animation-verified-before-it-is-written">rig-c — AI-Authored 2D Rigging and Animation, Verified Before It Is Written</h1>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">2D character rigging, authored by agents</p>
+          <h1 id="hero-title">One painting in. A verified rig out.</h1>
+          <p class="lede">rig-c turns a character painting, split into layers, into a rigged and animated character — Spine 4.3 skeleton data and a model a web page can play — and writes nothing until every named check passes.</p>
+          <div class="cta">
+            <a class="btn btn-primary" href="/docs/getting-started/">Get started</a>
+            <a class="btn" href="/docs/">Read the docs</a>
+          </div>
+          <pre class="install"><code>bunx rig-c --help</code></pre>
+        </div>
+        <figure class="hero-media">
+          <video autoplay muted loop playsinline preload="auto" poster="/assets/trailer-poster.jpg" width="960" height="540">
+            <source src="/assets/trailer.mp4" type="video/mp4">
+            <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, smiles, kicks her legs and waves" width="960" height="540">
+          </video>
+          <figcaption>One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a></figcaption>
+        </figure>
+      </section>
+      <article class="home-body">
 <p>One character painting goes in; a rigged, animated 2D character that plays in the browser or imports into the Spine 4.3 editor comes out. Every stage prints named, numeric findings and refuses by name what it cannot verify, so a broken file never reaches the disk.</p>
 <p><strong>rig-c makes no images.</strong> The painting and its layer split (<a href="https://github.com/shitagaki-lab/see-through">See-through</a>) come from image models you run yourself — on your own GPU, or a free web demo. rig-c starts from those files, ships no model weights, and runs every one of its own steps on the CPU.</p>
-<h2 id="the-toolchain-at-a-glance">The Toolchain at a Glance</h2>
+<h2 id="from-loose-parts-to-a-living-rig">From loose parts to a living rig</h2>
+<figure class="figure-media">
+  <video autoplay muted loop playsinline preload="metadata" poster="/assets/rigc-demo-poster.jpg" width="600" height="404">
+    <source src="/assets/rigc-demo.mp4" type="video/mp4">
+    <img src="/assets/rigc-demo-poster.jpg" alt="Loose part PNGs assembling themselves into a character that breathes, blinks and waves" width="600" height="404">
+  </video>
+  <figcaption>Loose part PNGs assembling themselves into a character that breathes, blinks and waves — from the <a href="https://github.com/rig-c/core">rig-c/core</a> README.</figcaption>
+</figure>
+<ol>
+<li><strong><a href="/docs/parts/">Parts</a></strong> merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle.</li>
+<li><strong><a href="/docs/pose/">Pose</a></strong> cleans a recorded body-18 pose sequence and retargets it onto the rig as an animation.</li>
+<li><strong><a href="/docs/core/">Core</a></strong> compiles the rig and motion specs and gates them by named assertions — nothing is written unless every one passes.</li>
+<li><strong><a href="/docs/review/">Review</a></strong> lets a person look at what an agent built and hand back feedback bound to a frame, bone or slot.</li>
+<li><strong><a href="/docs/play/">Play</a></strong> and the <strong><a href="/docs/adapters/">adapters</a></strong> run the compiled model in a page, PixiJS, Phaser or Three.js, with no Spine runtime.</li>
+</ol>
+<p>Try it end to end in about three minutes with no GPU: <strong><a href="/docs/getting-started/">Getting started</a></strong>. See what agents do with it on the <strong><a href="/exam/">Exam</a></strong>, and rebuild the published rigs from <strong><a href="/examples/">Examples</a></strong>.</p>
+<h2 id="the-toolchain">The toolchain</h2>
 <table>
 <thead>
-<tr><th align="center">#</th><th>Package</th><th>Latest</th><th>Install</th><th>What It Does</th></tr>
+<tr><th>Package</th><th>Latest</th><th>Install</th><th>What it does</th></tr>
 </thead>
 <tbody>
-<tr><td align="center">1</td><td><a href="/docs/parts/"><strong>@rig-c/parts</strong></a></td><td><code>1.40.0</code></td><td><code>npm i -D @rig-c/parts</code></td><td>Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them.</td></tr>
-<tr><td align="center">2</td><td><a href="/docs/pose/"><strong>@rig-c/pose</strong></a></td><td><code>0.33.0</code></td><td><code>npm i -D @rig-c/pose</code></td><td>Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written.</td></tr>
-<tr><td align="center">3</td><td><a href="/docs/core/"><strong>rig-c / @rig-c/core</strong></a></td><td><code>2.61.0</code></td><td><code>npm i -D rig-c</code></td><td>The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>.atlas</code>) and <code>skeleton.model.json</code> out — gated by named assertions before a byte is written (36 under the default <code>--profile spine</code>, all 50 under the opt-in <code>--profile rig-play</code>).</td></tr>
-<tr><td align="center">4</td><td><a href="/docs/review/"><strong>@rig-c/review</strong></a></td><td><code>0.2.1</code></td><td><code>npm i -D @rig-c/review</code></td><td>Local human inspection workspace: compare setup geometry, compiled-model playback, source video/sheets, and export frame/bone/slot-bound feedback ready to become an issue.</td></tr>
-<tr><td align="center">5</td><td><a href="/docs/play/"><strong>@rig-c/play</strong></a></td><td><code>1.12.0</code></td><td><code>npm i @rig-c/play</code></td><td>Plays <code>skeleton.model.json</code> in the browser with no Spine runtime — as plain DOM elements (<code>&lt;img&gt;</code> with CSS <code>matrix()</code>) or one <code>&lt;canvas&gt;</code> per player.</td></tr>
-<tr><td align="center">6</td><td><a href="/docs/adapters/"><strong>@rig-c/adapters</strong></a></td><td><code>0.1.1</code></td><td><code>npm i @rig-c/pixi</code><br><code>npm i @rig-c/phaser</code><br><code>npm i @rig-c/three</code></td><td>Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through <code>@rig-c/play</code>'s posing core, with no Spine runtime.</td></tr>
+<tr><td><a href="/docs/parts/"><strong>@rig-c/parts</strong></a></td><td><code>1.40.0</code></td><td><code>npm i -D @rig-c/parts</code></td><td>Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them.</td></tr>
+<tr><td><a href="/docs/pose/"><strong>@rig-c/pose</strong></a></td><td><code>0.33.0</code></td><td><code>npm i -D @rig-c/pose</code></td><td>Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written.</td></tr>
+<tr><td><a href="/docs/core/"><strong>rig-c / @rig-c/core</strong></a></td><td><code>2.61.0</code></td><td><code>npm i -D rig-c</code></td><td>The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>.atlas</code>) and <code>skeleton.model.json</code> out — gated by named assertions before a byte is written (36 under the default <code>--profile spine</code>, all 50 under the opt-in <code>--profile rig-play</code>).</td></tr>
+<tr><td><a href="/docs/review/"><strong>@rig-c/review</strong></a></td><td><code>0.2.1</code></td><td><code>npm i -D @rig-c/review</code></td><td>Local human inspection workspace: compare setup geometry, compiled-model playback, source video/sheets, and export frame/bone/slot-bound feedback ready to become an issue.</td></tr>
+<tr><td><a href="/docs/play/"><strong>@rig-c/play</strong></a></td><td><code>1.12.0</code></td><td><code>npm i @rig-c/play</code></td><td>Plays <code>skeleton.model.json</code> in the browser with no Spine runtime — as plain DOM elements (<code>&lt;img&gt;</code> with CSS <code>matrix()</code>) or one <code>&lt;canvas&gt;</code> per player.</td></tr>
+<tr><td><a href="/docs/adapters/"><strong>@rig-c/adapters</strong></a></td><td><code>0.1.1</code></td><td><code>npm i @rig-c/pixi</code><br><code>npm i @rig-c/phaser</code><br><code>npm i @rig-c/three</code></td><td>Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through <code>@rig-c/play</code>'s posing core, with no Spine runtime.</td></tr>
 </tbody>
 </table>
-<p>Additional resources:</p>
-<ul>
-<li><a href="/docs/getting-started/"><strong>Getting Started</strong></a> — Try the full pipeline in about 3 minutes with no GPU, or set up your own character workflow.</li>
-<li><a href="/exam/"><strong>AI Agent Exam (<code>rig-c/exam</code>)</strong></a> — Open-book benchmark measuring whether coding agents that have never seen the tools pass build, motion retargeting, and repair tasks on the first sitting.</li>
-<li><a href="/examples/"><strong>Reproducible Examples</strong></a> — Public character inputs, the 20-rig Agent Family reproducibility suite, and the 12-second reproducible trailer.</li>
-<li><a href="/llms.txt"><strong>Machine-Readable Docs (<code>/llms.txt</code>)</strong></a> and <a href="/llms-full.txt"><strong>Full Context (<code>/llms-full.txt</code>)</strong></a> — Plain-text indexes optimized for <code>curl</code> and LLM context windows.</li>
-</ul>
-<h2 id="quick-install">Quick Install</h2>
+<h2 id="built-for-agents-that-cannot-see">Built for agents that cannot see</h2>
+<p>An AI agent asked to author a 2D rig cannot see the screen, and standard JSON parsers accept broken rigs in silence — a 4.2-shaped constraint vanishes in 4.3, a mismatched <code>size:</code> collapses every UV, a four-number curve array yields <code>NaN</code>, and a mesh whose vertex count equals its UV count silently loses its bone weights.</p>
+<p>rig-c replaces that silence with four structural invariants:</p>
+<ol>
+<li>
+<p><strong>The messages are the UI.</strong> Every refusal names the object, the value found, and the value required. An agent reads one line and knows which field in which file to change — this is rig-c core's own example, a renamed page image:</p>
+<pre><code><span class="v-fail">FAIL</span>  A17_ATLAS_PAGE_FILES_EXIST: page &quot;../images/hull.png&quot; is not on disk at …/images/hull.png
+rigc: 1 assertion(s) failed
+</code></pre>
+</li>
+<li>
+<p><strong>Nothing is invented.</strong> The compiler never guesses defaults from art or fills in missing numbers. Where the input is silent, it raises a named <code>CompileError</code>.</p>
+</li>
+<li>
+<p><strong>Emit only after green.</strong> <code>rigc build</code> compiles, runs its assertion gate, and writes to disk <strong>only</strong> if every assertion passes. No broken file ever outlives the console output that warned about it.</p>
+</li>
+<li>
+<p><strong>A person can still look.</strong> <a href="/docs/review/"><code>@rig-c/review</code></a> lets a human inspect the agent's output against reference footage and export structured feedback bound to a frame, bone, or slot.</p>
+</li>
+</ol>
+<h2 id="install">Install</h2>
 <pre><code class="language-sh"># Run the compiler CLI directly with Bun
 bunx rig-c --help
 
@@ -124,22 +175,13 @@ bun rigc skills install
 /plugin marketplace add rig-c/core
 /plugin install rigc@rigc
 </code></pre>
-<h2 id="built-for-agents-that-cannot-see">Built for Agents That Cannot See</h2>
-<p>An AI agent asked to author a 2D rig cannot see the screen, and standard JSON parsers accept broken rigs in silence — a 4.2-shaped constraint vanishes in 4.3, a mismatched <code>size:</code> collapses every UV, a four-number curve array yields <code>NaN</code>, and a mesh whose vertex count equals its UV count silently loses its bone weights.</p>
-<p>rig-c replaces that silence with four structural invariants:</p>
-<ol>
-<li><strong>The messages are the UI.</strong> Every refusal names the object, the value found, and the value required (for example, <code>A20_MESH_WEIGHTS_COHERENT: mesh &quot;x&quot; vertex 12 weights sum to 0.9000</code>). An agent reads one line and knows which field in which file to change.</li>
-<li><strong>Nothing is invented.</strong> The compiler never guesses defaults from art or fills in missing numbers. Where the input is silent, it raises a named <code>CompileError</code>.</li>
-<li><strong>Emit only after green.</strong> <code>rigc build</code> compiles, runs its assertion gate, and writes to disk <strong>only</strong> if every assertion passes. No broken file ever outlives the console output that warned about it.</li>
-<li><strong>A person can still look.</strong> <a href="/docs/review/"><code>@rig-c/review</code></a> lets a human inspect the agent's output against reference footage and export structured feedback bound to a frame, bone, or slot.</li>
-</ol>
-<h2 id="package-names-aliases">Package Names &amp; Aliases</h2>
+<h2 id="package-names-and-aliases">Package names and aliases</h2>
 <ul>
 <li><code>rig-c</code>, <code>@rig-c/core</code>, and <code>spine-rigc</code> are the same compiler package on npm and install the <code>rigc</code> command.</li>
 <li><code>@rig-c/parts</code>, <code>rig-parts</code>, and <code>spine-parts</code> are the same part-assembly package and install the <code>rig-parts</code> command.</li>
 <li><code>@rig-c/play</code>, <code>rig-play</code>, and <code>spine-html</code> are the same browser player package.</li>
 </ul>
-<h2 id="licensing-stated-plainly">Licensing, Stated Plainly</h2>
+<h2 id="licensing-stated-plainly">Licensing, stated plainly</h2>
 <p>All rig-c packages are <strong>MIT licensed</strong>. The published packages link <strong>no Spine runtime</strong>:</p>
 <ul>
 <li><code>rigc</code> emits both Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>skeleton.atlas</code>) and rig-c's own compiled model document (<code>skeleton.model.json</code>).</li>

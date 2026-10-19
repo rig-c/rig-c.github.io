@@ -40,8 +40,38 @@ function expand(page: Page): string {
     .replace(/\{\{version:([a-z-]+)\}\}/g, (_, slug: string) => version(slug));
 }
 
+// Verdict words inside code blocks get a class, so a gate transcript reads at a glance.
+function markVerdicts(html: string): string {
+  return html.replace(/<pre><code([^>]*)>([\s\S]*?)<\/code><\/pre>/g, (_, attrs: string, code: string) => {
+    const marked = code.replace(/\b(PASS|FAIL|SKIP|WARN)\b/g, (w) => `<span class="v-${w.toLowerCase()}">${w}</span>`);
+    return `<pre><code${attrs}>${marked}</code></pre>`;
+  });
+}
+
 function renderMarkdown(markdown: string): string {
-  return Bun.markdown.html(markdown, { headings: { ids: true } });
+  return markVerdicts(Bun.markdown.html(markdown, { headings: { ids: true } }));
+}
+
+function hero(page: Page): string {
+  return `<section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">${escapeHtml(page.heroEyebrow ?? '')}</p>
+          <h1 id="hero-title">${escapeHtml(page.heroTitle ?? page.title)}</h1>
+          <p class="lede">${escapeHtml(page.heroLede ?? page.description)}</p>
+          <div class="cta">
+            <a class="btn btn-primary" href="/docs/getting-started/">Get started</a>
+            <a class="btn" href="/docs/">Read the docs</a>
+          </div>
+          <pre class="install"><code>bunx rig-c --help</code></pre>
+        </div>
+        <figure class="hero-media">
+          <video autoplay muted loop playsinline preload="auto" poster="/assets/trailer-poster.jpg" width="960" height="540">
+            <source src="/assets/trailer.mp4" type="video/mp4">
+            <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, smiles, kicks her legs and waves" width="960" height="540">
+          </video>
+          <figcaption>One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a></figcaption>
+        </figure>
+      </section>`;
 }
 
 function breadcrumbItems(page: Page): { name: string; route: string }[] {
@@ -146,6 +176,10 @@ function head(page: Page): string {
     <meta name="twitter:title" content="${escapeHtml(page.title)}">
     <meta name="twitter:description" content="${escapeHtml(page.description)}">
     <meta name="twitter:image" content="${ogImageUrl}">
+    <meta name="theme-color" content="#070b18">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
     <link rel="stylesheet" href="/styles.css">
     <script type="application/ld+json">
 ${buildJsonLd(page)}
@@ -248,9 +282,12 @@ function renderPage(page: Page): string {
   const body = renderMarkdown(expand(page));
   let main: string;
   if (page.section === 'home') {
+    // The hero carries the page's one <h1>; the Markdown's own H1 stays in the .md mirror only.
+    const rest = body.replace(/<h1[^>]*>[\s\S]*?<\/h1>\s*/, '');
     main = `<main class="site-main home">
-      <article>
-${body}
+      ${hero(page)}
+      <article class="home-body">
+${rest}
       </article>
     </main>`;
   } else if (page.section === 'docs') {

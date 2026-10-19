@@ -19,6 +19,9 @@ export interface Page {
   repoUrl: string;
   npmUrl?: string;
   summaryForLlms: string;
+  heroEyebrow?: string;
+  heroTitle?: string;
+  heroLede?: string;
   markdown: string;
 }
 
@@ -83,6 +86,9 @@ function load(): Page[] {
       repoUrl: required(file, meta, 'repoUrl'),
       npmUrl: meta.npmUrl,
       summaryForLlms: required(file, meta, 'summaryForLlms'),
+      heroEyebrow: meta.heroEyebrow,
+      heroTitle: meta.heroTitle,
+      heroLede: meta.heroLede,
       markdown: body,
     };
   });
