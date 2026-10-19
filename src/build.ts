@@ -88,12 +88,12 @@ function thread(slug: string, target: 'html' | 'md'): string {
   return `<nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol>${steps}</ol></nav>`;
 }
 
-// The Play page's player: Character 1 with the idle and the cup lift Pose wrote, served from this site.
+// The Play page's player: Character 1 with the idle and the cup swing Pose wrote, served from this site.
 function playDemo(target: 'html' | 'md'): string {
   if (target === 'md') {
-    return 'The live player on this page plays Character 1 with two motions (idle and the cup lift from the Pose page), with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.';
+    return 'The live player on this page plays Character 1 with two motions (idle and the cup swing from the Pose page), with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.';
   }
-  return `<section class="live-demo live-demo-play" data-model-url="/assets/rigs/character-1-lift/skeleton.model.json" data-character="Character 1" data-label="Character 1" data-fit="0.78" aria-label="Live player">
+  return `<section class="live-demo live-demo-play" data-model-url="/assets/rigs/character-1-swing/skeleton.model.json" data-character="Character 1" data-label="Character 1" data-fit="0.78" aria-label="Live player">
 <div class="demo-head"><span class="badge-live">Live</span><span>@rig-c/play 1.12.0 running in your browser — not a recording</span></div>
 <div class="demo-body">
 <div class="demo-stage" id="demo-stage-play" data-part="demo-stage"><button type="button" class="btn btn-primary demo-start" data-part="demo-start">Start the player</button><canvas class="demo-overlay" data-part="demo-overlay" aria-hidden="true"></canvas></div>
@@ -104,7 +104,7 @@ function playDemo(target: 'html' | 'md'): string {
 <div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
 </div>
 <p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 (about 2.2 MB).</p>
-<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted cup lift added.</p>
+<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted cup swing added.</p>
 <noscript><p class="demo-status" data-kind="error">The live player needs JavaScript.</p></noscript>
 </div>
 </div>

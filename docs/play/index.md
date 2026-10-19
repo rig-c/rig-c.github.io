@@ -2,7 +2,7 @@
 
 <p class="mod-role">The browser player for the model rigc writes — no Spine runtime, rigid parts as plain DOM elements or the whole rig in one canvas.</p>
 
-The live player on this page plays Character 1 with two motions (idle and the cup lift from the Pose page), with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.
+The live player on this page plays Character 1 with two motions (idle and the cup swing from the Pose page), with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.
 
 <p class="mod-skip">Skip to <a href="#a-minimal-page">A minimal page</a> · <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
@@ -19,7 +19,7 @@ The player above is the published package doing what any page does with it — n
 3. Each frame became a `PosedFrame` — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one `matrix()` string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).
 4. **Bones** and **Mesh** draw from the player's own read-only queries, `bone(name)` and `posedFrame()`; **Pause** calls `pause()`.
 
-`lift` is the motion the [Pose](/docs/pose/) page retargeted onto this rig; `idle` came with the rig from [Parts](/docs/parts/).
+`swing` — the cup swung like a pendulum — is the motion the [Pose](/docs/pose/) page retargeted onto this rig; `idle` came with the rig from [Parts](/docs/parts/).
 
 ## A minimal page
 
