@@ -4,9 +4,9 @@
 
 <figure class="mod-hero">
   <div class="media">
-    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="630" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right arm loosely; on the right Character 1 swinging her coffee cup the same way">
+    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="608" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right arm loosely; on the right Character 1 swinging her coffee cup the same way">
       <source src="/assets/docs/pose-swing.mp4" type="video/mp4">
-      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm and Character 1 holding her cup" width="630" height="792">
+      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm and Character 1 holding her cup" width="608" height="792">
     </video>
   </div>
   <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right forearm swinging the cup like a pendulum about the elbow. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
@@ -29,17 +29,19 @@ Getting that right took measuring rather than looking. Swung outward, the arm un
 | Animation | Arm pixels covered (rim excluded), worst frame |
 | --- | --- |
 | `idle`, as the rig was drawn | 926 |
-| the previous swing (upper arm and forearm, rest not aligned) | 1,828 |
-| this swing (forearm only, aligned rest) | 1,218 |
+| the previous swing (upper arm and forearm, rest not aligned) | 1,854 |
+| this swing (forearm only, aligned rest) | 1,242 |
 
 What the extra ~300 px are: a thin strip along the inside edge of the sleeve, where its mesh meets the shirt. The sleeve and cuff stay in front.
+
+The outward side got the same treatment. Counting pixels on the body side of the resting arm that turn into bare background — a hole in the trousers behind it — a ±6° swing opened up to 5,173 px at its outermost frame; with the outward half cut to 30% of the inward one, the worst frame opens 1,124 px, and side by side at twice the size it reads like the resting pose.
 
 The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and the **right arm** (shoulder, elbow, wrist) on the two sleeve bones. The rig has no left-arm bones (no `sleeve_l` in its `rig.json`), so that arm stays as painted, and the hand with the cup is not mapped: it turns with the forearm.
 
 | Track the rig received | From the pose | Range over the loop |
 | --- | --- | --- |
 | `sleeve_r0` rotate | shoulder → elbow | 0° (held) |
-| `sleeve_r1` rotate | elbow → wrist | −5.2° to 6.0° |
+| `sleeve_r1` rotate | elbow → wrist | −1.2° (outward) to 6.0° (inward) |
 | `chest` rotate | hip → neck | 0° (held) |
 | `hip` translate | hip | 0, 0 (held) |
 
@@ -47,7 +49,7 @@ The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and t
 
 <div class="compare">
   <figure><img src="/assets/docs/pose-keypoints.jpg" alt="Character 1's painting with 18 labelled body joints drawn over it" width="400" height="1142" loading="lazy"><figcaption>Where the motion starts: 18 body joints placed by hand on the painting (joints under the clothes marked occluded).</figcaption></figure>
-  <figure><img src="/assets/docs/pose-swing-ends.jpg" alt="Two side-by-side frames: the swing at its outermost and its innermost, source pose and rig each" width="1260" height="792" loading="lazy"><figcaption>The two ends of the swing (t = 0.33 s and 2.79 s). Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
+  <figure><img src="/assets/docs/pose-swing-ends.jpg" alt="Two side-by-side frames: the swing at its outermost and its innermost, source pose and rig each" width="1216" height="792" loading="lazy"><figcaption>The two ends of the swing (t = 0.17 s and 2.79 s). Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
 </div>
 
 ### What it checked before writing
@@ -56,7 +58,7 @@ The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and t
 rig-pose retarget: 73 frame(s), 3.000s — 4 track(s); min-score 0.3, flip off, short off, bends refuse (tolerance 0°)
   GATE   rigc build --profile spine-html: green — 52 assertions: 26 measured (26 passed, 0 failed), 26 skipped, 0 not in profile "rig-play"
   LAND   bone "sleeve_r0" aim — worst |reached − asked| 0.0000764° at frame 0 (t=0.000s); the tolerance is 0.01°
-  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.000555° at frame 64 (t=2.667s); the tolerance is 0.01°
+  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.000574° at frame 2 (t=0.083s); the tolerance is 0.01°
   FOLD   rigc render --folds at 24 fps: no mesh folds
   wrote swing.motion.json — animations: idle, swing
 ```
