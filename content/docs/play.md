@@ -29,7 +29,7 @@ The player above is the published package doing what any page does with it — n
 3. Each frame became a `PosedFrame` — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one `matrix()` string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).
 4. **Bones** and **Mesh** draw from the player's own read-only queries, `bone(name)` and `posedFrame()`; **Pause** calls `pause()`.
 
-The `wave` is the motion the [Pose](/docs/pose/) page retargeted onto this rig; `idle` came with the rig from [Parts](/docs/parts/).
+`lift` is the motion the [Pose](/docs/pose/) page retargeted onto this rig; `idle` came with the rig from [Parts](/docs/parts/).
 
 ## A minimal page
 
@@ -97,7 +97,7 @@ From the README's *Status* and *No counterpart in 1.0.0* (it has no limits secti
 - [How it works](https://github.com/rig-c/play#how-it-works)
 - [npm](https://www.npmjs.com/package/@rig-c/play) · [CHANGELOG](https://github.com/rig-c/play/blob/main/CHANGELOG.md)
 <!-- SOURCES (not published)
-- live player: @rig-c/play 1.12.0 from jsDelivr; model assets/rigs/character-1-wave = the Pose case's wave-build (Character 1 rig @parts-examples c239b09 + retargeted wave; rig-c 2.61.0, @rig-c/pose 0.35.0)
+- live player: @rig-c/play 1.12.0 from jsDelivr; model assets/rigs/character-1-lift = the Pose case's lift-build (Character 1 rig @parts-examples c239b09 + retargeted cup lift; rig-c 2.61.0, @rig-c/pose 0.35.0)
 - minimal page: rig-c/play README "A minimal page" (lines 301-326), style attribute only in the sample code
 - mode switch / meshBackendActive / pause / bone / posedFrame: dist/player.d.ts, DomRenderer.d.ts 1.12.0
 

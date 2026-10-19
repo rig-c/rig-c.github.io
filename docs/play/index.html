@@ -119,7 +119,7 @@
         <article>
 <h1 id="rig-cplay">@rig-c/play</h1>
 <p class="mod-role">The browser player for the model rigc writes — no Spine runtime, rigid parts as plain DOM elements or the whole rig in one canvas.</p>
-<section class="live-demo live-demo-play" data-model-url="/assets/rigs/character-1-wave/skeleton.model.json" data-character="Character 1" data-label="Character 1" data-fit="0.78" aria-label="Live player">
+<section class="live-demo live-demo-play" data-model-url="/assets/rigs/character-1-lift/skeleton.model.json" data-character="Character 1" data-label="Character 1" data-fit="0.78" aria-label="Live player">
 <div class="demo-head"><span class="badge-live">Live</span><span>@rig-c/play 1.12.0 running in your browser — not a recording</span></div>
 <div class="demo-body">
 <div class="demo-stage" id="demo-stage-play" data-part="demo-stage"><button type="button" class="btn btn-primary demo-start" data-part="demo-start">Start the player</button><canvas class="demo-overlay" data-part="demo-overlay" aria-hidden="true"></canvas></div>
@@ -130,7 +130,7 @@
 <div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
 </div>
 <p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 (about 2.2 MB).</p>
-<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted wave added.</p>
+<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted cup lift added.</p>
 <noscript><p class="demo-status" data-kind="error">The live player needs JavaScript.</p></noscript>
 </div>
 </div>
@@ -147,7 +147,7 @@
 <li>Each frame became a <code>PosedFrame</code> — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one <code>matrix()</code> string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).</li>
 <li><strong>Bones</strong> and <strong>Mesh</strong> draw from the player's own read-only queries, <code>bone(name)</code> and <code>posedFrame()</code>; <strong>Pause</strong> calls <code>pause()</code>.</li>
 </ol>
-<p>The <code>wave</code> is the motion the <a href="/docs/pose/">Pose</a> page retargeted onto this rig; <code>idle</code> came with the rig from <a href="/docs/parts/">Parts</a>.</p>
+<p><code>lift</code> is the motion the <a href="/docs/pose/">Pose</a> page retargeted onto this rig; <code>idle</code> came with the rig from <a href="/docs/parts/">Parts</a>.</p>
 <h2 id="a-minimal-page">A minimal page</h2>
 <p>Twenty-odd lines, from the README, load a model from jsDelivr, fit its stage box to a container and drive the clock:</p>
 <pre><code class="language-html">&lt;div id=&quot;stage&quot; style=&quot;position: relative; width: 480px; height: 640px; overflow: hidden&quot;&gt;&lt;/div&gt;
