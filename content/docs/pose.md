@@ -14,12 +14,12 @@ npmUrl: https://www.npmjs.com/package/@rig-c/pose
 
 <figure class="mod-hero">
   <div class="media">
-    <video data-loop="the cup-lift comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-lift-poster.jpg" width="618" height="792" aria-label="Recorded video: on the left a stick-figure pose lifting its right forearm; on the right Character 1 lifting her coffee cup the same way">
-      <source src="/assets/docs/pose-lift.mp4" type="video/mp4">
-      <img src="/assets/docs/pose-lift-peak.jpg" alt="Side by side at the top of the lift: the source pose's bent arm and Character 1 holding her cup up" width="618" height="792">
+    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="638" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right arm loosely; on the right Character 1 swinging her coffee cup the same way">
+      <source src="/assets/docs/pose-swing.mp4" type="video/mp4">
+      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm and Character 1 holding her cup" width="638" height="792">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right forearm lifting the cup and lowering it. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right arm swinging the cup like a pendulum, the forearm trailing the upper arm. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
 </figure>
 
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
@@ -28,26 +28,28 @@ npmUrl: https://www.npmjs.com/package/@rig-c/pose
 
 A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones has traps of its own: setup rotations, and parents that turn their children. `rig-pose` cleans the sequence once, where it can be inspected, then turns each mapped bone to point along its segment — and refuses to write keys that do not land where the pose asked.
 
-## How the cup lift reached Character 1
+## How the swing reached Character 1
 
 ### A motion that fits the rig
 
-The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, a small lift of the coffee cup she is already holding.
+The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, the coffee cup she is already holding, swung loosely like a pendulum — the upper arm sways about the shoulder and the forearm follows 0.18 s later, two swings in three seconds so the loop closes.
+
+Even that needed one more look: swung outward, the arm uncovered the edge of the trousers it hides in the painting, which See-through had to synthesize. So the swing is centred toward the body and never goes further out than the arm's resting angle.
 
 The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and the **right arm** (shoulder, elbow, wrist) on the two sleeve bones. The rig has no left-arm bones (no `sleeve_l` in its `rig.json`), so that arm stays as painted, and the hand with the cup is not mapped: it turns with the forearm.
 
-| Track the rig received | From the pose | At rest | Top of the lift |
-| --- | --- | --- | --- |
-| `sleeve_r0` rotate | shoulder → elbow | −4.5° | 1.5° |
-| `sleeve_r1` rotate | elbow → wrist | 0.4° | 39.4° |
-| `chest` rotate | hip → neck | 3.3° | 3.3° (held) |
-| `hip` translate | hip | 0, 0 | 0, 0 (held) |
+| Track the rig received | From the pose | Range over the loop |
+| --- | --- | --- |
+| `sleeve_r0` rotate | shoulder → elbow | −3.9° to 6.5° |
+| `sleeve_r1` rotate | elbow → wrist | −3.7° to 16.4° |
+| `chest` rotate | hip → neck | 2.6° (held) |
+| `hip` translate | hip | 0, 0 (held) |
 
 **Direction, not length.** Each bone points the way its segment points in the picture but keeps the rig's own length (upper arm 300 px in the pose, 267 units on the rig; forearm 335 px and 303 units).
 
 <div class="compare">
   <figure><img src="/assets/docs/pose-keypoints.jpg" alt="Character 1's painting with 18 labelled body joints drawn over it" width="400" height="1142" loading="lazy"><figcaption>Where the motion starts: 18 body joints placed by hand on the painting (joints under the clothes marked occluded).</figcaption></figure>
-  <figure><img src="/assets/docs/pose-lift-peak.jpg" alt="Side by side at the top of the lift: the source pose's bent right arm in orange and Character 1 holding her cup up" width="618" height="792" loading="lazy"><figcaption>The top of the lift, t = 1.46 s. Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
+  <figure><img src="/assets/docs/pose-swing-ends.jpg" alt="Two side-by-side frames: the swing at its outermost and its innermost, source pose and rig each" width="1276" height="792" loading="lazy"><figcaption>The two ends of the swing (t = 0.13 s and 1.00 s). Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
 </div>
 
 ### What it checked before writing
@@ -55,15 +57,15 @@ The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and t
 ```
 rig-pose retarget: 73 frame(s), 3.000s — 4 track(s); min-score 0.3, flip off, short off, bends refuse (tolerance 0°)
   GATE   rigc build --profile spine-html: green — 52 assertions: 26 measured (26 passed, 0 failed), 26 skipped, 0 not in profile "rig-play"
-  LAND   bone "sleeve_r0" aim — worst |reached − asked| 0.000910° at frame 41 (t=1.708s); the tolerance is 0.01°
-  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.00121° at frame 43 (t=1.792s); the tolerance is 0.01°
+  LAND   bone "sleeve_r0" aim — worst |reached − asked| 0.000660° at frame 19 (t=0.792s); the tolerance is 0.01°
+  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.000919° at frame 15 (t=0.625s); the tolerance is 0.01°
   FOLD   rigc render --folds at 24 fps: no mesh folds
-  wrote lift.motion.json — animations: idle, lift
+  wrote swing.motion.json — animations: idle, swing
 ```
 
-The rig is built with the new animation and gated before anything is written; every mapped bone, posed by rig-c's own poser, has to land within 0.01° of what the pose asked on every frame. The run also says what it left out: 26 `IDLE-DROPPED` lines name the breathing and hair tracks that were not carried into `lift` — which is why only the arm moves. And then someone still has to look: the torn first try passed all of these lines.
+The rig is built with the new animation and gated before anything is written; every mapped bone, posed by rig-c's own poser, has to land within 0.01° of what the pose asked on every frame. The run also says what it left out: 26 `IDLE-DROPPED` lines name the breathing and hair tracks that were not carried into `swing` — which is why only the arm moves. And then someone still has to look: the torn first try passed all of these lines.
 
-The joints were placed by hand on the painting (the way the getting-started guide's `docs/KEYPOINTS.md` describes); the lift is a three-second test motion made from them, not footage. Next, [Core](/docs/core/) is the compiler that gated this build, [Review](/docs/review/) is where a person checks a motion against footage, and [Play](/docs/play/) runs this one live.
+The joints were placed by hand on the painting (the way the getting-started guide's `docs/KEYPOINTS.md` describes); the swing is a three-second test motion made from them, not footage. Next, [Core](/docs/core/) is the compiler that gated this build, [Review](/docs/review/) is where a person checks a motion against footage, and [Play](/docs/play/) runs this one live.
 
 ## How it works
 
@@ -79,7 +81,7 @@ The joints were placed by hand on the painting (the way the getting-started guid
 
 ```sh
 npm i -D @rig-c/pose
-bunx rig-pose retarget --rig out/rig --map map.json --pose lift.pose.clean.json --out lift.motion.json --name lift --build lift-build
+bunx rig-pose retarget --rig out/rig --map map.json --pose swing.pose.clean.json --out swing.motion.json --name swing --build swing-build
 ```
 
 Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
@@ -110,7 +112,8 @@ Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
 - [What it does not do](https://github.com/rig-c/pose#what-it-does-not-do)
 - [npm](https://www.npmjs.com/package/@rig-c/pose) · [CHANGELOG](https://github.com/rig-c/pose/blob/main/CHANGELOG.md)
 <!-- SOURCES (not published)
-- lift case (replaces the wave, which tore the sleeve at the shoulder; owner review 2026-10-19): lift.py over the hand-placed keypoints, forearm 40 deg, upper arm 6 deg; GATE/LAND/FOLD lines and track values from the run; frames inspected at 2000 px
+- swing case (owner's idea, 2026-10-19): swing.py, upper arm +-6 deg, forearm +-9 deg trailing 0.18 s, centred 5 deg toward the body, period 1.5 s; outward swing uncovered the synthesized trouser edge (seen at 2000 px), hence the bias; track ranges and GATE/LAND/FOLD lines from the run
+- lift case (superseded; replaced the wave, which tore the sleeve at the shoulder; owner review 2026-10-19): lift.py over the hand-placed keypoints, forearm 40 deg, upper arm 6 deg; GATE/LAND/FOLD lines and track values from the run; frames inspected at 2000 px
 - wave case (superseded): @rig-c/pose 0.35.0, rig-c 2.61.0, rig family/roa/out/rig @c239b09; verbatim clean/retarget lines and track table from the case run (2026-10-19); keypoints hand-placed; wave from rig-c/getting-started scripts/wave.ts
 - retarget flags --pose / --name / --build: the case run's command (and getting-started step 9)
 
