@@ -53,7 +53,7 @@ One character painting goes in; a rigged, animated 2D character that plays in th
 | :-: | --- | --- | --- | --- |
 | 1 | [**@rig-c/parts**](/parts/) | \`1.38.0\` | \`npm i -D @rig-c/parts\` | Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them. |
 | 2 | [**@rig-c/pose**](/pose/) | \`0.33.0\` | \`npm i -D @rig-c/pose\` | Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written. |
-| 3 | [**rig-c / @rig-c/core**](/core/) | \`2.61.0\` | \`npm i -D rig-c\` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (\`skeleton.json\` + \`.atlas\`) and \`skeleton.model.json\` out — gated by 50 named assertions before a byte is written. |
+| 3 | [**rig-c / @rig-c/core**](/core/) | \`2.61.0\` | \`npm i -D rig-c\` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (\`skeleton.json\` + \`.atlas\`) and \`skeleton.model.json\` out — gated by named assertions before a byte is written (36 under the default \`--profile spine\`, all 50 under the opt-in \`--profile rig-play\`). |
 | 4 | [**@rig-c/review**](/review/) | \`0.2.1\` | \`npm i -D @rig-c/review\` | Local human inspection workspace: compare setup geometry, compiled-model playback, source video/sheets, and export frame/bone/slot-bound feedback ready to become an issue. |
 | 5 | [**@rig-c/play**](/play/) | \`1.12.0\` | \`npm i @rig-c/play\` | Plays \`skeleton.model.json\` in the browser with no Spine runtime — as plain DOM elements (\`<img>\` with CSS \`matrix()\`) or one \`<canvas>\` per player. |
 | 6 | [**@rig-c/adapters**](/adapters/) | \`0.1.1\` | \`npm i @rig-c/pixi\`<br>\`npm i @rig-c/phaser\`<br>\`npm i @rig-c/three\` | Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through \`@rig-c/play\`'s posing core, with no Spine runtime. |
@@ -153,7 +153,7 @@ All rig-c packages are **MIT licensed**. The published packages link **no Spine 
         <td><a href="/core/"><strong>rig-c / @rig-c/core</strong></a></td>
         <td><code>2.61.0</code></td>
         <td><code>npm i -D rig-c</code></td>
-        <td>The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>.atlas</code>) and <code>skeleton.model.json</code> out — gated by 50 named assertions before a byte is written.</td>
+        <td>The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>.atlas</code>) and <code>skeleton.model.json</code> out — gated by named assertions before a byte is written (36 under the default <code>--profile spine</code>, all 50 under the opt-in <code>--profile rig-play</code>).</td>
       </tr>
       <tr>
         <td>4</td>
@@ -696,7 +696,7 @@ Nothing is written unless every hard gate passes:
 
 | Check | Refusal Code | Requirement |
 | --- | --- | --- |
-| Base rig & retargeted rig pass \`rigc build\` | \`RIG_GATE_BASE\`, \`RIG_GATE\` | All 50 compiler assertions pass before and after adding the animation. |
+| Base rig & retargeted rig pass \`rigc build\` | \`RIG_GATE_BASE\`, \`RIG_GATE\` | rig-c's gate is green with the rig as it is, and again with the animation in. |
 | Every mapped bone lands on target angle/scale/ankle | \`POSE_LANDS\` | Posed by \`rig-c\`'s poser and measured within \`0.01°\` / \`0.01\` units on every frame. |
 | Hinges bend only in their anatomically valid direction | \`POSE_BEND_ONE_WAY\` | Elbows and knees stay on the rest pose's bend side (or clamp with \`--bends clamp\`). |
 | Every mapped point has valid data | \`POSE_POINT_NEVER_GOOD\` | Each required joint is good on at least one frame. |
@@ -801,7 +801,7 @@ bunx rig-pose retarget \
       <tr>
         <td>Base rig &amp; retargeted rig pass <code>rigc build</code></td>
         <td><code>RIG_GATE_BASE</code>, <code>RIG_GATE</code></td>
-        <td>All 50 compiler assertions pass before and after adding the animation.</td>
+        <td>rig-c's gate is green with the rig as it is, and again with the animation in.</td>
       </tr>
       <tr>
         <td>Every mapped bone lands on target angle/scale/ankle</td>
@@ -831,9 +831,9 @@ bunx rig-pose retarget \
   {
     slug: 'core',
     navLabel: 'Core (rigc)',
-    title: 'rig-c (@rig-c/core) — 2D Rig Compiler & 50-Assertion Gate for Spine 4.3',
+    title: 'rig-c (@rig-c/core) — 2D Rig Compiler & Named-Assertion Gate for Spine 4.3',
     description:
-      'rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by 50 named assertions held to spine-core round-trip verdicts.',
+      'rigc compiles a rig spec and motion spec into Spine 4.3 skeleton data and rig-c compiled models, gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile) held to spine-core round-trip verdicts in CI.',
     keywords: [
       'rig-c',
       '@rig-c/core',
@@ -849,7 +849,7 @@ bunx rig-pose retarget \
     repoUrl: 'https://github.com/rig-c/core',
     npmUrl: 'https://www.npmjs.com/package/rig-c',
     summaryForLlms:
-      'rig-c / @rig-c/core (v2.61.0) rig compiler: CLI commands (build, render, inspect, preview, vote, pose, chainfit, check), 50-assertion gate architecture, and determinism guarantees.',
+      'rig-c / @rig-c/core (v2.61.0) rig compiler: CLI commands (build, render, inspect, preview, vote, pose, chainfit, check), named-assertion gate and profiles, and determinism guarantees.',
     markdown: `# rig-c (\`@rig-c/core\`) — The Rig Compiler
 
 **AI-authored 2D rigging and animation, verified before it is written.**
@@ -859,7 +859,7 @@ bunx rig-pose retarget \
 - **Repository**: <https://github.com/rig-c/core>
 - **License**: MIT (published package links no Spine runtime)
 
-\`rigc\` is a deterministic rig compiler: a rig spec (\`rig.json\`), a motion spec (\`motion.json\`), and loose part PNGs go in; **Spine 4.3 skeleton data (\`skeleton.json\` + \`skeleton.atlas\`) and \`skeleton.model.json\` come out** — gated by 50 named assertions before a single byte is written to disk.
+\`rigc\` is a deterministic rig compiler: a rig spec (\`rig.json\`), a motion spec (\`motion.json\`), and loose part PNGs go in; **Spine 4.3 skeleton data (\`skeleton.json\` + \`skeleton.atlas\`) and \`skeleton.model.json\` come out** — gated by named assertions before a single byte is written to disk (36 under the default \`--profile spine\`, all 50 under the opt-in \`--profile rig-play\`).
 
 ## Install
 
@@ -879,16 +879,16 @@ bun add -d rig-c     # pin in a project
 | A compiled rig | \`rigc render\` | Every animation rendered as PNG frames plus a labelled contact sheet (supports \`--folds\` and physics readouts). |
 | A compiled rig and a geometry question | \`rigc inspect\` | Diagnostic overlay of bones, axes, mesh edges/hulls, bone weights, folded triangles, draw order, and world grid. |
 | A compiled rig | \`rigc preview\` | Self-contained \`.html\` playing the rig in Spine's web player (when \`@esotericsoftware/spine-core\` is installed beside it). |
-| 2 to 4 candidate rigs | \`rigc vote\` | Human A/B ballot page with verdicts recorded into a ledger. |
+| 2 to 4 candidate rigs | \`rigc vote\` | Human A/B ballot page with verdicts recorded into a ledger (when \`@esotericsoftware/spine-core\` is installed beside it). |
 | A key-pose image and part PNGs | \`rigc pose\` | Spec coordinates where each loose part sits in the target key pose. |
 | A key-pose image and an occluded rig | \`rigc chainfit\` | Fits occluded limb chains through the candidate's own draw order and hierarchy. |
 
-## The 50-Assertion Gate & Structural Invariants
+## The Named-Assertion Gate & Structural Invariants
 
 - **Validation is a structural invariant, never an option.** There is no \`--no-validate\` or \`--emit-anyway\` flag.
 - **Two suppliers, one oracle**:
-  1. Where \`@esotericsoftware/spine-core\` is installed (CI, repository clones, or optional dev install), \`rigc\` runs the full Spine 4.3 parser round-trip (\`A00_ROUNDTRIP_PARSE\`) plus 49 assertions.
-  2. In the standalone published package (which links zero Spine runtime code), \`rigc\` runs its own validator over the model document and emitted text — 49 shared rules plus \`A00_MODEL_READ\` and \`A00_MODEL_REGIONS_ON_PAGES\` (52 total lines), held equal to the \`spine-core\` round-trip verdicts on every commit in CI by \`verdict_gate\`, \`RC28\`, and \`core_gate\` (pose tolerance \`0\`).
+  1. The published package links no Spine runtime: \`rigc\` runs its own validator. Of the 50 assertions, 49 run there; \`A00_ROUNDTRIP_PARSE\`, the official parser's own parse, is reported as a SKIP, and the model side's own two parse rules, \`A00_MODEL_READ\` and \`A00_MODEL_REGIONS_ON_PAGES\`, run in its place — so the report's summary totals 52.
+  2. With \`@esotericsoftware/spine-core\` installed beside it (\`bun add -d @esotericsoftware/spine-core\`), the same \`rigc\` also runs the Spine 4.3 round trip, \`A00_ROUNDTRIP_PARSE\`, on every build. The rig-c/core repository holds the validator to the round trip's verdicts in its CI.
 - **Byte-for-byte determinism (\`A18_DETERMINISTIC_EMIT\`)**: Every \`build\` compiles twice independently and compares the output byte for byte before emitting.
 - **Named resolution everywhere**: Bone parents, slot bones, constraint targets, draw-order slots, and mesh vertex weights resolve by name, never silent raw array indices.
 `,
@@ -901,7 +901,7 @@ bun add -d rig-c     # pin in a project
   <span>License: <code>MIT</code></span>
 </div>
 
-<p><code>rigc</code> is a deterministic rig compiler: a rig spec (<code>rig.json</code>), a motion spec (<code>motion.json</code>), and loose part PNGs go in; <strong>Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>skeleton.atlas</code>) and <code>skeleton.model.json</code> come out</strong> — gated by 50 named assertions before a single byte is written to disk.</p>
+<p><code>rigc</code> is a deterministic rig compiler: a rig spec (<code>rig.json</code>), a motion spec (<code>motion.json</code>), and loose part PNGs go in; <strong>Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>skeleton.atlas</code>) and <code>skeleton.model.json</code> come out</strong> — gated by named assertions before a single byte is written to disk (36 under the default <code>--profile spine</code>, all 50 under the opt-in <code>--profile rig-play</code>).</p>
 
 <h2>Install</h2>
 <pre><code>bunx rig-c --help    # run without installing
@@ -952,7 +952,7 @@ bun add -d rig-c     # pin in a project</code></pre>
       <tr>
         <td>2 to 4 candidate rigs</td>
         <td><code>rigc vote</code></td>
-        <td>Human A/B ballot page with verdicts recorded into a ledger.</td>
+        <td>Human A/B ballot page with verdicts recorded into a ledger (when <code>@esotericsoftware/spine-core</code> is installed beside it).</td>
       </tr>
       <tr>
         <td>A key-pose image and part PNGs</td>
@@ -968,13 +968,13 @@ bun add -d rig-c     # pin in a project</code></pre>
   </table>
 </div>
 
-<h2>The 50-Assertion Gate &amp; Structural Invariants</h2>
+<h2>The Named-Assertion Gate &amp; Structural Invariants</h2>
 <ul>
   <li><strong>Validation is a structural invariant, never an option.</strong> There is no <code>--no-validate</code> or <code>--emit-anyway</code> flag.</li>
   <li><strong>Two suppliers, one oracle</strong>:
     <ol>
-      <li>Where <code>@esotericsoftware/spine-core</code> is installed (CI, repository clones, or optional dev install), <code>rigc</code> runs the full Spine 4.3 parser round-trip (<code>A00_ROUNDTRIP_PARSE</code>) plus 49 assertions.</li>
-      <li>In the standalone published package (which links zero Spine runtime code), <code>rigc</code> runs its own validator over the model document and emitted text — 49 shared rules plus <code>A00_MODEL_READ</code> and <code>A00_MODEL_REGIONS_ON_PAGES</code> (52 total lines), held equal to the <code>spine-core</code> round-trip verdicts on every commit in CI by <code>verdict_gate</code>, <code>RC28</code>, and <code>core_gate</code> (pose tolerance <code>0</code>).</li>
+      <li>The published package links no Spine runtime: <code>rigc</code> runs its own validator. Of the 50 assertions, 49 run there; <code>A00_ROUNDTRIP_PARSE</code>, the official parser's own parse, is reported as a SKIP, and the model side's own two parse rules, <code>A00_MODEL_READ</code> and <code>A00_MODEL_REGIONS_ON_PAGES</code>, run in its place — so the report's summary totals 52.</li>
+      <li>With <code>@esotericsoftware/spine-core</code> installed beside it (<code>bun add -d @esotericsoftware/spine-core</code>), the same <code>rigc</code> also runs the Spine 4.3 round trip, <code>A00_ROUNDTRIP_PARSE</code>, on every build. The rig-c/core repository holds the validator to the round trip's verdicts in its CI.</li>
     </ol>
   </li>
   <li><strong>Byte-for-byte determinism (<code>A18_DETERMINISTIC_EMIT</code>)</strong>: Every <code>build</code> compiles twice independently and compares the output byte for byte before emitting.</li>

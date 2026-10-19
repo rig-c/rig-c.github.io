@@ -249,7 +249,7 @@ function buildLlmsTxt(): string {
   const lines: string[] = [
     '# rig-c',
     '',
-    '> AI-authored 2D character rigging and animation toolchain, verified before a byte is written. Takes one character painting decomposed into RGBA layers (via See-through) and compiles Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and self-contained browser/engine models (`skeleton.model.json`) gated by 50 named assertions.',
+    '> AI-authored 2D character rigging and animation toolchain, verified before a byte is written. Takes one character painting decomposed into RGBA layers (via See-through) and compiles Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and self-contained browser/engine models (`skeleton.model.json`) gated by named assertions (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`).',
     '',
     `All pages on ${SITE_ORIGIN} are served as static semantic HTML (\`/<slug>/\`) with a clean Markdown mirror (\`/<slug>/index.md\`). No JavaScript execution is required to fetch or parse any page.`,
     '',

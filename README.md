@@ -12,7 +12,7 @@ Built flat-first for **zero-JS `curl` readability**, **AI agent ingestion (`llms
 | `/getting-started/` | `getting-started/index.html` | `getting-started/index.md` | The three-step pipeline (paint, split into layers, run the packages on the CPU) and the 10-step no-GPU walkthrough from [`rig-c/getting-started`](https://github.com/rig-c/getting-started), plus downstream export routes |
 | `/parts/` | `parts/index.html` | `parts/index.md` | `@rig-c/parts` (`1.38.0`) — See-through layer assembly, contour/lattice mesh, auto-weights, spring chains |
 | `/pose/` | `pose/index.html` | `pose/index.md` | `@rig-c/pose` (`0.33.0`) — body-18 pose cleaning, bone-length normalization, retargeting |
-| `/core/` | `core/index.html` | `core/index.md` | `rig-c` / `@rig-c/core` (`2.61.0`) — 2D rig compiler, 50 named assertions, CLI reference |
+| `/core/` | `core/index.html` | `core/index.md` | `rig-c` / `@rig-c/core` (`2.61.0`) — 2D rig compiler, named-assertion gate (36 default / 50 under `--profile rig-play`), CLI reference |
 | `/review/` | `review/index.html` | `review/index.md` | `@rig-c/review` (`0.2.1`) — local human inspection workspace and structured JSON feedback export |
 | `/play/` | `play/index.html` | `play/index.md` | `@rig-c/play` (`1.12.0`) — Spine-free browser player (`<rig-player>`, DOM & 2D `<canvas>` modes) |
 | `/adapters/` | `adapters/index.html` | `adapters/index.md` | `@rig-c/pixi`, `@rig-c/phaser`, `@rig-c/three` (`0.1.1`) — game engine adapters |
