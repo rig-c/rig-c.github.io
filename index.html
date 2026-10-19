@@ -182,12 +182,13 @@ bun rigc skills install
 <li><code>@rig-c/play</code>, <code>rig-play</code>, and <code>spine-html</code> are the same browser player package.</li>
 </ul>
 <h2 id="licensing-stated-plainly">Licensing, stated plainly</h2>
-<p>All rig-c packages are <strong>MIT licensed</strong>. The published packages link <strong>no Spine runtime</strong>:</p>
+<p>rig-c's code is <strong>MIT</strong>. Which Spine terms apply depends on what plays the output, because <code>rigc</code> writes both Spine 4.3 skeleton data and rig-c's own model (<code>skeleton.model.json</code>):</p>
 <ul>
-<li><code>rigc</code> emits both Spine 4.3 skeleton data (<code>skeleton.json</code> + <code>skeleton.atlas</code>) and rig-c's own compiled model document (<code>skeleton.model.json</code>).</li>
-<li>Playing <code>skeleton.model.json</code> with <a href="/docs/play/"><code>@rig-c/play</code></a> or <a href="/docs/adapters/"><code>@rig-c/adapters</code></a> integrates no Esoteric Software code and requires no Spine license.</li>
-<li>Importing <code>skeleton.json</code> into the Spine Editor or playing it with an official Spine Runtime is subject to Esoteric Software's <a href="https://esotericsoftware.com/spine-editor-license">Spine Editor License Agreement</a> and <a href="https://esotericsoftware.com/spine-runtimes-license">Spine Runtimes License Agreement</a>.</li>
+<li><strong>rig-c's model in <a href="/docs/play/"><code>@rig-c/play</code></a> or an <a href="/docs/adapters/">engine adapter</a></strong>: these link nothing from Esoteric Software and integrate no Spine Runtime.</li>
+<li><strong>Spine data in an official Spine Runtime or the Spine Web Player</strong>: the <a href="https://esotericsoftware.com/spine-runtimes-license">Spine Runtimes License</a> applies to that integration.</li>
+<li><strong>Spine data in the Spine editor</strong>: the <a href="https://esotericsoftware.com/spine-editor-license">Spine Editor License Agreement</a> applies.</li>
 </ul>
+<p>Sample paintings and layers carry their own licences — Getting Started's example inputs are CC BY-NC 4.0. The full table, with sources: <strong><a href="/docs/licensing/">Licensing</a></strong>.</p>
 
       </article>
     </main>

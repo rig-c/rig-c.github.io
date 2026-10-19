@@ -118,6 +118,8 @@ bun ../getting-started/scripts/serve.ts
 
 ## Three Ways to Use the Output
 
-1. **On the web with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/)**: Load `skeleton.model.json` and part PNGs directly. MIT licensed, zero Spine runtime dependencies.
-2. **In the Spine 4.3 Editor**: Import `out/check/build/skeleton.json` via `Import Data` and point `Images` to `out/rig/images/` to refine timelines by hand (requires rig-c 2.51.1+ and a Spine Editor license).
+1. **On the web with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/)**: Load `skeleton.model.json` and part PNGs directly. The packages are MIT and integrate no Spine Runtime.
+2. **In the Spine 4.3 Editor**: Import `out/check/build/skeleton.json` via `Import Data` and point `Images` to `out/rig/images/` to refine timelines by hand (requires rig-c 2.51.1+; the editor is under the Spine Editor License Agreement).
 3. **In a game engine via official Spine Runtimes**: Load `skeleton.json` and `skeleton.atlas` in Unity, Godot, Unreal, or C++ runtimes under the Spine Runtimes License.
+
+The example inputs in step 2 come from [rig-c/exam](https://github.com/rig-c/exam) and are **CC BY-NC 4.0**, not MIT: free to use with credit, not for commercial use, and what you build from them carries that licence. Which terms each route brings: [Licensing](/docs/licensing/).

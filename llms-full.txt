@@ -98,10 +98,13 @@ bun rigc skills install
 
 ## Licensing, stated plainly
 
-All rig-c packages are **MIT licensed**. The published packages link **no Spine runtime**:
-- `rigc` emits both Spine 4.3 skeleton data (`skeleton.json` + `skeleton.atlas`) and rig-c's own compiled model document (`skeleton.model.json`).
-- Playing `skeleton.model.json` with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/) integrates no Esoteric Software code and requires no Spine license.
-- Importing `skeleton.json` into the Spine Editor or playing it with an official Spine Runtime is subject to Esoteric Software's [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license) and [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license).
+rig-c's code is **MIT**. Which Spine terms apply depends on what plays the output, because `rigc` writes both Spine 4.3 skeleton data and rig-c's own model (`skeleton.model.json`):
+
+- **rig-c's model in [`@rig-c/play`](/docs/play/) or an [engine adapter](/docs/adapters/)**: these link nothing from Esoteric Software and integrate no Spine Runtime.
+- **Spine data in an official Spine Runtime or the Spine Web Player**: the [Spine Runtimes License](https://esotericsoftware.com/spine-runtimes-license) applies to that integration.
+- **Spine data in the Spine editor**: the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license) applies.
+
+Sample paintings and layers carry their own licences — Getting Started's example inputs are CC BY-NC 4.0. The full table, with sources: **[Licensing](/docs/licensing/)**.
 
 ================================================================================
 URL: https://rig-c.org/docs/
@@ -122,6 +125,7 @@ rig-c is a set of small packages that hand files to each other: a painting split
 - [**Review**](/docs/review/) — `@rig-c/review`: @rig-c/review is a local, loopback-only CLI and browser workspace for a person to inspect a compiled rig, compare it with reference video, and save structured, source-bound feedback for the producing agent.
 - [**Play**](/docs/play/) — `@rig-c/play`: @rig-c/play is the browser runtime that loads rigc's compiled skeleton.model.json and plays it as plain DOM elements (CSS matrix per rigid slot, small canvases per mesh) or as one canvas per player.
 - [**Adapters**](/docs/adapters/) — `@rig-c/pixi, @rig-c/phaser, @rig-c/three`: @rig-c/pixi, @rig-c/phaser and @rig-c/three play rigc's skeleton.model.json inside PixiJS, Phaser or Three.js scenes, posed through @rig-c/play and drawn with each host's native objects, without a Spine runtime.
+- [**Licensing**](/docs/licensing/): Licensing by path: rig-c code is MIT; rig-c's own model played by @rig-c/play or the adapters integrates no Spine Runtime; Spine data in a Spine Runtime or the Spine Editor falls under Esoteric Software's terms; sample assets carry their own licences (Getting Started's inputs are CC BY-NC 4.0).
 
 ## How the pieces fit
 
@@ -249,9 +253,11 @@ bun ../getting-started/scripts/serve.ts
 
 ## Three Ways to Use the Output
 
-1. **On the web with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/)**: Load `skeleton.model.json` and part PNGs directly. MIT licensed, zero Spine runtime dependencies.
-2. **In the Spine 4.3 Editor**: Import `out/check/build/skeleton.json` via `Import Data` and point `Images` to `out/rig/images/` to refine timelines by hand (requires rig-c 2.51.1+ and a Spine Editor license).
+1. **On the web with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/)**: Load `skeleton.model.json` and part PNGs directly. The packages are MIT and integrate no Spine Runtime.
+2. **In the Spine 4.3 Editor**: Import `out/check/build/skeleton.json` via `Import Data` and point `Images` to `out/rig/images/` to refine timelines by hand (requires rig-c 2.51.1+; the editor is under the Spine Editor License Agreement).
 3. **In a game engine via official Spine Runtimes**: Load `skeleton.json` and `skeleton.atlas` in Unity, Godot, Unreal, or C++ runtimes under the Spine Runtimes License.
+
+The example inputs in step 2 come from [rig-c/exam](https://github.com/rig-c/exam) and are **CC BY-NC 4.0**, not MIT: free to use with credit, not for commercial use, and what you build from them carries that licence. Which terms each route brings: [Licensing](/docs/licensing/).
 
 ================================================================================
 URL: https://rig-c.org/docs/parts/
@@ -316,7 +322,7 @@ npm i -D @rig-c/parts
 rig-parts --help
 ```
 
-Output is Spine skeleton data, so using it in a product requires a Spine Editor licence.
+Which Spine terms apply depends on what plays the output — rig-c's own model in `@rig-c/play` or an engine adapter, or the Spine data in a Spine Runtime or the editor. See [Licensing](/docs/licensing/).
 
 ## Go deeper
 
@@ -682,6 +688,43 @@ Swap in `@rig-c/phaser phaser` or `@rig-c/three three` for the other hosts.
 - [docs/ADDING_A_HOST.md](https://github.com/rig-c/adapters/blob/main/docs/ADDING_A_HOST.md)
 - Changelogs: [pixi](https://github.com/rig-c/adapters/blob/main/packages/pixi/CHANGELOG.md), [phaser](https://github.com/rig-c/adapters/blob/main/packages/phaser/CHANGELOG.md), [three](https://github.com/rig-c/adapters/blob/main/packages/three/CHANGELOG.md)
 - npm: [@rig-c/pixi](https://www.npmjs.com/package/@rig-c/pixi), [@rig-c/phaser](https://www.npmjs.com/package/@rig-c/phaser), [@rig-c/three](https://www.npmjs.com/package/@rig-c/three)
+
+================================================================================
+URL: https://rig-c.org/docs/licensing/
+Markdown: https://rig-c.org/docs/licensing/index.md
+Repository: https://github.com/rig-c/core/blob/main/NOTICE.md
+================================================================================
+
+# Licensing
+
+Three separate questions, answered separately: the licence of rig-c's own code, the Spine terms that come with the way you play the output, and the licence of the sample paintings and layers. This page restates rig-c's notices and Esoteric Software's published terms; it is not legal advice, and the originals linked below are what count.
+
+## rig-c's own code: MIT
+
+`rig-c` (core), `@rig-c/parts`, `@rig-c/pose`, `@rig-c/review`, `@rig-c/play`, `@rig-c/pixi`, `@rig-c/phaser` and `@rig-c/three` are MIT — each repository's `LICENSE`. That grant covers rig-c's code. It says nothing about Spine, and it does not cover the sample assets below.
+
+## Spine terms: they follow what plays the output
+
+`rigc build` writes two things side by side: **Spine 4.3 skeleton data** (`skeleton.json` + `skeleton.atlas`) and **rig-c's own model** (`skeleton.model.json`). rig-c core's [NOTICE](https://github.com/rig-c/core/blob/main/NOTICE.md) puts the rule in one line: *what the terms turn on is the integration* of a Spine Runtime — and rigc *neither adds those terms nor removes them*.
+
+| Path | What plays or opens the output | Terms that apply |
+| --- | --- | --- |
+| rig-c's model in a page or an engine | [`@rig-c/play`](/docs/play/), [`@rig-c/pixi` / `phaser` / `three`](/docs/adapters/) | rig-c's MIT. These packages link nothing from Esoteric Software and pose the rig with rig-c's own core, so no Spine Runtime is integrated. |
+| Spine data in a product | an official Spine Runtime, or the Spine Web Player (which `rigc preview` loads) | The [Spine Runtimes License](https://esotericsoftware.com/spine-runtimes-license): integration is permitted under Section 2 of the Spine Editor License Agreement, or on the condition that each user of the product obtains their own Spine Editor licence, and redistribution includes that licence and copyright notice. |
+| Spine data in the Spine editor | the Spine editor, to refine by hand | The [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license). |
+| rigc with `@esotericsoftware/spine-core` installed beside it | rigc's round-trip gate, `validate`, `preview`, `vote`, `bench`, `bonedist` | That install integrates a Spine Runtime, so the Spine Runtimes License applies there. The published `rig-c` package does not carry spine-core. |
+
+Esoteric Software's licence pages read *Last updated April 5, 2025* when this page was written.
+
+## Sample assets carry their own licences
+
+| Assets | Licence | Source |
+| --- | --- | --- |
+| The painting and layers [Getting started](/docs/getting-started/) downloads | **CC BY-NC 4.0** — credit required, no commercial use; what you build from them carries that licence | [rig-c/exam `LICENSE`](https://github.com/rig-c/exam/blob/main/LICENSE) |
+| The paintings, See-through inputs and layers in [rig-c/parts-examples](https://github.com/rig-c/parts-examples) | MIT | [`LICENSE`](https://github.com/rig-c/parts-examples/blob/main/LICENSE) |
+| The trailer's painting, layers, sky, palm and rendered trailer | MIT | [rig-c/trailer `LICENSE`](https://github.com/rig-c/trailer/blob/main/LICENSE) |
+
+The image models that generated those paintings, and See-through itself, have their own terms; each repository's `NOTICE.md` records them, and [rig-c/parts `NOTICE.md`](https://github.com/rig-c/parts/blob/main/NOTICE.md) collects See-through's. No rig-c package contains See-through code or weights.
 
 ================================================================================
 URL: https://rig-c.org/examples/

@@ -85,7 +85,10 @@ bun rigc skills install
 
 ## Licensing, stated plainly
 
-All rig-c packages are **MIT licensed**. The published packages link **no Spine runtime**:
-- `rigc` emits both Spine 4.3 skeleton data (`skeleton.json` + `skeleton.atlas`) and rig-c's own compiled model document (`skeleton.model.json`).
-- Playing `skeleton.model.json` with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/) integrates no Esoteric Software code and requires no Spine license.
-- Importing `skeleton.json` into the Spine Editor or playing it with an official Spine Runtime is subject to Esoteric Software's [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license) and [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license).
+rig-c's code is **MIT**. Which Spine terms apply depends on what plays the output, because `rigc` writes both Spine 4.3 skeleton data and rig-c's own model (`skeleton.model.json`):
+
+- **rig-c's model in [`@rig-c/play`](/docs/play/) or an [engine adapter](/docs/adapters/)**: these link nothing from Esoteric Software and integrate no Spine Runtime.
+- **Spine data in an official Spine Runtime or the Spine Web Player**: the [Spine Runtimes License](https://esotericsoftware.com/spine-runtimes-license) applies to that integration.
+- **Spine data in the Spine editor**: the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license) applies.
+
+Sample paintings and layers carry their own licences — Getting Started's example inputs are CC BY-NC 4.0. The full table, with sources: **[Licensing](/docs/licensing/)**.

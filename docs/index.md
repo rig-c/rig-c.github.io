@@ -11,6 +11,7 @@ rig-c is a set of small packages that hand files to each other: a painting split
 - [**Review**](/docs/review/) — `@rig-c/review`: @rig-c/review is a local, loopback-only CLI and browser workspace for a person to inspect a compiled rig, compare it with reference video, and save structured, source-bound feedback for the producing agent.
 - [**Play**](/docs/play/) — `@rig-c/play`: @rig-c/play is the browser runtime that loads rigc's compiled skeleton.model.json and plays it as plain DOM elements (CSS matrix per rigid slot, small canvases per mesh) or as one canvas per player.
 - [**Adapters**](/docs/adapters/) — `@rig-c/pixi, @rig-c/phaser, @rig-c/three`: @rig-c/pixi, @rig-c/phaser and @rig-c/three play rigc's skeleton.model.json inside PixiJS, Phaser or Three.js scenes, posed through @rig-c/play and drawn with each host's native objects, without a Spine runtime.
+- [**Licensing**](/docs/licensing/): Licensing by path: rig-c code is MIT; rig-c's own model played by @rig-c/play or the adapters integrates no Spine Runtime; Spine data in a Spine Runtime or the Spine Editor falls under Esoteric Software's terms; sample assets carry their own licences (Getting Started's inputs are CC BY-NC 4.0).
 
 ## How the pieces fit
 
