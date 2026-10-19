@@ -6,6 +6,7 @@ const ROOT_DIR = resolve(import.meta.dir, '..');
 const TODAY = '2026-10-19';
 const DOCS = PAGES.filter((p) => p.section === 'docs');
 const CORE = PAGES.find((p) => p.route === '/docs/core/');
+const AUTHOR = { '@type': 'Person', name: 'firejune', url: 'https://github.com/firejune', sameAs: ['https://github.com/firejune'] };
 
 function escapeHtml(value: string): string {
   return value
@@ -179,6 +180,7 @@ function buildJsonLd(page: Page): string {
         description: page.description,
         inLanguage: 'en',
         publisher: { '@type': 'Organization', name: 'rig-c', url: 'https://github.com/rig-c' },
+        creator: AUTHOR,
       },
       {
         '@type': 'SoftwareApplication',
@@ -190,6 +192,7 @@ function buildJsonLd(page: Page): string {
         url: `${SITE_ORIGIN}/`,
         downloadUrl: 'https://www.npmjs.com/package/rig-c',
         codeRepository: 'https://github.com/rig-c/core',
+        author: AUTHOR,
         description: page.description,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       },
@@ -205,7 +208,8 @@ function buildJsonLd(page: Page): string {
         datePublished: TODAY,
         dateModified: TODAY,
         inLanguage: 'en',
-        author: { '@type': 'Organization', name: 'rig-c', url: 'https://github.com/rig-c' },
+        author: AUTHOR,
+        publisher: { '@type': 'Organization', name: 'rig-c', url: 'https://github.com/rig-c' },
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
       },
       {
@@ -296,7 +300,7 @@ function siteHeader(page: Page): string {
 function siteFooter(page: Page): string {
   return `<footer class="site-footer">
       <div class="footer-inner">
-        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror. Made by <a href="https://github.com/firejune" rel="author">firejune</a>.</p>
         <nav aria-label="Machine-readable" class="footer-links">
           <a href="${mdRoute(page.route)}">This page as Markdown</a>
           <a href="/llms.txt">llms.txt</a>
@@ -436,6 +440,8 @@ function buildLlmsTxt(): string {
     '# rig-c',
     '',
     '> AI-authored 2D character rigging and animation toolchain, verified before a byte is written. Takes one character painting decomposed into RGBA layers (via See-through) and compiles Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and self-contained browser/engine models (`skeleton.model.json`), gated by named assertions (36 under the default spine profile, 50 under the opt-in rig-play profile).',
+    '',
+    'Made by firejune (https://github.com/firejune). Source and packages: https://github.com/rig-c.',
     '',
     `All pages on ${SITE_ORIGIN} are served as static semantic HTML (\`/<path>/\`) with a clean Markdown mirror (\`/<path>/index.md\`). No JavaScript execution is required to fetch or parse any page.`,
     '',
