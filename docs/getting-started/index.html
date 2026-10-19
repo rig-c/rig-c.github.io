@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Getting Started with rig-c — One Painting to a Browser Rig in 3 Minutes</title>
+    <title>Getting Started with rig-c — One Painting to a Browser Rig, No GPU</title>
     <meta name="description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
     <meta name="keywords" content="rig-c tutorial, getting started, 2D character rigging tutorial, See-through layers, rig-parts build, rig-pose retarget">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -14,13 +14,13 @@
     <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="rig-c">
-    <meta property="og:title" content="Getting Started with rig-c — One Painting to a Browser Rig in 3 Minutes">
+    <meta property="og:title" content="Getting Started with rig-c — One Painting to a Browser Rig, No GPU">
     <meta property="og:description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
     <meta property="og:url" content="https://rig-c.org/docs/getting-started/">
     <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Getting Started with rig-c — One Painting to a Browser Rig in 3 Minutes">
+    <meta name="twitter:title" content="Getting Started with rig-c — One Painting to a Browser Rig, No GPU">
     <meta name="twitter:description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
     <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
     <meta name="theme-color" content="#070b18">
@@ -36,7 +36,7 @@
     {
       "@type": "TechArticle",
       "@id": "https://rig-c.org/docs/getting-started/#article",
-      "headline": "Getting Started with rig-c — One Painting to a Browser Rig in 3 Minutes",
+      "headline": "Getting Started with rig-c — One Painting to a Browser Rig, No GPU",
       "description": "Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.",
       "url": "https://rig-c.org/docs/getting-started/",
       "datePublished": "2026-10-19",
@@ -111,27 +111,40 @@
 <h1 id="getting-started-with-rig-c">Getting Started with rig-c</h1>
 <p>You start with one painting of a character. You end with that character rigged — split into movable pieces on a skeleton — breathing, blinking, and waving in your browser.</p>
 <p>Repository: <a href="https://github.com/rig-c/getting-started">https://github.com/rig-c/getting-started</a></p>
-<h2 id="the-whole-pipeline-in-three-steps">The Whole Pipeline in Three Steps</h2>
+<h2 id="the-whole-pipeline-in-three-steps">The whole pipeline in three steps</h2>
 <ol>
 <li><strong>Paint one character.</strong> Any image model or illustration workflow produces a front-facing, full-body character PNG on a plain white background with arms clear of the body.</li>
 <li><strong>Split it into layers, and mark the joints.</strong> <a href="https://github.com/shitagaki-lab/see-through">See-through</a> cuts the painting into layered parts (twice: full figure + head crop). Body-18 joints come from a lightweight CPU script (<code>rtmlib</code>) or hand placement.</li>
 <li><strong>Run the rig-c packages on the CPU.</strong> <code>@rig-c/parts</code>, <code>rig-c</code>, <code>@rig-c/pose</code>, and <code>@rig-c/play</code> assemble the parts, author meshes and bones, gate the build, retarget motion, and play it in the browser. <strong>No GPU is used in step 3.</strong></li>
 </ol>
-<h2 id="try-it-first-no-gpu-about-3-minutes">Try It First — No GPU, About 3 Minutes</h2>
-<p>This walkthrough builds a published example character whose painting and See-through layers are already prepared. Requires <a href="https://bun.sh">Bun</a> 1.2+ and optionally <a href="https://docs.astral.sh/uv/">uv</a> for step 6.</p>
-<h3 id="1-install-the-packages">1. Install the Packages</h3>
+<h2 id="try-it-first-no-gpu-no-python">Try it first — no GPU, no Python</h2>
+<p>This builds a published example character whose painting and See-through layers are already made, then plays it in your browser. The joints come from a hand-placed file that ships with the guide, so the only tools you need are <a href="https://bun.sh">Bun</a> 1.2 or later, <code>git</code> and <code>curl</code>, on macOS or Linux (Windows is not tested).</p>
+<p><strong>How long it takes.</strong> Every command below was run as written, in order, from an empty folder on 2026-10-19 — Apple M4, Bun 1.4.2, and whatever <code>bun add</code> resolved that day (<code>rig-c</code> 2.61.0, <code>@rig-c/parts</code> 1.41.0, <code>@rig-c/pose</code> 0.35.0, <code>@rig-c/play</code> 1.12.0):</p>
+<table>
+<thead>
+<tr><th>Run</th><th>Steps 1–10</th></tr>
+</thead>
+<tbody>
+<tr><td>Empty Bun cache (includes downloading the packages and the 41 MB example)</td><td>56 s</td></tr>
+<tr><td>A second run, caches warm</td><td>62 s</td></tr>
+</tbody>
+</table>
+<p>Steps 5 (assemble) and 8 (build) are most of it. A slower machine or network takes longer; the two runs above are the only measurements.</p>
+<h3 id="1-install-the-packages">1. Install the packages</h3>
 <pre><code class="language-sh">mkdir rig-c-start &amp;&amp; cd rig-c-start
 git clone https://github.com/rig-c/getting-started
 mkdir my-rig &amp;&amp; cd my-rig
 bun add @rig-c/parts rig-c @rig-c/pose @rig-c/play
 </code></pre>
-<h3 id="2-fetch-the-example-inputs">2. Fetch the Example Inputs</h3>
+<p>Every command from here on runs in <code>my-rig</code>.</p>
+<h3 id="2-get-the-example-inputs">2. Get the example inputs</h3>
 <pre><code class="language-sh">curl -L -o exam.tar.gz https://codeload.github.com/rig-c/exam/tar.gz/01436ee3f02c189fe1a1e9656fe62068889837f5
 tar -xzf exam.tar.gz --strip-components=3 exam-01436ee3f02c189fe1a1e9656fe62068889837f5/tasks/01-build/inputs
 tar -xzf exam.tar.gz --strip-components=1 exam-01436ee3f02c189fe1a1e9656fe62068889837f5/LICENSE exam-01436ee3f02c189fe1a1e9656fe62068889837f5/NOTICE.md
 rm exam.tar.gz
 </code></pre>
-<h3 id="3-initialize-configjson">3. Initialize <code>config.json</code></h3>
+<p>You now have <code>inputs/</code> with <code>painting.png</code>, <code>layers/full/</code> and <code>layers/head/</code>. These inputs are <strong>CC BY-NC 4.0</strong> — see <a href="/docs/licensing/">Licensing</a>.</p>
+<h3 id="3-start-the-config">3. Start the config</h3>
 <pre><code class="language-sh">cat &gt; config.json &lt;&lt;'EOF'
 {
   &quot;key&quot;: &quot;exam-01&quot;,
@@ -141,30 +154,40 @@ rm exam.tar.gz
 EOF
 bunx rig-parts inputs --source inputs/painting.png --config config.json --out work
 </code></pre>
-<h3 id="4-propose-the-head-box">4. Propose the Head Box</h3>
+<p>You should see <code>st_input_full.png 2432x2432</code> and a note that there is no head box yet.</p>
+<h3 id="4-find-the-head-box">4. Find the head box</h3>
 <pre><code class="language-sh">bunx rig-parts layers inputs/layers/full
 bunx rig-parts propose --head-box --full inputs/layers/full --canvas 1664x2432 | tail -n 1 &gt; work/head_box.json
 bun ../getting-started/scripts/take.ts work/head_box.json config.json seethrough.head_box=head_box
 bunx rig-parts inputs --source inputs/painting.png --config config.json --out work
 </code></pre>
-<h3 id="5-assemble-the-parts">5. Assemble the Parts</h3>
+<p>You should see <code>29 layer(s): 29 with opaque pixels</code>, <code>0 WARN line(s)</code>, <code>work/head_box.json</code> holding <code>{&quot;head_box&quot;:[616,32,1132,548]}</code>, then <code>st_input_head.png 516x516</code>.</p>
+<h3 id="5-assemble-the-parts">5. Assemble the parts</h3>
 <pre><code class="language-sh">bunx rig-parts assemble --propose-plan --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json &gt; work/plan.json
 bun ../getting-started/scripts/take.ts work/plan.json config.json assemble.plan=plan assemble.extend_below_crop=extend_below_crop
 bunx rig-parts assemble --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json --out work
 </code></pre>
-<h3 id="6-detect-body-18-keypoints">6. Detect Body-18 Keypoints</h3>
+<p>You should see <code>22 part(s) on a 832x1216 rig</code>, then <code>recomposite vs source: mean |d|=1.13, within 8: 97.8%</code>.</p>
+<h3 id="6-put-the-joints-in-place">6. Put the joints in place</h3>
+<pre><code class="language-sh">sed -n '/^```json$/,/^```$/p' ../getting-started/docs/KEYPOINTS.md | sed '1d;$d' &gt; keypoints.json
+</code></pre>
+<p>This copies the hand-placed body-18 joints for this painting out of the guide's <a href="https://github.com/rig-c/getting-started/blob/main/docs/KEYPOINTS.md"><code>docs/KEYPOINTS.md</code></a>, which also explains how to place them for a painting of your own.</p>
+<p><strong>Detecting the joints with a script instead</strong> needs <a href="https://docs.astral.sh/uv/">uv</a> and downloads about 300 MB of pose models on first run:</p>
 <pre><code class="language-sh">uv run --with rtmlib --with onnxruntime python ../getting-started/scripts/keypoints.py inputs/painting.png --out keypoints.json
 </code></pre>
-<h3 id="7-draft-bones-meshes-regions-and-idle-motion">7. Draft Bones, Meshes, Regions, and Idle Motion</h3>
+<p>On 2026-10-19 this resolved rtmlib 0.0.16 and onnxruntime 1.27.0. It placed both ankles about 44 px lower than the hand-placed file, and step 8 then refused with <code>ASSEMBLE_LIMB_JOINT_ON_ART</code> on <code>foot_l</code>. Until that is fixed upstream, use the hand-placed file for this example.</p>
+<h3 id="7-draft-the-bones">7. Draft the bones</h3>
 <pre><code class="language-sh">bunx rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json
-bun ../getting-started/scripts/take.ts work/proposal.json config.json bones meshes regions motion
+bun ../getting-started/scripts/take.ts work/proposal.json config.json bones meshes regions motion limbs
 </code></pre>
-<h3 id="8-build-and-gate-the-rig">8. Build and Gate the Rig</h3>
+<p>You should see a coverage line starting <code>coverage: 42 bone(s) — 29 checked and clean</code>. This is where a person would correct the draft; the example uses it as is.</p>
+<h3 id="8-build-the-rig">8. Build the rig</h3>
 <pre><code class="language-sh">bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
 </code></pre>
-<p>Expected verdict: <code>[check] check: PASS; 10 of 10 bar(s) measured</code>, followed by <code>build: PASS</code> and <code>out/idle.gif</code>.</p>
-<h3 id="9-retarget-a-3-second-wave-with-rig-cpose">9. Retarget a 3-Second Wave with <code>@rig-c/pose</code></h3>
+<p>You should see <code>check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)</code>, then <code>build: PASS</code>. Open <code>out/idle.gif</code>: the character breathes and blinks in a loop. A skipped bar is named with its reason; any <code>FAIL</code> line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (<code>out/idle.gif</code>, or <a href="/docs/review/">Review</a>).</p>
+<h3 id="9-give-it-a-wave">9. Give it a wave</h3>
 <pre><code class="language-sh">bun ../getting-started/scripts/wave.ts keypoints.json wave.pose.json
+bunx rig-pose clean --pose wave.pose.json --out wave.pose.clean.json
 cat &gt; map.json &lt;&lt;'EOF'
 {
   &quot;spec&quot;: &quot;rig-pose-map/1&quot;,
@@ -176,13 +199,15 @@ cat &gt; map.json &lt;&lt;'EOF'
   &quot;translate&quot;: { &quot;bone&quot;: &quot;hip&quot;, &quot;joint&quot;: &quot;mid_hip&quot;, &quot;scale&quot;: { &quot;pose&quot;: [&quot;mid_hip&quot;, &quot;neck&quot;], &quot;rig&quot;: [&quot;hip&quot;, &quot;neck&quot;] } }
 }
 EOF
-bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.json --out wave.motion.json --name wave --profile spine-html --build wave-build
+bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json --out wave.motion.json --name wave --profile spine-html --build wave-build
 </code></pre>
-<h3 id="10-play-it-in-the-browser">10. Play It in the Browser</h3>
+<p>You should see <code>wave.ts: 73 frame(s), 3 s at 24 fps</code>, a <code>GATE … green</code> line, and <code>wrote wave.motion.json — animations: idle, wave</code>. <code>wave-build/</code> holds the rig with both animations.</p>
+<h3 id="10-play-it-in-your-browser">10. Play it in your browser</h3>
 <pre><code class="language-sh">bun ../getting-started/scripts/serve.ts
-# Open http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave
 </code></pre>
-<h2 id="three-ways-to-use-the-output">Three Ways to Use the Output</h2>
+<p>Open <a href="http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave">http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave</a>: the character raises her right arm and waves; the menu switches to <code>idle</code>. Ctrl+C stops the server.</p>
+<p>The full guide — making your own character, the GPU routes, troubleshooting and every measured figure — is the <a href="https://github.com/rig-c/getting-started#readme">rig-c/getting-started README</a> and its <a href="https://github.com/rig-c/getting-started/blob/main/docs/REFERENCE.md">docs/REFERENCE.md</a>.</p>
+<h2 id="three-ways-to-use-the-output">Three ways to use the output</h2>
 <ol>
 <li><strong>On the web with <a href="/docs/play/"><code>@rig-c/play</code></a> or <a href="/docs/adapters/"><code>@rig-c/adapters</code></a></strong>: Load <code>skeleton.model.json</code> and part PNGs directly. The packages are MIT and integrate no Spine Runtime.</li>
 <li><strong>In the Spine 4.3 Editor</strong>: Import <code>out/check/build/skeleton.json</code> via <code>Import Data</code> and point <code>Images</code> to <code>out/rig/images/</code> to refine timelines by hand (requires rig-c 2.51.1+; the editor is under the Spine Editor License Agreement).</li>
@@ -193,7 +218,7 @@ bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.json --out 
         </article>
         <nav aria-label="Docs pages" class="pager"><a href="/docs/" rel="prev"><span>Previous</span>Overview</a><a href="/docs/parts/" rel="next"><span>Next</span>Parts</a></nav>
       </main>
-      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#the-whole-pipeline-in-three-steps">The Whole Pipeline in Three Steps</a></li><li><a href="#try-it-first-no-gpu-about-3-minutes">Try It First — No GPU, About 3 Minutes</a></li><li><a href="#three-ways-to-use-the-output">Three Ways to Use the Output</a></li></ol></aside>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#the-whole-pipeline-in-three-steps">The whole pipeline in three steps</a></li><li><a href="#try-it-first-no-gpu-no-python">Try it first — no GPU, no Python</a></li><li><a href="#three-ways-to-use-the-output">Three ways to use the output</a></li></ol></aside>
     </div>
     <footer class="site-footer">
       <div class="footer-inner">

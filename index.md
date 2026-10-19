@@ -22,7 +22,7 @@ One character painting goes in; a rigged, animated 2D character that plays in th
 4. **[Review](/docs/review/)** lets a person look at what an agent built and hand back feedback bound to a frame, bone or slot.
 5. **[Play](/docs/play/)** and the **[adapters](/docs/adapters/)** run the compiled model in a page, PixiJS, Phaser or Three.js, with no Spine runtime.
 
-Try it end to end in about three minutes with no GPU: **[Getting started](/docs/getting-started/)**. See what agents do with it on the **[Exam](/exam/)**, and rebuild the published rigs from **[Examples](/examples/)**.
+Try it end to end with no GPU and no Python — about a minute of commands on an Apple M4: **[Getting started](/docs/getting-started/)**. See what agents do with it on the **[Exam](/exam/)**, and rebuild the published rigs from **[Examples](/examples/)**.
 
 ## The toolchain
 
