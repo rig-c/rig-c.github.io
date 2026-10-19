@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@rig-c/pose (rig-pose) — Retarget Body-18 Pose Sequences onto 2D Rigs</title>
+    <meta name="description" content="@rig-c/pose cleans noisy detector pose sequences and retargets joint trajectories onto rig-c bone chains with hinge, landing, foot-slip, and seam verification.">
+    <meta name="keywords" content="@rig-c/pose, rig-pose, 2D motion retargeting, OpenPose, body-18, Savitzky-Golay, Spine animation retargeting">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://rig-c.org/pose/">
+    <link rel="alternate" type="text/markdown" href="/pose/index.md" title="Pose (Markdown)">
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="rig-c">
+    <meta property="og:title" content="@rig-c/pose (rig-pose) — Retarget Body-18 Pose Sequences onto 2D Rigs">
+    <meta property="og:description" content="@rig-c/pose cleans noisy detector pose sequences and retargets joint trajectories onto rig-c bone chains with hinge, landing, foot-slip, and seam verification.">
+    <meta property="og:url" content="https://rig-c.org/pose/">
+    <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@rig-c/pose (rig-pose) — Retarget Body-18 Pose Sequences onto 2D Rigs">
+    <meta name="twitter:description" content="@rig-c/pose cleans noisy detector pose sequences and retargets joint trajectories onto rig-c bone chains with hinge, landing, foot-slip, and seam verification.">
+    <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://rig-c.org/pose/#article",
+      "headline": "@rig-c/pose (rig-pose) — Retarget Body-18 Pose Sequences onto 2D Rigs",
+      "description": "@rig-c/pose cleans noisy detector pose sequences and retargets joint trajectories onto rig-c bone chains with hinge, landing, foot-slip, and seam verification.",
+      "url": "https://rig-c.org/pose/",
+      "datePublished": "2026-10-19",
+      "dateModified": "2026-10-19",
+      "inLanguage": "en",
+      "author": {
+        "@type": "Organization",
+        "name": "rig-c",
+        "url": "https://github.com/rig-c"
+      },
+      "isPartOf": {
+        "@id": "https://rig-c.org/#website"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "rig-c",
+          "item": "https://rig-c.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Pose",
+          "item": "https://rig-c.org/pose/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "@rig-c/pose",
+      "version": "0.33.0",
+      "codeRepository": "https://github.com/rig-c/pose",
+      "url": "https://rig-c.org/pose/",
+      "programmingLanguage": "TypeScript",
+      "runtimePlatform": "Node.js >= 20, Bun, Web Browser",
+      "description": "@rig-c/pose cleans noisy detector pose sequences and retargets joint trajectories onto rig-c bone chains with hinge, landing, foot-slip, and seam verification."
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="brand">rig-c<span>v2.61.0</span></a>
+        <nav aria-label="Primary" class="site-nav">
+          <a href="/">Overview</a>
+          <a href="/getting-started/">Getting Started</a>
+          <a href="/parts/">Parts</a>
+          <a href="/pose/" aria-current="page">Pose</a>
+          <a href="/core/">Core (rigc)</a>
+          <a href="/review/">Review</a>
+          <a href="/play/">Play</a>
+          <a href="/adapters/">Adapters</a>
+          <a href="/exam/">AI Exam</a>
+          <a href="/examples/">Examples</a>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <ol>
+          <li><a href="/">rig-c</a></li>
+          <li aria-current="page">Pose</li>
+        </ol>
+      </nav>
+      <div class="meta-bar" role="region" aria-label="Document metadata">
+        <span>Package: <code>@rig-c/pose@0.33.0</code></span>
+        <span>GitHub: <a href="https://github.com/rig-c/pose">rig-c/pose</a></span>
+        <span>npm: <a href="https://www.npmjs.com/package/@rig-c/pose">registry</a></span>
+        <span>Markdown: <a href="/pose/index.md">/pose/index.md</a></span>
+        <span>LLM Index: <a href="/llms.txt">/llms.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></span>
+      </div>
+      <article>
+        <h1>@rig-c/pose (rig-pose) — Retarget Body-18 Pose Sequences onto 2D Rigs</h1>
+<p class="lead"><strong>Puts motion from a body-18 pose sequence onto a rig that <a href="/core/"><code>rig-c</code></a> built — checked before a key is written.</strong></p>
+
+<div class="meta-bar">
+  <span>npm: <a href="https://www.npmjs.com/package/@rig-c/pose"><code>@rig-c/pose@0.33.0</code></a></span>
+  <span>CLI: <code>rig-pose</code></span>
+  <span>Repository: <a href="https://github.com/rig-c/pose"><code>github.com/rig-c/pose</code></a></span>
+  <span>License: <code>MIT</code></span>
+</div>
+
+<p>The motion is joint positions over time — from a video detector, a motion dataset, or points placed by hand. <code>@rig-c/pose</code> cleans detector jitter and spikes at the sequence level, retargets each limb chain onto <code>rig-c</code> bone keys (<code>rigc-motion/1</code>), poses the compiled rig through <code>rig-c</code>'s own poser to verify every bone lands on its target angle, and emits a structured diagnostic report (<code>rig-pose-report/1</code>).</p>
+
+<h2>Install &amp; Quick Try</h2>
+<pre><code>bun add -d @rig-c/pose rig-c
+
+# Clean a raw detector pose sequence first
+bunx rig-pose clean --pose dance.scan.json --out dance.pose.json --loop
+
+# Retarget onto a rig-c rig and emit a gated build + report
+bunx rig-pose retarget   --rig out/rig   --map map.json   --pose dance.pose.json   --out dance.motion.json   --name dance   --build dance-build</code></pre>
+
+<h2>Step 1: <code>rig-pose clean</code> (Mandatory Sequence Hygiene)</h2>
+<p><code>retarget</code> refuses any pose sequence that lacks a <code>rig-pose-clean/1</code> record (<code>POSE_NOT_CLEANED</code>). <code>clean</code> executes five deterministic passes:</p>
+<ol>
+  <li><strong>Spikes (<code>SPIKE</code>)</strong>: Replaces any joint jumping more than <code>0.2</code> trunk lengths from its 5-frame median.</li>
+  <li><strong>Occlusion (<code>OCCLUDED</code>)</strong>: Replaces joints not marked <code>observed</code>/<code>inferred</code> or scored below <code>0.3</code> with their 3-frame median.</li>
+  <li><strong>Savitzky–Golay Smoothing</strong>: Quadratic filter over <code>--legs</code> frames (default <code>5</code>) for hips/knees/ankles and <code>--rest</code> frames (default <code>7</code>) for other joints.</li>
+  <li><strong>Floor &amp; In-Place Loop (<code>--loop</code>)</strong>: Aligns lowest ankle over the cycle and declares <code>"travel": "in-place"</code>.</li>
+  <li><strong>Stillness Hold (<code>HOLD</code>)</strong>: Locks joints whose median speed stays below <code>--hold-speed</code> (<code>0.015</code> trunk lengths/frame) and within <code>--hold-reach</code> (<code>0.03</code>) for at least <code>0.5s</code>, cross-fading across 6-frame ramps.</li>
+</ol>
+
+<h3>Measured Jitter Reduction on Reference Fixtures</h3>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Clip</th>
+        <th>Mode</th>
+        <th>Jitter Reduction</th>
+        <th>Comparison vs. Hand-Cleaned Reference</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>dance-a</code> (13 s non-loop)</td>
+        <td>defaults</td>
+        <td><strong>−42%</strong> (<code>7.91 -&gt; 4.62 px/f²</code>)</td>
+        <td>Hand-cleaned: <code>4.62</code>; positions within <code>0.071 px</code></td>
+      </tr>
+      <tr>
+        <td><code>walk-a</code> (1 gait cycle)</td>
+        <td><code>--loop</code></td>
+        <td><strong>−66%</strong></td>
+        <td>Within <code>0.001 px/f²</code> outside the arms</td>
+      </tr>
+      <tr>
+        <td><code>run-a</code> (1 gait cycle)</td>
+        <td><code>--loop</code></td>
+        <td><strong>−53%</strong></td>
+        <td>Matches hand-cleaned reference</td>
+      </tr>
+      <tr>
+        <td><code>walk-b</code> (90 frames, held out)</td>
+        <td>defaults</td>
+        <td><strong>−67%</strong></td>
+        <td>Target bar: <code>−30%</code></td>
+      </tr>
+      <tr>
+        <td><code>run-b</code> (90 frames, held out)</td>
+        <td>defaults</td>
+        <td><strong>−75%</strong></td>
+        <td>Target bar: <code>−30%</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Step 2: <code>rig-pose retarget</code> Gate &amp; Diagnostics</h2>
+<p>Nothing is written unless every hard gate passes:</p>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Check</th>
+        <th>Refusal Code</th>
+        <th>Requirement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Base rig &amp; retargeted rig pass <code>rigc build</code></td>
+        <td><code>RIG_GATE_BASE</code>, <code>RIG_GATE</code></td>
+        <td>All 50 compiler assertions pass before and after adding the animation.</td>
+      </tr>
+      <tr>
+        <td>Every mapped bone lands on target angle/scale/ankle</td>
+        <td><code>POSE_LANDS</code></td>
+        <td>Posed by <code>rig-c</code>'s poser and measured within <code>0.01°</code> / <code>0.01</code> units on every frame.</td>
+      </tr>
+      <tr>
+        <td>Hinges bend only in their anatomically valid direction</td>
+        <td><code>POSE_BEND_ONE_WAY</code></td>
+        <td>Elbows and knees stay on the rest pose's bend side (or clamp with <code>--bends clamp</code>).</td>
+      </tr>
+      <tr>
+        <td>Every mapped point has valid data</td>
+        <td><code>POSE_POINT_NEVER_GOOD</code></td>
+        <td>Each required joint is good on at least one frame.</td>
+      </tr>
+      <tr>
+        <td>Map resolves against rig hierarchy</td>
+        <td><code>MAP_*</code></td>
+        <td>Named bones exist and chains descend parent-to-child.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>The diagnostic report (<code>&lt;out&gt;.report.json</code>, consumed by <a href="/review/"><code>@rig-c/review</code></a> and agents) records <code>HOLD</code>, <code>SHORT</code>, <code>END-ON</code>, <code>FOLD</code>, <code>POSTURE</code>, <code>FEET</code>, <code>STANCE</code>, <code>SHEAR</code>, <code>SEAM_OVER_MOTION</code> (<code>seams</code> + <code>seamPairs</code> with <code>--parts</code>), <code>NOD</code> loop closure, and alternate-drawing <code>SWITCH</code>/<code>UNCOVERED</code> demands.</p>
+      </article>
+      <nav aria-label="Page pagination" class="meta-bar">
+        <span>Previous: <a href="/parts/" rel="prev">Parts</a></span>
+        <span>Next: <a href="/core/" rel="next">Core (rigc)</a></span>
+      </nav>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>
+          <strong>rig-c</strong> — AI-authored 2D rigging and animation toolchain. Static HTML &amp; Markdown built for zero-JS <code>curl</code> and search indexing.
+        </div>
+        <div class="footer-links">
+          <a href="/llms.txt">llms.txt</a>
+          <a href="/llms-full.txt">llms-full.txt</a>
+          <a href="/pose/index.md">Page Markdown</a>
+          <a href="/sitemap.xml">sitemap.xml</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+          <a href="https://www.npmjs.com/package/rig-c">npm</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

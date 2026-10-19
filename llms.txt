@@ -1,0 +1,44 @@
+# rig-c
+
+> AI-authored 2D character rigging and animation toolchain, verified before a byte is written. Takes one character painting decomposed into RGBA layers (via See-through) and compiles Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and self-contained browser/engine models (`skeleton.model.json`) gated by 50 named assertions.
+
+All pages on https://rig-c.org are served as static semantic HTML (`/<slug>/`) with a clean Markdown mirror (`/<slug>/index.md`). No JavaScript execution is required to fetch or parse any page.
+
+## Documentation Pages
+
+- [Overview](https://rig-c.org/) ([Markdown](https://rig-c.org/index.md)) (`rig-c@2.61.0`): Toolchain overview, package index (parts, pose, core, review, play, adapters), installation commands, AI agent skill setup, and licensing boundaries.
+- [Getting Started](https://rig-c.org/getting-started/) ([Markdown](https://rig-c.org/getting-started/index.md)): 10-step no-GPU walkthrough from pre-decomposed character layers to a compiled rig with idle and wave animations playing in the browser, plus downstream export routes.
+- [Parts](https://rig-c.org/parts/) ([Markdown](https://rig-c.org/parts/index.md)) (`@rig-c/parts@1.38.0`): @rig-c/parts (v1.38.0) CLI and pipeline: merges full + head See-through runs, proposes bones/meshes/physics, and runs rigc build + 10-bar quality check.
+- [Pose](https://rig-c.org/pose/) ([Markdown](https://rig-c.org/pose/index.md)) (`@rig-c/pose@0.33.0`): @rig-c/pose (v0.33.0) pipeline: clean (spikes, occlusion, Savitzky-Golay, floor, stillness hold) -> retarget onto descending bone chains with landing and hinge gates.
+- [Core (rigc)](https://rig-c.org/core/) ([Markdown](https://rig-c.org/core/index.md)) (`rig-c@2.61.0`): rig-c / @rig-c/core (v2.61.0) rig compiler: CLI commands (build, render, inspect, preview, vote, pose, chainfit, check), 50-assertion gate architecture, and determinism guarantees.
+- [Review](https://rig-c.org/review/) ([Markdown](https://rig-c.org/review/index.md)) (`@rig-c/review@0.2.1`): @rig-c/review (v0.2.1) local human inspection workspace: opens compiled output folders, plays models via @rig-c/play beside source videos/poses, and exports structured issue feedback without mutating rig files.
+- [Play](https://rig-c.org/play/) ([Markdown](https://rig-c.org/play/index.md)) (`@rig-c/play@1.12.0`): @rig-c/play (v1.12.0) browser player for skeleton.model.json: DOM mode (<img> + CSS matrix() + WebGL mesh backend) and single-canvas mode, API usage, and 60fps benchmark table.
+- [Adapters](https://rig-c.org/adapters/) ([Markdown](https://rig-c.org/adapters/index.md)) (`@rig-c/pixi@0.1.1`): Engine adapters (@rig-c/pixi 0.1.1, @rig-c/phaser 0.1.1, @rig-c/three 0.1.1): mount skeleton.model.json inside PixiJS 8, Phaser 4.2+, and Three.js 0.186+ with zero Spine runtime.
+- [AI Exam](https://rig-c.org/exam/) ([Markdown](https://rig-c.org/exam/index.md)): rig-c/exam benchmark rules and leaderboards: Basic Exam (5 sittings, 16/16 pass across Haiku, Gemini Flash, Sol 6.1) and Advanced Exam (R1 walk, R2 run, R3 dance across 5 models).
+- [Examples](https://rig-c.org/examples/) ([Markdown](https://rig-c.org/examples/index.md)): Reproducible showcase repositories: rig-c/parts-examples (5 single characters + 5x4=20 Agent Family rigs with SHA256 reproducibility gates) and rig-c/trailer (12s 240-frame animated short rebuilt by ./build.sh).
+
+## Packages & Latest Versions
+
+- `rig-c` / `@rig-c/core` (`2.61.0`): The 2D rig compiler (`rigc compile`, `rigc check`, `rigc exam`, `rigc preview`, `rigc render`, `rigc import`, `rigc schema`).
+- `@rig-c/parts` (`1.38.0`): Layer assembly, contour/lattice mesh generation, auto-weights, spring chain synthesis, and procedural idle authoring (`rig-parts`).
+- `@rig-c/pose` (`0.33.0`): Body-18 pose cleaning, bone-length normalization, and retargeting (`rig-pose`).
+- `@rig-c/review` (`0.2.1`): Local human inspection workspace and structured JSON feedback exporter (`rig-review`).
+- `@rig-c/play` (`1.12.0`): Spine-free browser player (`<rig-player>`, `mountRig()`, `loadCompiledModel()`) using DOM `matrix()` or single `<canvas>` 2D affine triangular mesh rendering.
+- `@rig-c/pixi` (`0.1.1`), `@rig-c/phaser` (`0.1.1`), `@rig-c/three` (`0.1.1`): Spine-free game engine adapters built on `@rig-c/play/core`.
+
+## Quick Install
+
+```bash
+# Authoring toolchain
+npm i -D rig-c @rig-c/parts @rig-c/pose @rig-c/review
+
+# Browser and engine runtimes (no Spine runtime required)
+npm i @rig-c/play @rig-c/pixi @rig-c/phaser @rig-c/three
+
+# AI Agent Skills (Claude Code, Codex, Cursor, Gemini CLI, OpenCode)
+npx skills add rig-c/rigc rig-c/parts rig-c/pose rig-c/play rig-c/review rig-c/adapters
+```
+
+## Full Single-File Corpus
+
+- [Full Documentation Bundle (llms-full.txt)](https://rig-c.org/llms-full.txt): Concatenated Markdown of every page on rig-c.org for single-request LLM context ingestion.

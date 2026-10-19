@@ -1,0 +1,12 @@
+{
+  "name": "rig-c-site",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Official static website for rig-c (https://rig-c.org) — SEO and AI-crawler (curl / llms.txt) first",
+  "type": "module",
+  "scripts": {
+    "build": "bun src/build.ts",
+    "verify": "bun src/verify.ts",
+    "serve": "bun src/serve.ts"
+  }
+}

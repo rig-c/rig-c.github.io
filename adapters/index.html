@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@rig-c/adapters — Play rig-c Models in PixiJS 8, Phaser 4, and Three.js</title>
+    <meta name="description" content="Native scene-graph and renderer adapters for @rig-c/pixi, @rig-c/phaser, and @rig-c/three. Play rig-c compiled models inside web game engines with no Spine runtime.">
+    <meta name="keywords" content="@rig-c/adapters, @rig-c/pixi, @rig-c/phaser, @rig-c/three, PixiJS 8 2D rigging, Phaser 4 skeletal animation, Three.js 2D character">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://rig-c.org/adapters/">
+    <link rel="alternate" type="text/markdown" href="/adapters/index.md" title="Adapters (Markdown)">
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="rig-c">
+    <meta property="og:title" content="@rig-c/adapters — Play rig-c Models in PixiJS 8, Phaser 4, and Three.js">
+    <meta property="og:description" content="Native scene-graph and renderer adapters for @rig-c/pixi, @rig-c/phaser, and @rig-c/three. Play rig-c compiled models inside web game engines with no Spine runtime.">
+    <meta property="og:url" content="https://rig-c.org/adapters/">
+    <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@rig-c/adapters — Play rig-c Models in PixiJS 8, Phaser 4, and Three.js">
+    <meta name="twitter:description" content="Native scene-graph and renderer adapters for @rig-c/pixi, @rig-c/phaser, and @rig-c/three. Play rig-c compiled models inside web game engines with no Spine runtime.">
+    <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://rig-c.org/adapters/#article",
+      "headline": "@rig-c/adapters — Play rig-c Models in PixiJS 8, Phaser 4, and Three.js",
+      "description": "Native scene-graph and renderer adapters for @rig-c/pixi, @rig-c/phaser, and @rig-c/three. Play rig-c compiled models inside web game engines with no Spine runtime.",
+      "url": "https://rig-c.org/adapters/",
+      "datePublished": "2026-10-19",
+      "dateModified": "2026-10-19",
+      "inLanguage": "en",
+      "author": {
+        "@type": "Organization",
+        "name": "rig-c",
+        "url": "https://github.com/rig-c"
+      },
+      "isPartOf": {
+        "@id": "https://rig-c.org/#website"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "rig-c",
+          "item": "https://rig-c.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Adapters",
+          "item": "https://rig-c.org/adapters/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "@rig-c/pixi",
+      "version": "0.1.1",
+      "codeRepository": "https://github.com/rig-c/adapters",
+      "url": "https://rig-c.org/adapters/",
+      "programmingLanguage": "TypeScript",
+      "runtimePlatform": "Node.js >= 20, Bun, Web Browser",
+      "description": "Native scene-graph and renderer adapters for @rig-c/pixi, @rig-c/phaser, and @rig-c/three. Play rig-c compiled models inside web game engines with no Spine runtime."
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="brand">rig-c<span>v2.61.0</span></a>
+        <nav aria-label="Primary" class="site-nav">
+          <a href="/">Overview</a>
+          <a href="/getting-started/">Getting Started</a>
+          <a href="/parts/">Parts</a>
+          <a href="/pose/">Pose</a>
+          <a href="/core/">Core (rigc)</a>
+          <a href="/review/">Review</a>
+          <a href="/play/">Play</a>
+          <a href="/adapters/" aria-current="page">Adapters</a>
+          <a href="/exam/">AI Exam</a>
+          <a href="/examples/">Examples</a>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <ol>
+          <li><a href="/">rig-c</a></li>
+          <li aria-current="page">Adapters</li>
+        </ol>
+      </nav>
+      <div class="meta-bar" role="region" aria-label="Document metadata">
+        <span>Package: <code>@rig-c/pixi@0.1.1</code></span>
+        <span>GitHub: <a href="https://github.com/rig-c/adapters">rig-c/adapters</a></span>
+        <span>npm: <a href="https://www.npmjs.com/package/@rig-c/pixi">registry</a></span>
+        <span>Markdown: <a href="/adapters/index.md">/adapters/index.md</a></span>
+        <span>LLM Index: <a href="/llms.txt">/llms.txt</a> · <a href="/llms-full.txt">/llms-full.txt</a></span>
+      </div>
+      <article>
+        <h1>@rig-c/adapters — Play rig-c Models in PixiJS 8, Phaser 4, and Three.js</h1>
+<p class="lead"><strong>Play a rig that <a href="/core/"><code>rig-c</code></a> built inside the engine or renderer your game already uses — with no Spine runtime.</strong></p>
+
+<div class="meta-bar">
+  <span>npm: <code>@rig-c/pixi@0.1.1</code> · <code>@rig-c/phaser@0.1.1</code> · <code>@rig-c/three@0.1.1</code></span>
+  <span>Repository: <a href="https://github.com/rig-c/adapters"><code>github.com/rig-c/adapters</code></a></span>
+  <span>License: <code>MIT</code></span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Package</th>
+        <th>Version</th>
+        <th>Target Host</th>
+        <th>Exports</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://www.npmjs.com/package/@rig-c/pixi"><code>@rig-c/pixi</code></a></td>
+        <td><code>0.1.1</code></td>
+        <td>PixiJS 8</td>
+        <td><code>PixiRig</code>, <code>PixiRenderer</code></td>
+      </tr>
+      <tr>
+        <td><a href="https://www.npmjs.com/package/@rig-c/phaser"><code>@rig-c/phaser</code></a></td>
+        <td><code>0.1.1</code></td>
+        <td>Phaser 4.2+</td>
+        <td><code>PhaserRig</code>, <code>PhaserRenderer</code> (shared ref-counted page textures)</td>
+      </tr>
+      <tr>
+        <td><a href="https://www.npmjs.com/package/@rig-c/three"><code>@rig-c/three</code></a></td>
+        <td><code>0.1.1</code></td>
+        <td>Three.js 0.186.1+</td>
+        <td>Native Three.js renderer and live <code>Group</code> (orthographic &amp; perspective)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>PixiJS 8 Usage (<code>@rig-c/pixi</code>)</h2>
+<pre><code>npm install @rig-c/pixi pixi.js @rig-c/play</code></pre>
+<pre><code>import { loadModel } from '@rig-c/play';
+import { Application } from 'pixi.js';
+import { PixiRig } from '@rig-c/pixi';
+
+const app = new Application();
+await app.init({ width: 800, height: 600 });
+document.body.appendChild(app.canvas);
+
+const assets = await loadModel({ modelUrl: '/rigs/walk/skeleton.model.json' });
+const rig = new PixiRig(assets, { ticker: app.ticker });
+rig.play('walk');
+app.stage.addChild(rig);
+// On removal: app.stage.removeChild(rig); rig.destroy();</code></pre>
+
+<h2>Phaser 4 Usage (<code>@rig-c/phaser</code>)</h2>
+<pre><code>npm install @rig-c/phaser phaser @rig-c/play</code></pre>
+<pre><code>import { loadModel } from '@rig-c/play';
+import { PhaserRig } from '@rig-c/phaser';
+
+const assets = await loadModel({
+  modelUrl: '/rigs/walk/skeleton.model.json',
+  regions: 'none',
+});
+const rig = new PhaserRig(scene, assets);
+rig.setPosition(400, 480);
+rig.play('walk');
+scene.add.existing(rig);
+// On removal: rig.destroy(); assets.dispose();</code></pre>
+
+<h2>Three.js Usage (<code>@rig-c/three</code>)</h2>
+<pre><code>npm install @rig-c/three three @rig-c/play</code></pre>
+
+<h2>What Every Adapter Guarantees</h2>
+<ol>
+  <li><strong>Pose parity with <code>@rig-c/play</code></strong>: Produces the exact same pose for the same time, verified in CI across Chromium and WebKit against <code>@rig-c/play</code>'s reference output.</li>
+  <li><strong>Unmodified <code>rigc build</code> inputs</strong>: Reads <code>skeleton.model.json</code> and its atlas pages directly as emitted by <code>rigc build</code>.</li>
+  <li><strong>Zero Spine runtime</strong>: Links no Esoteric Software code.</li>
+</ol>
+      </article>
+      <nav aria-label="Page pagination" class="meta-bar">
+        <span>Previous: <a href="/play/" rel="prev">Play</a></span>
+        <span>Next: <a href="/exam/" rel="next">AI Exam</a></span>
+      </nav>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>
+          <strong>rig-c</strong> — AI-authored 2D rigging and animation toolchain. Static HTML &amp; Markdown built for zero-JS <code>curl</code> and search indexing.
+        </div>
+        <div class="footer-links">
+          <a href="/llms.txt">llms.txt</a>
+          <a href="/llms-full.txt">llms-full.txt</a>
+          <a href="/adapters/index.md">Page Markdown</a>
+          <a href="/sitemap.xml">sitemap.xml</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+          <a href="https://www.npmjs.com/package/rig-c">npm</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
