@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>rig-c engine adapters: PixiJS, Phaser and Three.js</title>
+    <meta name="description" content="Play a rig that rigc built inside PixiJS 8, Phaser 4.2+ or Three.js, posed by @rig-c/play and drawn by the host&#39;s own renderer. No Spine runtime.">
+    <meta name="keywords" content="">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://rig-c.org/docs/adapters/">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <link rel="alternate" type="text/markdown" href="/docs/adapters/index.md" title="Adapters (Markdown)">
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="rig-c">
+    <meta property="og:title" content="rig-c engine adapters: PixiJS, Phaser and Three.js">
+    <meta property="og:description" content="Play a rig that rigc built inside PixiJS 8, Phaser 4.2+ or Three.js, posed by @rig-c/play and drawn by the host&#39;s own renderer. No Spine runtime.">
+    <meta property="og:url" content="https://rig-c.org/docs/adapters/">
+    <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="rig-c engine adapters: PixiJS, Phaser and Three.js">
+    <meta name="twitter:description" content="Play a rig that rigc built inside PixiJS 8, Phaser 4.2+ or Three.js, posed by @rig-c/play and drawn by the host&#39;s own renderer. No Spine runtime.">
+    <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <meta name="theme-color" content="#070b18">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://rig-c.org/docs/adapters/#article",
+      "headline": "rig-c engine adapters: PixiJS, Phaser and Three.js",
+      "description": "Play a rig that rigc built inside PixiJS 8, Phaser 4.2+ or Three.js, posed by @rig-c/play and drawn by the host's own renderer. No Spine runtime.",
+      "url": "https://rig-c.org/docs/adapters/",
+      "datePublished": "2026-10-19",
+      "dateModified": "2026-10-19",
+      "inLanguage": "en",
+      "author": {
+        "@type": "Organization",
+        "name": "rig-c",
+        "url": "https://github.com/rig-c"
+      },
+      "isPartOf": {
+        "@id": "https://rig-c.org/#website"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "rig-c",
+          "item": "https://rig-c.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Docs",
+          "item": "https://rig-c.org/docs/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Adapters",
+          "item": "https://rig-c.org/docs/adapters/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "@rig-c/pixi, @rig-c/phaser, @rig-c/three",
+      "version": "0.1.1, 0.1.1, 0.1.1",
+      "codeRepository": "https://github.com/rig-c/adapters",
+      "url": "https://rig-c.org/docs/adapters/",
+      "programmingLanguage": "TypeScript",
+      "description": "Play a rig that rigc built inside PixiJS 8, Phaser 4.2+ or Three.js, posed by @rig-c/play and drawn by the host's own renderer. No Spine runtime."
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="section-docs">
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>rig-c</span></a>
+        <nav aria-label="Primary" class="site-nav">
+          <a href="/docs/" aria-current="page">Docs</a>
+          <a href="/examples/">Examples</a>
+          <a href="/exam/">Exam</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+        </nav>
+      </div>
+    </header>
+    <div class="docs-layout">
+        <nav aria-label="Docs" class="docs-nav">
+          <ol>
+            <li><a href="/docs/">Overview</a></li>
+            <li><a href="/docs/getting-started/">Getting Started</a></li>
+            <li><a href="/docs/parts/">Parts</a></li>
+            <li><a href="/docs/pose/">Pose</a></li>
+            <li><a href="/docs/core/">Core</a></li>
+            <li><a href="/docs/review/">Review</a></li>
+            <li><a href="/docs/play/">Play</a></li>
+            <li><a href="/docs/adapters/" aria-current="page">Adapters</a></li>
+          </ol>
+        </nav>
+      <main class="site-main docs-main">
+        <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Adapters</li></ol></nav>
+        <div class="pkg-bar"><span class="pkg"><code>@rig-c/pixi, @rig-c/phaser, @rig-c/three</code> <span class="ver">0.1.1, 0.1.1, 0.1.1</span></span><a href="https://github.com/rig-c/adapters">github.com/rig-c/adapters</a><a href="https://www.npmjs.com/package/@rig-c/pixi">npm</a></div>
+        <article>
+<h1 id="engine-adapters">Engine adapters</h1>
+<p>The adapters put a rigc-built rig inside the engine or renderer your game already uses. <a href="/docs/play/">Play</a> computes the pose; the host draws it with its own objects.</p>
+<h2 id="what-it-is">What it is</h2>
+<p>Three packages, each versioned on its own, all at 0.1.1 with 0.x APIs:</p>
+<ul>
+<li><code>@rig-c/pixi</code>: a PixiJS 8 adapter.</li>
+<li><code>@rig-c/phaser</code>: a Phaser 4.2+ adapter for WebGL scenes.</li>
+<li><code>@rig-c/three</code>: a native Three.js 0.186.1 renderer and live <code>Group</code>.</li>
+</ul>
+<p>Each one reads the model document <code>rigc build</code> writes, <code>skeleton.model.json</code>, through <code>@rig-c/play</code>.</p>
+<h2 id="when-to-use-it">When to use it</h2>
+<p>Use an adapter when your game or page already renders with PixiJS, Phaser or Three.js, and the rig must sit in that scene graph with your other objects. Three.js is a 3D renderer, so its adapter is for 2D characters inside 3D scenes and interactive pages.</p>
+<p>If you only need a rig in a web page, with no engine, use <a href="/docs/play/">Play</a> directly. It draws as DOM elements or one canvas. Native engines such as Godot or Unity are planned, not available.</p>
+<h2 id="what-it-solves">What it solves</h2>
+<p>rigc compiles a rig into two things side by side: Spine 4.3 skeleton data and its own model document. An official Spine runtime can load the Spine data, but it brings the Spine Runtimes licence with it. An adapter is a third way: rig-c's own poser runs inside the engine's scene graph and renderer, reads the model document, and links no Spine runtime.</p>
+<h2 id="what-you-get">What you get</h2>
+<ul>
+<li><strong>A live object</strong> per host: <code>PixiRig</code> (a Pixi <code>Container</code>), <code>PhaserRig</code> (a Phaser <code>Container</code>) and <code>ThreeRig</code> (a flat Three.js <code>Group</code>). Each owns an independent player and exposes <code>play</code>, <code>seek</code>, <code>bone()</code> and <code>bounds()</code>.</li>
+<li><strong>A renderer</strong> per host for when you own the player: <code>PixiRenderer</code>, <code>PhaserRenderer</code> and <code>ThreeRenderer</code>. Each draws a supplied <code>PosedFrame</code>.</li>
+<li><strong>Shared page textures</strong>: several rigs over one <code>ModelAssets</code> load share page textures until the last holder releases them.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<ol>
+<li>Load the model with <code>@rig-c/play</code>'s <code>loadModel</code>, using the files <code>rigc build</code> wrote, unmodified.</li>
+<li>Create the host object, for example <code>new PixiRig(assets, { ticker: app.ticker })</code>, and add it to your stage or scene.</li>
+<li>Each update, <code>@rig-c/play</code> poses the rig and produces a <code>PosedFrame</code> record.</li>
+<li>The adapter reads slot corners or mesh vertices, page UVs, tint, blend and clip straight from that record. It maps world <code>(x, y)</code> to <code>(x, -y)</code> and draws with the host's native objects.</li>
+<li>On removal, <code>destroy()</code> frees that rig's own resources. Dispose the shared assets after the last rig is gone.</li>
+</ol>
+<pre><code class="language-sh">npm install @rig-c/pixi pixi.js @rig-c/play
+</code></pre>
+<p>Swap in <code>@rig-c/phaser phaser</code> or <code>@rig-c/three three</code> for the other hosts.</p>
+<h2 id="key-concepts">Key concepts</h2>
+<ul>
+<li><strong>Host</strong>: the engine or renderer an adapter targets. Each host lives in <code>packages/&lt;host&gt;</code>.</li>
+<li><strong>Model document</strong>: <code>skeleton.model.json</code>, the source the adapters read. Spine is one export of it.</li>
+<li><strong><code>PosedFrame</code></strong>: the per-frame record <code>@rig-c/play</code> produces and every renderer draws.</li>
+<li><strong><code>ModelAssets</code></strong>: one <code>loadModel</code> result, which several rigs can share.</li>
+<li><strong>Parity</strong>: an adapter plays the same pose for the same time as <code>@rig-c/play</code>, held to the player's output by a test.</li>
+</ul>
+<h2 id="go-deeper">Go deeper</h2>
+<ul>
+<li><a href="https://github.com/rig-c/adapters#why-this-exists">README: Why this exists</a></li>
+<li><a href="https://github.com/rig-c/adapters#what-an-adapter-promises">README: What an adapter promises</a></li>
+<li><a href="https://github.com/rig-c/adapters/tree/main/packages/pixi#readme">packages/pixi README</a></li>
+<li><a href="https://github.com/rig-c/adapters/tree/main/packages/phaser#readme">packages/phaser README</a> (renderer contract)</li>
+<li><a href="https://github.com/rig-c/adapters/tree/main/packages/three#readme">packages/three README</a> (native drawing and scene placement)</li>
+<li><a href="https://github.com/rig-c/adapters/blob/main/docs/ADDING_A_HOST.md">docs/ADDING_A_HOST.md</a></li>
+<li>Changelogs: <a href="https://github.com/rig-c/adapters/blob/main/packages/pixi/CHANGELOG.md">pixi</a>, <a href="https://github.com/rig-c/adapters/blob/main/packages/phaser/CHANGELOG.md">phaser</a>, <a href="https://github.com/rig-c/adapters/blob/main/packages/three/CHANGELOG.md">three</a></li>
+<li>npm: <a href="https://www.npmjs.com/package/@rig-c/pixi">@rig-c/pixi</a>, <a href="https://www.npmjs.com/package/@rig-c/phaser">@rig-c/phaser</a>, <a href="https://www.npmjs.com/package/@rig-c/three">@rig-c/three</a></li>
+</ul>
+
+        </article>
+        <nav aria-label="Docs pages" class="pager"><a href="/docs/play/" rel="prev"><span>Previous</span>Play</a></nav>
+      </main>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+    </div>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <nav aria-label="Machine-readable" class="footer-links">
+          <a href="/docs/adapters/index.md">This page as Markdown</a>
+          <a href="/llms.txt">llms.txt</a>
+          <a href="/llms-full.txt">llms-full.txt</a>
+          <a href="/sitemap.xml">sitemap.xml</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+          <a href="https://www.npmjs.com/package/rig-c">npm</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

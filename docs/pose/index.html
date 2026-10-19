@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@rig-c/pose: put pose motion onto a rig-c rig</title>
+    <meta name="description" content="Turns a body-18 pose sequence into bone keys in rig-c&#39;s motion format, checked through rig-c&#39;s gate before anything is written.">
+    <meta name="keywords" content="">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://rig-c.org/docs/pose/">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <link rel="alternate" type="text/markdown" href="/docs/pose/index.md" title="Pose (Markdown)">
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="rig-c">
+    <meta property="og:title" content="@rig-c/pose: put pose motion onto a rig-c rig">
+    <meta property="og:description" content="Turns a body-18 pose sequence into bone keys in rig-c&#39;s motion format, checked through rig-c&#39;s gate before anything is written.">
+    <meta property="og:url" content="https://rig-c.org/docs/pose/">
+    <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@rig-c/pose: put pose motion onto a rig-c rig">
+    <meta name="twitter:description" content="Turns a body-18 pose sequence into bone keys in rig-c&#39;s motion format, checked through rig-c&#39;s gate before anything is written.">
+    <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <meta name="theme-color" content="#070b18">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://rig-c.org/docs/pose/#article",
+      "headline": "@rig-c/pose: put pose motion onto a rig-c rig",
+      "description": "Turns a body-18 pose sequence into bone keys in rig-c's motion format, checked through rig-c's gate before anything is written.",
+      "url": "https://rig-c.org/docs/pose/",
+      "datePublished": "2026-10-19",
+      "dateModified": "2026-10-19",
+      "inLanguage": "en",
+      "author": {
+        "@type": "Organization",
+        "name": "rig-c",
+        "url": "https://github.com/rig-c"
+      },
+      "isPartOf": {
+        "@id": "https://rig-c.org/#website"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "rig-c",
+          "item": "https://rig-c.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Docs",
+          "item": "https://rig-c.org/docs/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Pose",
+          "item": "https://rig-c.org/docs/pose/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "@rig-c/pose",
+      "version": "0.33.0",
+      "codeRepository": "https://github.com/rig-c/pose",
+      "url": "https://rig-c.org/docs/pose/",
+      "programmingLanguage": "TypeScript",
+      "description": "Turns a body-18 pose sequence into bone keys in rig-c's motion format, checked through rig-c's gate before anything is written."
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="section-docs">
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>rig-c</span></a>
+        <nav aria-label="Primary" class="site-nav">
+          <a href="/docs/" aria-current="page">Docs</a>
+          <a href="/examples/">Examples</a>
+          <a href="/exam/">Exam</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+        </nav>
+      </div>
+    </header>
+    <div class="docs-layout">
+        <nav aria-label="Docs" class="docs-nav">
+          <ol>
+            <li><a href="/docs/">Overview</a></li>
+            <li><a href="/docs/getting-started/">Getting Started</a></li>
+            <li><a href="/docs/parts/">Parts</a></li>
+            <li><a href="/docs/pose/" aria-current="page">Pose</a></li>
+            <li><a href="/docs/core/">Core</a></li>
+            <li><a href="/docs/review/">Review</a></li>
+            <li><a href="/docs/play/">Play</a></li>
+            <li><a href="/docs/adapters/">Adapters</a></li>
+          </ol>
+        </nav>
+      <main class="site-main docs-main">
+        <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Pose</li></ol></nav>
+        <div class="pkg-bar"><span class="pkg"><code>@rig-c/pose</code> <span class="ver">0.33.0</span></span><a href="https://github.com/rig-c/pose">github.com/rig-c/pose</a><a href="https://www.npmjs.com/package/@rig-c/pose">npm</a></div>
+        <article>
+<h1 id="rig-cpose">@rig-c/pose</h1>
+<p>Pose moves a rig. It takes joint positions over time and writes them onto a rig-c rig as bone keys, and it checks those keys before it writes anything.</p>
+<h2 id="what-it-is">What it is</h2>
+<p>A command-line tool, <code>rig-pose</code>, that turns a body-18 pose sequence into an animation in rig-c's motion format. In the rig-c toolchain, <a href="/docs/core/">core</a> gates the rig, <a href="/docs/parts/">parts</a> builds it, <a href="/docs/play/">play</a> plays it, and pose moves it. Version 0.x is a prototype: the format, the commands and the output can change in any release before 1.0.</p>
+<h2 id="when-to-use-it">When to use it</h2>
+<p>Use it when you already have joint positions (from a pose model, a dataset, or placed by hand) and a rig-c rig with limb chains, and you want an animation that follows them.</p>
+<p>Do not use it to:</p>
+<ul>
+<li><strong>Get the poses.</strong> It does not extract poses from video; how you get joint positions is up to you.</li>
+<li><strong>Build the rig.</strong> The rig must have chains: a thigh with a shin below it, an upper arm with a forearm below it. <a href="/docs/parts/">@rig-c/parts</a> builds such a rig from a painting. A rig whose arm is one bone is refused.</li>
+<li><strong>Animate hands, fingers or depth.</strong> It works in 2D. A limb pointing at the camera foreshortens, and the rig matches its direction, not its length.</li>
+</ul>
+<h2 id="what-it-solves">What it solves</h2>
+<p>A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones also has traps: setup rotations, and parents that turn their children. Pose cleans the sequence once, where it can be inspected, and then refuses to write keys that do not land where the pose asked.</p>
+<h2 id="what-you-get">What you get</h2>
+<ul>
+<li>A cleaned <code>rig-pose-sequence/1</code> file that carries a <code>cleaned</code> record of what was done.</li>
+<li>A motion file with the new animation, for the rig's motion spec.</li>
+<li>With <code>--report</code>, a <code>rig-pose-report/1</code> JSON file of everything the run found.</li>
+<li>With <code>--build</code>, the gated build, which <code>rigc preview</code> can play.</li>
+<li>From <code>compare</code>, a <code>rig-pose-compare/1</code> report and an optional PNG sheet.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<ol>
+<li><strong>Clean.</strong> <code>rig-pose clean</code> removes spikes, fills low-score or occluded joints from their neighbours, smooths each joint, and holds joints that have stopped. <code>retarget</code> reads only a sequence that <code>clean</code> wrote. COCO-17 input is converted here with <code>--coco</code>.</li>
+<li><strong>Map.</strong> You write a map that says which bones carry which joints, chain by chain.</li>
+<li><strong>Retarget.</strong> For every frame and every mapped bone, the bone is turned so it points the way its segment points in the picture, minus its setup angle and its parent's turn.</li>
+<li><strong>Check.</strong> rig-c's gate must be green with the rig as it is and with the animation in. Every mapped bone must land on its asked angle on every frame, posed by rig-c's own poser. Hinges must bend only one way. If any check fails, nothing is written and every reason is printed.</li>
+<li><strong>List what it cannot decide.</strong> Lines such as <code>HOLD</code>, <code>END-ON</code> and <code>IDLE-DROPPED</code> name what you should look at.</li>
+</ol>
+<pre><code class="language-sh">bun add @rig-c/pose
+rig-pose retarget --rig out/rig --map map.json --sequence dance.pose.json --out motion.json --animation dance
+</code></pre>
+<h2 id="key-concepts">Key concepts</h2>
+<ul>
+<li><strong>body-18</strong>: the 18 joints the sequence uses (<code>nose</code>, <code>neck</code>, shoulders, elbows, wrists, hips, knees, ankles, eyes, ears); <code>r</code>/<code>l</code> are the subject's sides.</li>
+<li><strong>chain</strong>: a limb in the map, as bones that descend from one another; bone <em>k</em> carries the segment from joint <em>k</em> to joint <em>k</em>+1.</li>
+<li><strong>lands</strong>: a mapped bone, posed by rig-c's poser, is within 0.01° of the angle the pose asks for.</li>
+<li><strong>cleaned record</strong>: the <code>cleaned</code> block <code>clean</code> writes into the sequence; <code>retarget</code> requires it.</li>
+<li><strong>alternates</strong>: sets of slots switched together to show a second drawing for a pose bone rotation cannot carry.</li>
+</ul>
+<h2 id="go-deeper">Go deeper</h2>
+<ul>
+<li><a href="https://github.com/rig-c/pose#try-it">Try it</a> and the <a href="https://github.com/rig-c/pose/tree/main/examples/wave">wave example</a>, with no art and no video</li>
+<li><a href="https://github.com/rig-c/pose#clean-first-rig-pose-clean">Clean first</a></li>
+<li><a href="https://github.com/rig-c/pose#what-it-does">What it does</a>: every check and every listed line</li>
+<li><a href="https://github.com/rig-c/pose#the-pose-rig-pose-sequence1">The pose format</a> and <a href="https://github.com/rig-c/pose#the-map-rig-pose-map1">the map format</a></li>
+<li><a href="https://github.com/rig-c/pose#alternate-drawings-alternates">Alternate drawings</a></li>
+<li><a href="https://github.com/rig-c/pose#compare-the-rigs-render-against-the-video">Compare</a></li>
+<li><a href="https://github.com/rig-c/pose#what-it-does-not-do">What it does not do</a> and <a href="https://github.com/rig-c/pose#requirements">Requirements</a></li>
+<li><a href="https://github.com/rig-c/pose/blob/main/CHANGELOG.md">CHANGELOG</a> and the <a href="https://www.npmjs.com/package/@rig-c/pose">npm page</a></li>
+<li><code>rig-pose --help</code> lists every flag.</li>
+</ul>
+
+        </article>
+        <nav aria-label="Docs pages" class="pager"><a href="/docs/parts/" rel="prev"><span>Previous</span>Parts</a><a href="/docs/core/" rel="next"><span>Next</span>Core</a></nav>
+      </main>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+    </div>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <nav aria-label="Machine-readable" class="footer-links">
+          <a href="/docs/pose/index.md">This page as Markdown</a>
+          <a href="/llms.txt">llms.txt</a>
+          <a href="/llms-full.txt">llms-full.txt</a>
+          <a href="/sitemap.xml">sitemap.xml</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+          <a href="https://www.npmjs.com/package/rig-c">npm</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@rig-c/review: local rig inspection and feedback</title>
+    <meta name="description" content="A local workspace where a person inspects an agent&#39;s rig output, compares it with reference video, and exports issue-ready feedback.">
+    <meta name="keywords" content="">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://rig-c.org/docs/review/">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <link rel="alternate" type="text/markdown" href="/docs/review/index.md" title="Review (Markdown)">
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="rig-c">
+    <meta property="og:title" content="@rig-c/review: local rig inspection and feedback">
+    <meta property="og:description" content="A local workspace where a person inspects an agent&#39;s rig output, compares it with reference video, and exports issue-ready feedback.">
+    <meta property="og:url" content="https://rig-c.org/docs/review/">
+    <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@rig-c/review: local rig inspection and feedback">
+    <meta name="twitter:description" content="A local workspace where a person inspects an agent&#39;s rig output, compares it with reference video, and exports issue-ready feedback.">
+    <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
+    <meta name="theme-color" content="#070b18">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://rig-c.org/docs/review/#article",
+      "headline": "@rig-c/review: local rig inspection and feedback",
+      "description": "A local workspace where a person inspects an agent's rig output, compares it with reference video, and exports issue-ready feedback.",
+      "url": "https://rig-c.org/docs/review/",
+      "datePublished": "2026-10-19",
+      "dateModified": "2026-10-19",
+      "inLanguage": "en",
+      "author": {
+        "@type": "Organization",
+        "name": "rig-c",
+        "url": "https://github.com/rig-c"
+      },
+      "isPartOf": {
+        "@id": "https://rig-c.org/#website"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "rig-c",
+          "item": "https://rig-c.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Docs",
+          "item": "https://rig-c.org/docs/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Review",
+          "item": "https://rig-c.org/docs/review/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "@rig-c/review",
+      "version": "0.2.1",
+      "codeRepository": "https://github.com/rig-c/review",
+      "url": "https://rig-c.org/docs/review/",
+      "programmingLanguage": "TypeScript",
+      "description": "A local workspace where a person inspects an agent's rig output, compares it with reference video, and exports issue-ready feedback."
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="section-docs">
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>rig-c</span></a>
+        <nav aria-label="Primary" class="site-nav">
+          <a href="/docs/" aria-current="page">Docs</a>
+          <a href="/examples/">Examples</a>
+          <a href="/exam/">Exam</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+        </nav>
+      </div>
+    </header>
+    <div class="docs-layout">
+        <nav aria-label="Docs" class="docs-nav">
+          <ol>
+            <li><a href="/docs/">Overview</a></li>
+            <li><a href="/docs/getting-started/">Getting Started</a></li>
+            <li><a href="/docs/parts/">Parts</a></li>
+            <li><a href="/docs/pose/">Pose</a></li>
+            <li><a href="/docs/core/">Core</a></li>
+            <li><a href="/docs/review/" aria-current="page">Review</a></li>
+            <li><a href="/docs/play/">Play</a></li>
+            <li><a href="/docs/adapters/">Adapters</a></li>
+          </ol>
+        </nav>
+      <main class="site-main docs-main">
+        <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Review</li></ol></nav>
+        <div class="pkg-bar"><span class="pkg"><code>@rig-c/review</code> <span class="ver">0.2.1</span></span><a href="https://github.com/rig-c/review">github.com/rig-c/review</a><a href="https://www.npmjs.com/package/@rig-c/review">npm</a></div>
+        <article>
+<h1 id="review">Review</h1>
+<p>Review is the human inspection gate in the rig-c toolchain. A person opens an agent's rig output in one local workspace, checks it, and saves feedback that the agent can read back.</p>
+<h2 id="what-it-is">What it is</h2>
+<p><code>@rig-c/review</code> is a CLI, <code>rig-review</code>, that serves a browser workspace on <code>127.0.0.1</code>. It plays a compiled model through <code>@rig-c/play</code>, shows local image, video and pose-sequence references beside it, and records the person's review decision and feedback.</p>
+<h2 id="when-to-use-it">When to use it</h2>
+<p>Use it after a <a href="/docs/core/">Core</a> build, when a person needs to look at the result before it goes on. The agent does not have to build a new viewer for each rig.</p>
+<p>Do not use it to fix the rig. Motion is view, annotate and export only: it never retimes, authors keys or writes <code>motion.json</code>. It does not edit meshes, weights or source art. It also does not replace Core's compiler gate; <code>check</code> validates the delivery contract and model envelope, not visual quality. To ship a rig into a game, use <a href="/docs/play/">Play</a> or an <a href="/docs/adapters/">engine adapter</a>.</p>
+<h2 id="what-it-solves">What it solves</h2>
+<p>An agent can produce a rig, but a person has to judge it. Without a shared tool, that judgment ends up as loose notes that point at nothing exact. Review ties each piece of feedback to the exact bytes that were reviewed, and to a frame interval and a bone or slot target. The agent then retrieves it with one command. If the input changes, the old approval does not carry over.</p>
+<h2 id="what-you-get">What you get</h2>
+<ul>
+<li>A <strong>review status</strong>: <code>approved</code>, <code>changes-requested</code> or <code>pending</code>. Opening never approves.</li>
+<li><strong>Feedback</strong> items with an inclusive frame interval, a bone/slot/rig target, a defect/quality category and a one-line summary.</li>
+<li>A <code>reviewedSource</code> record: package revision, viewer/runtime versions, and SHA-256 plus path for the reviewed rig and motion.</li>
+<li>JSON and issue-ready Markdown exports (<code>--format issue</code>).</li>
+<li><strong>Frame strip</strong> exports as PNG or JSON, with a <code>.png.json</code> provenance sidecar.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<ol>
+<li>Install it beside the agent and run <code>open</code> on the output folder. It recognizes <code>skeleton.model.json</code> at the root or under <code>build/</code>, plus <code>motion.json</code>, <code>report.json</code>, source videos and pose sequences. It reads them without changing them.</li>
+<li><code>open</code> hashes the folder, starts or reuses a background loopback instance, prints its URL and exits. It never opens a browser and binds only <code>127.0.0.1</code>.</li>
+<li>The person inspects playback, parts and references, then explicitly saves a status and feedback. Feedback is stored under <code>~/.local/state/rig-c-review/</code>, outside the delivered files.</li>
+<li>The agent runs <code>feedback</code> on the same folder to read the session JSON. Changed content starts a fresh pending session.</li>
+<li>Optionally, <code>compare</code> seeks two outputs against one reference video with a single playhead.</li>
+</ol>
+<pre><code class="language-sh">npm i -D @rig-c/review
+npx rig-review open /absolute/path/to/output
+</code></pre>
+<p>It runs under Bun 1.3.0 or later. The CLI is the supported surface; no importable API is promised.</p>
+<h2 id="key-concepts">Key concepts</h2>
+<ul>
+<li><strong>Output folder</strong>: an existing agent output opened as-is, with no manifest required.</li>
+<li><strong><code>review.json</code></strong>: an optional curated manifest with named checkpoints, references and angle axes.</li>
+<li><strong>Checkpoint</strong>: a named inspection point in a curated package, with its own outcome and notes.</li>
+<li><strong>Producer clock</strong>: <code>fps</code> plus <code>frame0</code>, or exact <code>frameTimes[]</code>, declared in the report. Without it the UI shows <code>rate unknown</code>.</li>
+<li><strong>Reference binding</strong>: the name and byte hash of a selected external video, bound into sessions and exports.</li>
+<li><strong>Write capability</strong>: a per-instance secret carried in the URL's <code>#cap=</code> fragment. A link without it opens read-only.</li>
+</ul>
+<h2 id="go-deeper">Go deeper</h2>
+<ul>
+<li><a href="https://github.com/rig-c/review#start">README: Start</a></li>
+<li><a href="https://github.com/rig-c/review#feedback-ownership">README: Feedback ownership</a></li>
+<li><a href="https://github.com/rig-c/review#compare-two-outputs">README: Compare two outputs</a></li>
+<li><a href="https://github.com/rig-c/review#frame-strip-export">README: Frame strip export</a></li>
+<li><a href="https://github.com/rig-c/review#managed-front-and-write-capability">README: Managed front and write capability</a></li>
+<li><a href="https://github.com/rig-c/review#control-the-current-inspection-page">README: Control the current inspection page</a></li>
+<li><a href="https://github.com/rig-c/review/blob/main/docs/REVIEW_PACKAGE.md">docs/REVIEW_PACKAGE.md</a> (package format and HTTP contract)</li>
+<li><a href="https://github.com/rig-c/review/blob/main/docs/DESIGN.md">docs/DESIGN.md</a> (product boundary and direction)</li>
+<li><a href="https://github.com/rig-c/review/blob/main/CHANGELOG.md">CHANGELOG</a></li>
+<li><a href="https://www.npmjs.com/package/@rig-c/review">npm: @rig-c/review</a></li>
+</ul>
+
+        </article>
+        <nav aria-label="Docs pages" class="pager"><a href="/docs/core/" rel="prev"><span>Previous</span>Core</a><a href="/docs/play/" rel="next"><span>Next</span>Play</a></nav>
+      </main>
+      <aside class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#what-it-is">What it is</a></li><li><a href="#when-to-use-it">When to use it</a></li><li><a href="#what-it-solves">What it solves</a></li><li><a href="#what-you-get">What you get</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#key-concepts">Key concepts</a></li><li><a href="#go-deeper">Go deeper</a></li></ol></aside>
+    </div>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p><strong>rig-c</strong> — AI-authored 2D rigging and animation, verified before it is written. Every page is static HTML with a Markdown mirror.</p>
+        <nav aria-label="Machine-readable" class="footer-links">
+          <a href="/docs/review/index.md">This page as Markdown</a>
+          <a href="/llms.txt">llms.txt</a>
+          <a href="/llms-full.txt">llms-full.txt</a>
+          <a href="/sitemap.xml">sitemap.xml</a>
+          <a href="https://github.com/rig-c">GitHub</a>
+          <a href="https://www.npmjs.com/package/rig-c">npm</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

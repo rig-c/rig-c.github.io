@@ -1,3 +1,11 @@
+---
+navLabel: Getting Started
+title: Getting Started with rig-c — One Painting to a Browser Rig in 3 Minutes
+description: Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.
+keywords: rig-c tutorial, getting started, 2D character rigging tutorial, See-through layers, rig-parts build, rig-pose retarget
+repoUrl: https://github.com/rig-c/getting-started
+summaryForLlms: 10-step no-GPU walkthrough from pre-decomposed character layers to a compiled rig with idle and wave animations playing in the browser, plus downstream export routes.
+---
 # Getting Started with rig-c
 
 You start with one painting of a character. You end with that character rigged — split into movable pieces on a skeleton — breathing, blinking, and waving in your browser.
@@ -110,6 +118,6 @@ bun ../getting-started/scripts/serve.ts
 
 ## Three Ways to Use the Output
 
-1. **On the web with [`@rig-c/play`](/play/) or [`@rig-c/adapters`](/adapters/)**: Load `skeleton.model.json` and part PNGs directly. MIT licensed, zero Spine runtime dependencies.
+1. **On the web with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/)**: Load `skeleton.model.json` and part PNGs directly. MIT licensed, zero Spine runtime dependencies.
 2. **In the Spine 4.3 Editor**: Import `out/check/build/skeleton.json` via `Import Data` and point `Images` to `out/rig/images/` to refine timelines by hand (requires rig-c 2.51.1+ and a Spine Editor license).
 3. **In a game engine via official Spine Runtimes**: Load `skeleton.json` and `skeleton.atlas` in Unity, Godot, Unreal, or C++ runtimes under the Spine Runtimes License.

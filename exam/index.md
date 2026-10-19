@@ -22,7 +22,7 @@ The rig-c tools are written for agents that cannot see what they build. `rig-c/e
 
 ## Advanced Exam Leaderboard (Walk · Run · Dance Pose Retargeting)
 
-Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and dance (R3) pose sequences with [`@rig-c/pose`](/pose/), one round per fresh session, fixing what the diagnostic numbers report without ever seeing the footage:
+Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and dance (R3) pose sequences with [`@rig-c/pose`](/docs/pose/), one round per fresh session, fixing what the diagnostic numbers report without ever seeing the footage:
 
 | Model | R1 Walk | R2 Run | R3 Dance | 0.21 Shin-Scale Row (What-If) | Minutes (R1 · R2 · R3) |
 | --- | :-: | :-: | :-: | --- | --- |

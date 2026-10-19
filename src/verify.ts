@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { PAGES, SITE_ORIGIN } from './pages.ts';
+import { htmlRel, mdRoute, PAGES, REDIRECTS, SITE_ORIGIN } from './content.ts';
 
 const ROOT_DIR = resolve(import.meta.dir, '..');
 
@@ -45,18 +45,16 @@ function main(): void {
     : '';
 
   for (const page of PAGES) {
-    const route = page.slug === '' ? '/' : `/${page.slug}/`;
-    const htmlRel = page.slug === '' ? 'index.html' : `${page.slug}/index.html`;
-    const mdRel = page.slug === '' ? 'index.md' : `${page.slug}/index.md`;
-    const htmlPath = join(ROOT_DIR, htmlRel);
-    const mdPath = join(ROOT_DIR, mdRel);
+    const route = page.route;
+    const htmlPath = join(ROOT_DIR, htmlRel(route));
+    const mdPath = join(ROOT_DIR, mdRoute(route).slice(1));
 
     if (!existsSync(htmlPath)) {
-      errors.push(`[${route}] Missing HTML file: ${htmlRel}`);
+      errors.push(`[${route}] Missing HTML file: ${htmlRel(route)}`);
       continue;
     }
     if (!existsSync(mdPath)) {
-      errors.push(`[${route}] Missing Markdown file: ${mdRel}`);
+      errors.push(`[${route}] Missing Markdown file: ${mdRoute(route)}`);
       continue;
     }
 
@@ -102,6 +100,10 @@ function main(): void {
       if (targetPath && !existsSync(targetPath)) {
         errors.push(`[${route}] Broken internal link href="${href}" -> ${targetPath}`);
       }
+      const bare = href.split('#')[0] ?? '';
+      if (bare in REDIRECTS) {
+        errors.push(`[${route}] Links to moved route ${bare}; link ${REDIRECTS[bare]} instead`);
+      }
       match = hrefRegex.exec(html);
     }
 
@@ -115,6 +117,27 @@ function main(): void {
     if (!llmsFullTxt.includes(`URL: ${fullUrl}`)) {
       errors.push(`[${route}] Missing URL: ${fullUrl} in llms-full.txt`);
     }
+    if (md.includes('{{') || html.includes('{{')) {
+      errors.push(`[${route}] Unexpanded template token`);
+    }
+  }
+
+  for (const [from, to] of Object.entries(REDIRECTS)) {
+    const stubPath = join(ROOT_DIR, htmlRel(from));
+    if (!existsSync(stubPath)) {
+      errors.push(`[${from}] Missing redirect stub`);
+      continue;
+    }
+    const stub = readFileSync(stubPath, 'utf8');
+    if (!stub.includes(`url=${to}"`) || !stub.includes(`href="${SITE_ORIGIN}${to}"`)) {
+      errors.push(`[${from}] Redirect stub does not point at ${to}`);
+    }
+    if (!PAGES.some((p) => p.route === to)) {
+      errors.push(`[${from}] Redirect target ${to} is not a page`);
+    }
+    if (sitemap.includes(`<loc>${SITE_ORIGIN}${from}</loc>`)) {
+      errors.push(`[${from}] Moved route is still in sitemap.xml`);
+    }
   }
 
   if (errors.length > 0) {
@@ -126,7 +149,7 @@ function main(): void {
   }
 
   console.log(
-    `PASS: Verified ${PAGES.length} static HTML pages, ${PAGES.length} Markdown mirrors, JSON-LD schemas, canonical tags, internal links, llms.txt, llms-full.txt, sitemap.xml, and robots.txt.`,
+    `PASS: Verified ${PAGES.length} static HTML pages, ${PAGES.length} Markdown mirrors, ${Object.keys(REDIRECTS).length} redirect stubs, JSON-LD schemas, canonical tags, internal links, llms.txt, llms-full.txt, sitemap.xml, and robots.txt.`,
   );
 }
 
