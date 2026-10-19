@@ -143,7 +143,7 @@ rigc: wrote build/skeleton.atlas
 rigc: wrote build/skeleton.model.json
 exit=0</code></pre></figure>
 </div>
-<p class="mod-skip">Real output from Character 1's rig, <code>rig-c</code> 2.61.0 (long lines wrapped). Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
+<p class="mod-skip">Real output from Character 1's rig, <code>rig-c</code> 2.61.0 (long lines wrapped). Why the summary says 52 when the gate has 50 rules: <a href="#how-the-gate-decides">below</a>. Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 <nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol><li><a href="/docs/parts/"><strong>Parts</strong><span>split into parts</span></a></li><li><a href="/docs/pose/"><strong>Pose</strong><span>given a motion</span></a></li><li><a href="/docs/core/" aria-current="step"><strong>Core</strong><span>checked</span></a></li><li><a href="/docs/review/"><strong>Review</strong><span>looked at</span></a></li><li><a href="/docs/play/"><strong>Play</strong><span>played</span></a></li></ol></nav>
 <p>An agent authoring a rig cannot tell whether it succeeded, because Spine's JSON parser accepts a lot of nonsense silently: a constraint in the 4.2 shape simply vanishes, a <code>size:</code> that disagrees with the PNG collapses every UV, a four-number curve array yields NaN. Each of these loads clean, plays, and is wrong. <code>rigc</code> makes the failure legible: every refusal names its rule and the value it found, ends with the command that explains it, and leaves nothing on disk.</p>
 <h2 id="three-mistakes-an-agent-makes-on-one-rig">Three mistakes an agent makes, on one rig</h2>
@@ -183,10 +183,19 @@ exit=1
 <p>When a person needs to judge the motion against footage and hand back notes, that is <a href="/docs/review/">Review</a>.</p>
 <h2 id="how-the-gate-decides">How the gate decides</h2>
 <ol>
-<li><strong>Measure the art.</strong> rigc reads the PNGs themselves instead of trusting sizes you typed, so the skeleton and the atlas cannot drift apart.</li>
-<li><strong>Compile two specs.</strong> The rig spec (<code>rigc-rig/1</code>) holds structure — bones, slots in draw order, skins. The motion spec (<code>rigc-motion/1</code>) holds time — animations, tracks, keys.</li>
-<li><strong>Gate.</strong> The default profile, <code>spine</code>, runs the 36 validity rules: <em>is this valid Spine 4.3 that any runtime plays correctly?</em> <code>--profile rig-play</code> runs all 50; the extra 14 are one renderer's and one canvas budget's policy, which is why they are opt-in. Every report names its profile and lists, on <code>PROF</code> lines, the rules it left out.</li>
-<li><strong>Write, or refuse.</strong> Only a green gate writes <code>--out</code>.</li>
+<li>
+<p><strong>Measure the art.</strong> rigc reads the PNGs themselves instead of trusting sizes you typed, so the skeleton and the atlas cannot drift apart.</p>
+</li>
+<li>
+<p><strong>Compile two specs.</strong> The rig spec (<code>rigc-rig/1</code>) holds structure — bones, slots in draw order, skins. The motion spec (<code>rigc-motion/1</code>) holds time — animations, tracks, keys.</p>
+</li>
+<li>
+<p><strong>Gate.</strong> The default profile, <code>spine</code>, runs the 36 validity rules: <em>is this valid Spine 4.3 that any runtime plays correctly?</em> <code>--profile rig-play</code> runs all 50; the extra 14 are one renderer's and one canvas budget's policy, which is why they are opt-in. Every report names its profile and lists, on <code>PROF</code> lines, the rules it left out.</p>
+<p><strong>Why a report counts 52.</strong> The registry holds 50 named assertions, and <code>spine</code> + the 14 policy rules = 50. The published package links no Spine runtime, so the round trip's own parse, <code>A00_ROUNDTRIP_PARSE</code>, reports SKIP; in its place the report also carries the model side's two parse rules, <code>A00_MODEL_READ</code> and <code>A00_MODEL_REGIONS_ON_PAGES</code>, which the registry does not hold — so the summary totals 52 (rig-c 2.61.0, as in the runs on this page: 21 measured + 17 skipped + 14 not in profile <code>spine</code>).</p>
+</li>
+<li>
+<p><strong>Write, or refuse.</strong> Only a green gate writes <code>--out</code>.</p>
+</li>
 </ol>
 <p>The published package links no Spine runtime, so <code>A00_ROUNDTRIP_PARSE</code> — Spine's own parse — reports SKIP. Install <code>@esotericsoftware/spine-core</code> beside it and the same <code>rigc</code> runs that round trip too, plus <code>validate</code>, <code>preview</code>, <code>vote</code>, <code>bench</code> and <code>bonedist</code>.</p>
 <p><strong>Key terms.</strong> <em>Rig spec</em> — bones, the slots array (the setup draw order) and skins. <em>Motion spec</em> — the time file, aimed at the rig by name. <em>Named assertion</em> — a rule the gate runs; each failure names it. <em>Profile</em> — the rulebook: <code>spine</code> (default) or <code>rig-play</code>. <em><code>ingest</code></em> — <code>build</code> run backwards: a Spine 4.3 <code>skeleton.json</code> in, the two specs that rebuild it byte for byte out.</p>
