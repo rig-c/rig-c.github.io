@@ -37,7 +37,7 @@ rigc: wrote build/skeleton.model.json
 exit=0</code></pre></figure>
 </div>
 
-<p class="mod-skip">Real output from Character 1's rig, <code>rig-c</code> 2.61.0 (long lines wrapped). Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
+<p class="mod-skip">Real output from Character 1's rig, <code>rig-c</code> 2.61.0 (long lines wrapped). Why the summary says 52 when the gate has 50 rules: <a href="#how-the-gate-decides">below</a>. Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
 {{thread:core}}
 
@@ -109,6 +109,8 @@ When a person needs to judge the motion against footage and hand back notes, tha
 1. **Measure the art.** rigc reads the PNGs themselves instead of trusting sizes you typed, so the skeleton and the atlas cannot drift apart.
 2. **Compile two specs.** The rig spec (`rigc-rig/1`) holds structure — bones, slots in draw order, skins. The motion spec (`rigc-motion/1`) holds time — animations, tracks, keys.
 3. **Gate.** The default profile, `spine`, runs the 36 validity rules: *is this valid Spine 4.3 that any runtime plays correctly?* `--profile rig-play` runs all 50; the extra 14 are one renderer's and one canvas budget's policy, which is why they are opt-in. Every report names its profile and lists, on `PROF` lines, the rules it left out.
+
+   **Why a report counts 52.** The registry holds 50 named assertions, and `spine` + the 14 policy rules = 50. The published package links no Spine runtime, so the round trip's own parse, `A00_ROUNDTRIP_PARSE`, reports SKIP; in its place the report also carries the model side's two parse rules, `A00_MODEL_READ` and `A00_MODEL_REGIONS_ON_PAGES`, which the registry does not hold — so the summary totals 52 (rig-c 2.61.0, as in the runs on this page: 21 measured + 17 skipped + 14 not in profile `spine`).
 4. **Write, or refuse.** Only a green gate writes `--out`.
 
 The published package links no Spine runtime, so `A00_ROUNDTRIP_PARSE` — Spine's own parse — reports SKIP. Install `@esotericsoftware/spine-core` beside it and the same `rigc` runs that round trip too, plus `validate`, `preview`, `vote`, `bench` and `bonedist`.
@@ -176,6 +178,7 @@ rigc runs on Bun 1.2.0 or later. The npm package is `rig-c`; `@rig-c/core` is th
 - measures PNGs rather than typed sizes, so sizes cannot drift — README.md:259-260, 307-309
 - rig spec rigc-rig/1: bones, slots (draw order), skins — README.md:275-276, 280, 305-306
 - motion spec rigc-motion/1: time only, aimed at rig by name — README.md:313, 317
+- 52 = 50 registry assertions + A00_MODEL_READ + A00_MODEL_REGIONS_ON_PAGES on the core entry — rig-c/core README lines 68-74 (origin/main, 2.61.0)
 - default profile spine, 36 validity rules; rig-play all 50; extra 14 = one renderer's and one canvas budget's policy, opt-in — README.md:627-630; `rigc build --help` line 22
 - writes only if gate green — README.md:600
 - green says nothing about the picture; render/inspect/check — README.md:519, README.md:44, README.md:616

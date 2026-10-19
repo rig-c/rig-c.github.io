@@ -82,7 +82,7 @@ Review changes nothing in the package — the repair was made in the authoring w
 
 </div>
 
-Review also lines a build up against reference footage — side by side, synchronized cameras, frame strips — which is how a retargeted motion like the [Pose](/docs/pose/) page's wave gets judged against what it was meant to copy.
+Review also lines a build up against reference footage — side by side, synchronized cameras, frame strips — which is how a retargeted motion like the [Pose](/docs/pose/) page's cup swing gets judged against what it was meant to copy.
 
 ## Install
 ```sh

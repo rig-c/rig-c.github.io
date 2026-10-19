@@ -35,9 +35,23 @@ function init(section) {
   const config = (c, o) => (o === 'office' ? `${c}/config.json` : `outfits/${o}/${c}/authoring/config.json`);
   const label = () => section.dataset.label ?? `${ui.character.selectedOptions[0].textContent}, ${ui.outfit.value}`;
 
-  function status(text, kind = '') {
+  // A failure line ends with a pointer to a recording of the same rig (data-fallback-href / -text on the section).
+  function status(text, kind = '', fallback = false) {
     ui.status.textContent = text;
     ui.status.dataset.kind = kind;
+    if (fallback && section.dataset.fallbackHref) {
+      const a = document.createElement('a');
+      a.href = section.dataset.fallbackHref;
+      a.textContent = section.dataset.fallbackText ?? 'Watch a recording instead';
+      ui.status.append(' ', a, '.');
+    }
+  }
+
+  // After any failure the Start button comes back as Retry; the rest of the page never waits on it.
+  function offerRetry() {
+    ui.start.hidden = false;
+    ui.start.disabled = false;
+    ui.start.textContent = 'Retry';
   }
 
   function setControls(enabled) {
@@ -206,27 +220,35 @@ function init(section) {
       status(`Live: ${label()} — ${motions}, ${backend}.${playing ? '' : ' Paused; press Play.'}`, 'ready');
     } catch (err) {
       if (id !== request) return;
-      status(`The live demo could not load ${label()}: ${err.message}. The recorded preview above shows the same rigs.`, 'error');
+      status(`The live demo could not load ${label()}: ${err.message}.`, 'error', true);
+      offerRetry();
     } finally {
       if (id === request) setControls(true);
       syncButtons();
     }
   }
 
+  let ticking = false;
+  let attempts = 0;
   async function start() {
     ui.start.disabled = true;
-    status('Loading the @rig-c/play runtime…', 'loading');
-    try {
-      lib = await import(PLAY_URL);
-    } catch (err) {
-      ui.start.disabled = false;
-      ui.start.textContent = 'Try again';
-      status(`The live demo could not load the @rig-c/play runtime from jsDelivr (${err.message}). The recorded preview above shows the same rigs.`, 'error');
-      return;
+    if (!lib) {
+      status('Loading the @rig-c/play runtime…', 'loading');
+      try {
+        // A failed module import is cached by the browser, so each retry asks for a fresh URL.
+        lib = await import(attempts++ ? `${PLAY_URL}?retry=${attempts}` : PLAY_URL);
+      } catch (err) {
+        status(`The live demo could not load the @rig-c/play runtime from jsDelivr (${err.message}).`, 'error', true);
+        offerRetry();
+        return;
+      }
     }
     ui.start.hidden = true;
-    playing = !reduce.matches;
-    requestAnimationFrame(tick);
+    if (!ticking) {
+      ticking = true;
+      playing = !reduce.matches;
+      requestAnimationFrame(tick);
+    }
     await load();
   }
 
