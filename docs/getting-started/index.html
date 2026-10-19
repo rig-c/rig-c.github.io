@@ -100,6 +100,7 @@
             <li><a href="/docs/review/">Review</a></li>
             <li><a href="/docs/play/">Play</a></li>
             <li><a href="/docs/adapters/">Adapters</a></li>
+            <li><a href="/docs/licensing/">Licensing</a></li>
           </ol>
         </nav>
       <main class="site-main docs-main">
@@ -182,10 +183,11 @@ bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.json --out 
 </code></pre>
 <h2 id="three-ways-to-use-the-output">Three Ways to Use the Output</h2>
 <ol>
-<li><strong>On the web with <a href="/docs/play/"><code>@rig-c/play</code></a> or <a href="/docs/adapters/"><code>@rig-c/adapters</code></a></strong>: Load <code>skeleton.model.json</code> and part PNGs directly. MIT licensed, zero Spine runtime dependencies.</li>
-<li><strong>In the Spine 4.3 Editor</strong>: Import <code>out/check/build/skeleton.json</code> via <code>Import Data</code> and point <code>Images</code> to <code>out/rig/images/</code> to refine timelines by hand (requires rig-c 2.51.1+ and a Spine Editor license).</li>
+<li><strong>On the web with <a href="/docs/play/"><code>@rig-c/play</code></a> or <a href="/docs/adapters/"><code>@rig-c/adapters</code></a></strong>: Load <code>skeleton.model.json</code> and part PNGs directly. The packages are MIT and integrate no Spine Runtime.</li>
+<li><strong>In the Spine 4.3 Editor</strong>: Import <code>out/check/build/skeleton.json</code> via <code>Import Data</code> and point <code>Images</code> to <code>out/rig/images/</code> to refine timelines by hand (requires rig-c 2.51.1+; the editor is under the Spine Editor License Agreement).</li>
 <li><strong>In a game engine via official Spine Runtimes</strong>: Load <code>skeleton.json</code> and <code>skeleton.atlas</code> in Unity, Godot, Unreal, or C++ runtimes under the Spine Runtimes License.</li>
 </ol>
+<p>The example inputs in step 2 come from <a href="https://github.com/rig-c/exam">rig-c/exam</a> and are <strong>CC BY-NC 4.0</strong>, not MIT: free to use with credit, not for commercial use, and what you build from them carries that licence. Which terms each route brings: <a href="/docs/licensing/">Licensing</a>.</p>
 
         </article>
         <nav aria-label="Docs pages" class="pager"><a href="/docs/" rel="prev"><span>Previous</span>Overview</a><a href="/docs/parts/" rel="next"><span>Next</span>Parts</a></nav>

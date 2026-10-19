@@ -64,7 +64,7 @@ npm i -D @rig-c/parts
 rig-parts --help
 ```
 
-Output is Spine skeleton data, so using it in a product requires a Spine Editor licence.
+Which Spine terms apply depends on what plays the output — rig-c's own model in `@rig-c/play` or an engine adapter, or the Spine data in a Spine Runtime or the editor. See [Licensing](/docs/licensing/).
 
 ## Go deeper
 
