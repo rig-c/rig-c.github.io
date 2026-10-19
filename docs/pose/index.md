@@ -4,12 +4,12 @@
 
 <figure class="mod-hero">
   <div class="media">
-    <video data-loop="the wave comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-wave-poster.jpg" width="978" height="792" aria-label="Recorded video: on the left a stick-figure pose raising and waving its right arm; on the right Character 1 doing the same wave">
-      <source src="/assets/docs/pose-wave.mp4" type="video/mp4">
-      <img src="/assets/docs/pose-wave-peak.jpg" alt="Side by side at the top of the wave: the source pose's raised arm and Character 1's raised arm" width="978" height="792">
+    <video data-loop="the cup-lift comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-lift-poster.jpg" width="618" height="792" aria-label="Recorded video: on the left a stick-figure pose lifting its right forearm; on the right Character 1 lifting her coffee cup the same way">
+      <source src="/assets/docs/pose-lift.mp4" type="video/mp4">
+      <img src="/assets/docs/pose-lift-peak.jpg" alt="Side by side at the top of the lift: the source pose's bent arm and Character 1 holding her cup up" width="618" height="792">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right arm raised and waved. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right forearm lifting the cup and lowering it. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
 </figure>
 
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
@@ -18,42 +18,42 @@
 
 A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones has traps of its own: setup rotations, and parents that turn their children. `rig-pose` cleans the sequence once, where it can be inspected, then turns each mapped bone to point along its segment — and refuses to write keys that do not land where the pose asked.
 
-## How the wave reached Character 1
+## How the cup lift reached Character 1
 
-### What was carried, and what was not
+### A motion that fits the rig
 
-The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and the **right arm** (shoulder, elbow, wrist) on the two sleeve bones. Character 1's rig has no left-arm bones (no `sleeve_l` in its `rig.json`), so the map leaves that arm out, and the hand with the cup is not mapped either: it turns with the forearm.
+The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, a small lift of the coffee cup she is already holding.
 
-| Track the rig received | From the pose | First key | Top of the wave |
+The map names two chains: the **trunk** (hip to neck) on the `chest` bone, and the **right arm** (shoulder, elbow, wrist) on the two sleeve bones. The rig has no left-arm bones (no `sleeve_l` in its `rig.json`), so that arm stays as painted, and the hand with the cup is not mapped: it turns with the forearm.
+
+| Track the rig received | From the pose | At rest | Top of the lift |
 | --- | --- | --- | --- |
-| `sleeve_r0` rotate | shoulder → elbow | −3.7° | −114.7° |
-| `sleeve_r1` rotate | elbow → wrist | 0.4° | −71.0° |
-| `chest` rotate | hip → neck | 2.6° | 2.6° (held) |
+| `sleeve_r0` rotate | shoulder → elbow | −4.5° | 1.5° |
+| `sleeve_r1` rotate | elbow → wrist | 0.4° | 39.4° |
+| `chest` rotate | hip → neck | 3.3° | 3.3° (held) |
 | `hip` translate | hip | 0, 0 | 0, 0 (held) |
 
-**Direction, not length.** Each bone points the way its segment points in the picture but keeps the rig's own length: the upper arm is 300 px in the pose and 267 units on the rig, the forearm 335 px and 303 units. That is why the raised cup ends up above the source's wrist dot.
+**Direction, not length.** Each bone points the way its segment points in the picture but keeps the rig's own length (upper arm 300 px in the pose, 267 units on the rig; forearm 335 px and 303 units).
 
 <div class="compare">
-  <figure><img src="/assets/docs/pose-keypoints.jpg" alt="Character 1's painting with 18 labelled body joints drawn over it" width="400" height="1142" loading="lazy"><figcaption>Where the wave starts: 18 body joints placed by hand on the painting (shoulders, hips, knees and ankles under the clothes marked occluded).</figcaption></figure>
-  <figure><img src="/assets/docs/pose-wave-peak.jpg" alt="Side by side at the top of the wave: the source pose's raised arm in orange and Character 1's raised arm holding the cup" width="978" height="792" loading="lazy"><figcaption>The top of the wave, t = 0.50 s. Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
+  <figure><img src="/assets/docs/pose-keypoints.jpg" alt="Character 1's painting with 18 labelled body joints drawn over it" width="400" height="1142" loading="lazy"><figcaption>Where the motion starts: 18 body joints placed by hand on the painting (joints under the clothes marked occluded).</figcaption></figure>
+  <figure><img src="/assets/docs/pose-lift-peak.jpg" alt="Side by side at the top of the lift: the source pose's bent right arm in orange and Character 1 holding her cup up" width="618" height="792" loading="lazy"><figcaption>The top of the lift, t = 1.46 s. Orange is what the map carries; the rest of the skeleton has no bone to go to.</figcaption></figure>
 </div>
 
 ### What it checked before writing
 
 ```
-rig-pose clean: SPIKES 0 replaced
-  JITTER mean |second difference| of y over 1207 joint-frame triple(s): 1.260 → 1.222 px/f² (3.1% lower)
-rig-pose retarget:
+rig-pose retarget: 73 frame(s), 3.000s — 4 track(s); min-score 0.3, flip off, short off, bends refuse (tolerance 0°)
   GATE   rigc build --profile spine-html: green — 52 assertions: 26 measured (26 passed, 0 failed), 26 skipped, 0 not in profile "rig-play"
-  LAND   bone "sleeve_r0" aim — worst |reached − asked| 0.000652° at frame 65 (t=2.708s); the tolerance is 0.01°
-  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.000983° at frame 4 (t=0.167s); the tolerance is 0.01°
+  LAND   bone "sleeve_r0" aim — worst |reached − asked| 0.000910° at frame 41 (t=1.708s); the tolerance is 0.01°
+  LAND   bone "sleeve_r1" aim — worst |reached − asked| 0.00121° at frame 43 (t=1.792s); the tolerance is 0.01°
   FOLD   rigc render --folds at 24 fps: no mesh folds
-  wrote wave.motion.json — animations: idle, wave
+  wrote lift.motion.json — animations: idle, lift
 ```
 
-The rig is built with the new animation and gated before anything is written; every mapped bone, posed by rig-c's own poser, has to land within 0.01° of what the pose asked on every frame. The run also says what it left out: 26 `IDLE-DROPPED` lines name the breathing, hair and skirt tracks that were not carried into `wave` — which is why only the arm moves.
+The rig is built with the new animation and gated before anything is written; every mapped bone, posed by rig-c's own poser, has to land within 0.01° of what the pose asked on every frame. The run also says what it left out: 26 `IDLE-DROPPED` lines name the breathing and hair tracks that were not carried into `lift` — which is why only the arm moves. And then someone still has to look: the torn first try passed all of these lines.
 
-The joints were placed by hand on the painting (the way the guide's `docs/KEYPOINTS.md` describes), and the wave itself comes from the getting-started guide's `scripts/wave.ts`. Next, [Core](/docs/core/) is the compiler that gated this build, and [Review](/docs/review/) is where a person checks a motion like this one against footage.
+The joints were placed by hand on the painting (the way the getting-started guide's `docs/KEYPOINTS.md` describes); the lift is a three-second test motion made from them, not footage. Next, [Core](/docs/core/) is the compiler that gated this build, [Review](/docs/review/) is where a person checks a motion against footage, and [Play](/docs/play/) runs this one live.
 
 ## How it works
 
@@ -69,7 +69,7 @@ The joints were placed by hand on the painting (the way the guide's `docs/KEYPOI
 
 ```sh
 npm i -D @rig-c/pose
-bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json --out wave.motion.json --name wave --build wave-build
+bunx rig-pose retarget --rig out/rig --map map.json --pose lift.pose.clean.json --out lift.motion.json --name lift --build lift-build
 ```
 
 Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
