@@ -1,6 +1,6 @@
-# rig-c.github.io
+# rig-c.github.io (`rig-c.org`)
 
-Official static website for the **rig-c** 2D character rigging and animation toolchain, served at `https://rig-c.github.io` (the `rig-c.org` custom domain is not connected yet).
+Official static website for the **rig-c** 2D character rigging and animation toolchain, served at `https://rig-c.org` (GitHub Pages custom domain; the `CNAME` file holds it).
 
 Built flat-first for **zero-JS `curl` readability**, **AI agent ingestion (`llms.txt` / `llms-full.txt` / per-page `index.md`)**, and **technical SEO** (semantic HTML5, Schema.org JSON-LD, Open Graph, `sitemap.xml`, `robots.txt`).
 

@@ -49,4 +49,4 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-Sitemap: https://rig-c.github.io/sitemap.xml
+Sitemap: https://rig-c.org/sitemap.xml
