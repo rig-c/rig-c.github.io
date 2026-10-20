@@ -258,7 +258,19 @@ You should see a coverage line starting `coverage: 42 bone(s) — 29 checked and
 bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
 ```
 
-You should see `check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)`, then `build: PASS`. Open `out/idle.gif`: the character breathes and blinks in a loop. A skipped bar is named with its reason; any `FAIL` line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (`out/idle.gif`, or [Review](/docs/review/)).
+You should see `check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)`, then `build: PASS`. Open `out/idle.gif`: the character breathes and blinks in a loop.
+
+<figure>
+  <div class="media">
+    <video data-loop="the idle" controls muted loop playsinline preload="metadata" poster="/assets/docs/getting-started-idle-poster.jpg" width="316" height="640" aria-label="Recorded video: the example character standing, breathing and blinking once in her idle loop">
+      <source src="/assets/docs/getting-started-idle.mp4" type="video/mp4">
+      <img src="/assets/docs/getting-started-idle-poster.jpg" alt="The example character standing at rest" width="316" height="640">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The idle this walkthrough wrote, unedited: 40 frames at 12 fps from <code>out/idle.png</code>, the lossless copy <code>build --loop</code> writes beside <code>out/idle.gif</code>. Made by the commands above, run as written on 2026-10-20 with <code>@rig-c/parts</code> 1.42.0 and <code>rig-c</code> 2.64.1.</figcaption>
+</figure>
+
+A skipped bar is named with its reason; any `FAIL` line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (`out/idle.gif`, or [Review](/docs/review/)).
 
 ### 9. Give it a wave
 
@@ -288,6 +300,16 @@ bun ../getting-started/scripts/serve.ts
 ```
 
 Open <http://localhost:3000/?model=wave-build/skeleton.model.json&anim=wave>: the character raises her right arm and waves; the menu switches to `idle`. Ctrl+C stops the server.
+
+<figure>
+  <div class="media">
+    <video data-loop="the wave" controls muted loop playsinline preload="metadata" poster="/assets/docs/getting-started-wave-poster.jpg" width="388" height="640" aria-label="Recorded video: the example character raises her right arm above her head, waves, and lowers it back to rest">
+      <source src="/assets/docs/getting-started-wave.mp4" type="video/mp4">
+      <img src="/assets/docs/getting-started-wave-poster.jpg" alt="The example character standing at rest before the wave" width="388" height="640">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The <code>wave</code> animation in this walkthrough's <code>wave-build/</code>, unedited: 73 frames, 3 s at 24 fps, from rest back to rest. Drawn frame by frame by rig-c's own poser (<code>bunx rigc render --candidate wave-build --animation wave --fps 24 --max 640 --poser core</code>) rather than filmed from the browser player. Same run as the idle above: <code>@rig-c/parts</code> 1.42.0, <code>rig-c</code> 2.64.1, <code>@rig-c/pose</code> 0.36.0.</figcaption>
+</figure>
 
 The full guide — making your own character, the GPU routes, troubleshooting and every measured figure — is the [rig-c/getting-started README](https://github.com/rig-c/getting-started#readme) and its [docs/REFERENCE.md](https://github.com/rig-c/getting-started/blob/main/docs/REFERENCE.md).
 
