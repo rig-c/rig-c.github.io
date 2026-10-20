@@ -312,12 +312,12 @@ Repository: https://github.com/rig-c/parts
 
 <figure class="mod-hero">
   <div class="media">
-    <video data-loop="the parts coming together" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-explode-poster.jpg" width="1280" height="720" aria-label="Recorded video: Character 1's seventeen parts laid out in a grid, then moving to their places in the rig">
+    <video data-loop="the parts loop" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-explode-poster.jpg" width="1280" height="720" aria-label="Recorded video: Character 1 assembled from her seventeen parts, dissolving into a labelled grid of those parts and back">
       <source src="/assets/docs/parts-explode.mp4" type="video/mp4">
-      <img src="/assets/docs/parts-explode-poster.jpg" alt="Character 1's seventeen parts laid out in a grid" width="1280" height="720">
+      <img src="/assets/docs/parts-explode-poster.jpg" alt="Character 1 assembled from her seventeen parts" width="1280" height="720">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> Character 1's 17 parts as rig-parts assembled them, drawn from <code>out/parts/</code> at the positions <code>parts.json</code> records, in the rig's draw order.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> Character 1's 17 parts from <code>out/parts/</code>. The assembled figure that opens and closes the loop is drawn at the positions <code>parts.json</code> records, in the rig's draw order; the labelled grid and the dissolves between them are this page's illustration.</figcaption>
 </figure>
 
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
