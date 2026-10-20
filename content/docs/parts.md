@@ -128,6 +128,7 @@ From the README's own *What it does not do*:
 - red = uncovered error, blue = covered error (>40 off): rig-c/parts docs/AUTHORING.md lines 2200, 2633
 - Limits: rig-c/parts README "What it does not do" (origin/main lines 325-362)
 - 12 fps idle: 41 frames at 80 ms = 12.5 fps per GIF timing; check renders at 12 fps (rig-parts AUTHORING check row)
+- parts-idle.mp4: encoded by scripts/encode-video.sh from parts-examples@c239b09 family/roa/docs/idle.png (lossless APNG, 41 frames at 83.33 ms = 12 fps, 3.417 s); loop seam 0.872 vs max step 0.937 (scripts/loop-seam.py)
 
 - published version 1.40.0; origin/main = tag v1.40.0 (8718427) — `npm view @rig-c/parts version`; `git rev-parse v1.40.0^{} origin/main`
 - command name rig-parts — package.json "bin"; README.md:425-426

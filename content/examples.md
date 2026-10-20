@@ -72,5 +72,6 @@ Licences for all of these: [Licensing](/docs/licensing/).
 - 20 rigs / 396 part rows / outfits / config paths / repro commands: family/README.md §현재 승인된 입력과 재검증
 - every model carries one animation, idle; stage 800x2284; 2 files per rig; jsDelivr CORS: demo survey of all 20 models at c239b09
 - blink from the viewer's adjust, not the model: family/viewer/index.html lines 545-568
+- family-preview.mp4: encoded by scripts/encode-video.sh from parts-examples@c239b09 family/docs/family-preview.webp (67 frames, 3.333 s per family-preview.json) at 20.1 fps over the page --bg #070b18; loop seam 0.960 vs max step 1.324 (scripts/loop-seam.py)
 - standalone table: parts-examples README Layout table; trailer: rig-c/trailer README
 -->
