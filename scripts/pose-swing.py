@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rebuild the Pose page hero (assets/docs/pose-swing.mp4 and its poster).
 
-Usage: scripts/pose-swing.py [--rigc "bunx rig-c@2.61.0"] [--window 21:60] [--keep DIR]
+Usage: scripts/pose-swing.py [--rigc "bunx rig-c@2.61.0"] [--window 0:72] [--keep DIR]
 
 Three columns on the page background:
   1. the source pose: the cleaned body-18 sequence the retarget read
@@ -13,15 +13,17 @@ Three columns on the page background:
   3. an inset: the forearm and cup, rendered by rigc at twice the size, with
      the cropped region marked by orange corners on the rig panel.
 
-The loop. `swing` is 3 s (73 keys, 0..3 s) but does not close: `rig-pose
-clean` ran with "loop": false and held the wrist at the outward end
-(frames 4-23, 26-37, 40-59 in its "holds"), so the forearm reads 2.355 deg at
-t = 0 and 4.108 deg at t = 3 s. No 72-frame cut of it wraps without a jump.
-The clip is therefore one whole swing that does close: frames 21..59 of the
-motion (39 frames, 1.625 s), from the start of the inward swing back through
-the outward hold, whose last frame (-1.154 deg) sits one ordinary step before
-frame 21 (-0.758 deg). The cycle is rotated to start at the frame whose
-forearm track is nearest 0 (the rest pose), which is also the poster.
+The loop. `swing` is 3 s (73 keys, 0..3 s) and closes by construction: it is
+exactly two periods of a sine (scripts/pendulum.py, period 1.5 s), cleaned with
+`rig-pose clean --loop --hold off --rest 1`, so key 72 (t = 3 s) is key 0 again
+and the cleaned record has no holds. The clip is the 72 distinct frames 0..71
+(3.000 s; frame 72 would repeat frame 0 at the wrap). The swing is centred 2.5 deg
+toward the body, so the rest pose (forearm 0, as the rig was drawn) is passed
+twice a period on the outward side. The cycle is rotated to start at the frame
+whose forearm track is nearest 0, which is also the poster. Starting at the
+centre of the swing instead puts the wrap on the fastest step: lossless it still
+passes (whole frame 0.804 vs max step 0.864), but encoded it did not (rig panel
+1.021 vs 0.972, whole frame 1.111 vs 0.925).
 
 Rendering. The site carries the model document and the part PNGs, not the
 Spine skeleton.json the build wrote beside them. `rigc render` poses a
@@ -198,7 +200,7 @@ def decode(path):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--rigc", default=RIGC, help=f"how to run rigc (default: {RIGC})")
-    ap.add_argument("--window", default="21:60", help="frames of the 73 to loop, START:END (end excluded)")
+    ap.add_argument("--window", default="0:72", help="frames of the 73 to loop, START:END (end excluded; the default drops frame 72, which repeats frame 0)")
     ap.add_argument("--keep", help="also keep the composited PNG frames in this directory")
     args = ap.parse_args()
     start, end = (int(v) for v in args.window.split(":"))

@@ -63,7 +63,7 @@ CLIPS=(
   # Pose page hero. Rendered and encoded by scripts/pose-swing.py from the
   # committed assets/rigs/character-1-swing/ (same encode settings); not
   # rebuilt here.
-  "pose-swing|assets/docs/pose-swing.mp4|this repo|-|scripts/pose-swing.py|24|39|1.625|-|hold"
+  "pose-swing|assets/docs/pose-swing.mp4|this repo|-|scripts/pose-swing.py|24|72|3.000|-|hold"
   # Getting Started page, step 8. The walkthrough's own idle: out/idle.png,
   # the lossless APNG `rig-parts build --loop` writes beside out/idle.gif (the
   # same 40 frames; the GIF is its palette copy at 80/90 ms). 40 frames at
