@@ -262,12 +262,12 @@ You should see `check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHA
 
 <figure>
   <div class="media">
-    <video data-loop="the idle" controls muted loop playsinline preload="metadata" poster="/assets/docs/getting-started-idle-poster.jpg" width="316" height="640" aria-label="Recorded video: the example character standing, breathing and blinking once in her idle loop">
-      <source src="/assets/docs/getting-started-idle.mp4" type="video/mp4">
-      <img src="/assets/docs/getting-started-idle-poster.jpg" alt="The example character standing at rest" width="316" height="640">
-    </video>
+    <picture>
+      <source srcset="/assets/docs/getting-started-idle.webp" type="image/webp" media="(prefers-reduced-motion: no-preference)">
+      <img src="/assets/docs/getting-started-idle-poster.png" alt="Animation: the example character standing, breathing and blinking once in her idle loop" width="317" height="640">
+    </picture>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> The idle this walkthrough wrote, unedited: 40 frames at 12 fps from <code>out/idle.png</code>, the lossless copy <code>build --loop</code> writes beside <code>out/idle.gif</code>. Made by the commands above, run as written on 2026-10-20 with <code>@rig-c/parts</code> 1.42.0 and <code>rig-c</code> 2.64.1.</figcaption>
+  <figcaption><span class="media-kind">Animation</span> The step-8 build this walkthrough wrote (<code>out/check/build</code>), playing its <code>idle</code>: 40 frames at 12 fps, looping, drawn by <code>@rig-c/play</code> 1.12.0 over the page rather than by <code>rigc render</code>, whose frames are opaque by design. Made by the commands above, run as written on 2026-10-20 with <code>@rig-c/parts</code> 1.42.0 and <code>rig-c</code> 2.64.1. With reduced motion on, the first frame stands still.</figcaption>
 </figure>
 
 A skipped bar is named with its reason; any `FAIL` line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (`out/idle.gif`, or [Review](/docs/review/)).

@@ -2,7 +2,7 @@
 # Rebuild the site's MP4s (and their posters) from pinned sources.
 #
 #   PARTS_EXAMPLES=/path/to/parts-examples scripts/encode-video.sh [clip ...]
-#   WALKTHROUGH=/path/to/rig-c-start/my-rig scripts/encode-video.sh getting-started-idle
+#   WALKTHROUGH=/path/to/rig-c-start/my-rig scripts/encode-video.sh getting-started-wave
 #   ADAPTERS_CAPTURE=/path/to/capture scripts/encode-video.sh adapters-three-engines
 #
 # With no clip names it rebuilds every clip whose status is "build".
@@ -64,23 +64,17 @@ CLIPS=(
   # committed assets/rigs/character-1-swing/ (same encode settings); not
   # rebuilt here.
   "pose-swing|assets/docs/pose-swing.mp4|this repo|-|scripts/pose-swing.py|24|72|3.000|-|hold"
-  # Getting Started page, step 8. The walkthrough's own idle: out/idle.png,
-  # the lossless APNG `rig-parts build --loop` writes beside out/idle.gif (the
-  # same 40 frames; the GIF is its palette copy at 80/90 ms). 40 frames at
-  # 83.33 ms = 12 fps, 3.333 s. Opaque. Written by the page's ten steps as
-  # given, run 2026-10-20 from an empty folder with Bun 1.4.2, which resolved
-  # @rig-c/parts 1.42.0, rig-c 2.64.1, @rig-c/pose 0.36.0, @rig-c/play 1.12.0
-  # and rig-c/getting-started 2928714; step 8 is
-  #   bunx rig-parts build --config config.json --source inputs/painting.png \
-  #     --full inputs/layers/full --head inputs/layers/head --out out --loop
-  # That run's out/idle.png: md5 b958dbf8574d7939667d61a47d46b26a.
-  # Wrap QP 10: this idle's wrap is itself one of its largest steps (source
-  # seam 0.497 vs max step 0.504; 0.512 vs 0.518 after a lossless yuv420p
-  # round trip), so at QP 12 the encode's seam was 0.562 vs max 0.552 (FAIL);
-  # CRF 16 and 18 failed too. QP 10 gives 0.545 vs 0.551.
-  "getting-started-idle|assets/docs/getting-started-idle.mp4|walkthrough|-|out/idle.png|12|40|3.333|-|build|10"
+  # Getting Started page, step 8: no longer an MP4. The idle is an animated
+  # WebP with alpha (assets/docs/getting-started-idle.webp + -poster.png),
+  # drawn by @rig-c/play over a transparent page and encoded by
+  # scripts/getting-started-idle-webp.ts (its header has the command and
+  # versions). rigc render's out/idle.png, the old source, is opaque by design.
+
   # Getting Started page, step 10. The `wave` animation of step 9's
-  # wave-build/ (same run as above), drawn frame by frame by rig-c's own poser
+  # wave-build/, written by the page's ten steps as given, run 2026-10-20 from
+  # an empty folder with Bun 1.4.2, which resolved @rig-c/parts 1.42.0,
+  # rig-c 2.64.1, @rig-c/pose 0.36.0, @rig-c/play 1.12.0 and
+  # rig-c/getting-started 2928714. Drawn frame by frame by rig-c's own poser
   # rather than recorded from the browser player:
   #   bunx rigc render --candidate wave-build --animation wave --fps 24 \
   #     --max 640 --poser core --out wave-render
