@@ -21,12 +21,12 @@ One character painting goes in; a rigged, animated 2D character that plays in th
 
 <figure class="figure-media">
   <div class="media">
-    <video data-loop="the assembly demo" controls muted loop playsinline preload="metadata" poster="/assets/rigc-demo-poster.jpg" width="600" height="404" aria-label="Recorded video: loose part PNGs assembling themselves into a character that breathes, blinks and waves">
+    <video data-loop="the assembly demo" controls muted loop playsinline preload="metadata" poster="/assets/rigc-demo-poster.jpg" width="600" height="404" aria-label="Recorded video: fourteen drawn-from-scratch part PNGs converge into a character that breathes, blinks and waves — core's own film, with its authored animations compiled by rig-c">
       <source src="/assets/rigc-demo.mp4" type="video/mp4">
-      <img src="/assets/rigc-demo-poster.jpg" alt="Loose part PNGs assembling themselves into a character that breathes, blinks and waves" width="600" height="404">
+      <img src="/assets/rigc-demo-poster.jpg" alt="Fourteen drawn-from-scratch part PNGs converge into a character that breathes, blinks and waves" width="600" height="404">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> Loose part PNGs assembling themselves into a character that breathes, blinks and waves — from the <a href="https://github.com/rig-c/core">rig-c/core</a> README.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> rig-c core's own film: fourteen parts drawn from scratch and three authored animations — <code>assemble</code>, <code>idle</code>, <code>wave</code> — compiled and rendered by rig-c; the filename labels and the caption band are the film's. From the <a href="https://github.com/rig-c/core">rig-c/core</a> README (film one).</figcaption>
 </figure>
 
 1. **[Parts](/docs/parts/)** merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle.
