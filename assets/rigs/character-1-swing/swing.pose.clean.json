@@ -7,289 +7,25 @@
   },
   "width": 800,
   "height": 2284,
-  "source": "scripts/swing.py over keypoints.json: the subject's right arm swings the cup like a pendulum, upper arm 0 deg, forearm 6 deg trailing 0.18 s, centred 0 deg toward the body, period 1.5 s, 3 s at 24 fps; every other joint held",
+  "source": "scripts/pendulum.py over the hand-placed keypoints: the right forearm swings the cup as a pendulum, +-4 deg against the upper arm (centred 2.5 deg toward the body) trailing it by 0.15 s, upper arm +-0 deg, period 1.5 s, 2 periods (73 frames at 24 fps, the last repeating the first); rest aligned (upper arm -1.19, forearm 0.37, trunk 2.553 deg); every other joint held",
   "cleaned": {
     "spec": "rig-pose-clean/1",
     "params": {
-      "loop": false,
+      "loop": true,
       "legs": 5,
-      "rest": 7,
-      "hold": {
-        "speed": 0.015,
-        "reach": 0.03,
-        "minSeconds": 0.5,
-        "blend": 6
-      }
+      "rest": 1,
+      "hold": "off"
     },
     "spikes": {
       "found": [],
-      "untested": [
-        0,
-        1,
-        71,
-        72
-      ]
+      "untested": []
     },
     "jitter": {
-      "before": 0.0022,
-      "after": 0.0016
-    },
-    "holds": [
-      {
-        "joint": "neck",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "r_shoulder",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "r_elbow",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "l_shoulder",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "l_elbow",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "l_wrist",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "r_hip",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "r_knee",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "r_ankle",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "l_hip",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "l_knee",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "l_ankle",
-        "frames": [
-          0,
-          72
-        ],
-        "jitter": {
-          "before": 0,
-          "after": 0
-        }
-      },
-      {
-        "joint": "r_wrist",
-        "frames": [
-          4,
-          23
-        ],
-        "jitter": {
-          "before": 0.0097,
-          "after": 0.0074
-        }
-      },
-      {
-        "joint": "r_wrist",
-        "frames": [
-          26,
-          37
-        ],
-        "jitter": {
-          "before": 0.0582,
-          "after": 0.0265
-        }
-      },
-      {
-        "joint": "r_wrist",
-        "frames": [
-          40,
-          59
-        ],
-        "jitter": {
-          "before": 0.0097,
-          "after": 0.0074
-        }
-      }
-    ],
-    "seams": [
-      {
-        "joint": "r_wrist",
-        "frame": 26,
-        "step": 0.0756,
-        "gap": 2
-      },
-      {
-        "joint": "r_wrist",
-        "frame": 40,
-        "step": 0.0756,
-        "gap": 2
-      }
-    ],
-    "unheld": [
-      {
-        "joint": "nose",
-        "frames": [
-          0,
-          72
-        ],
-        "test": "span",
-        "value": 0
-      },
-      {
-        "joint": "r_wrist",
-        "frames": [
-          0,
-          3
-        ],
-        "test": "short",
-        "value": 0.1667
-      },
-      {
-        "joint": "r_eye",
-        "frames": [
-          0,
-          72
-        ],
-        "test": "span",
-        "value": 0
-      },
-      {
-        "joint": "l_eye",
-        "frames": [
-          0,
-          72
-        ],
-        "test": "span",
-        "value": 0
-      },
-      {
-        "joint": "r_ear",
-        "frames": [
-          0,
-          72
-        ],
-        "test": "span",
-        "value": 0
-      },
-      {
-        "joint": "r_wrist",
-        "frames": [
-          24,
-          25
-        ],
-        "test": "short",
-        "value": 0.0833
-      },
-      {
-        "joint": "r_wrist",
-        "frames": [
-          38,
-          39
-        ],
-        "test": "short",
-        "value": 0.0833
-      },
-      {
-        "joint": "r_wrist",
-        "frames": [
-          60,
-          72
-        ],
-        "test": "reach",
-        "value": 0.0399
-      }
-    ]
+      "before": 0.0024,
+      "after": 0.0024
+    }
   },
+  "travel": "in-place",
   "frames": [
     {
       "t": 0,
@@ -328,8 +64,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                152.78,
-                1174.39
+                167.37,
+                1173.88
               ]
             },
             "l_shoulder": {
@@ -460,8 +196,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                145.22,
-                1174.63
+                163.88,
+                1174.14
               ]
             },
             "l_shoulder": {
@@ -592,8 +328,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                138.97,
-                1174.76
+                160.08,
+                1174.37
               ]
             },
             "l_shoulder": {
@@ -724,8 +460,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                134.69,
-                1174.79
+                156.08,
+                1174.58
               ]
             },
             "l_shoulder": {
@@ -856,8 +592,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                152.01,
+                1174.73
               ]
             },
             "l_shoulder": {
@@ -988,8 +724,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                147.98,
+                1174.84
               ]
             },
             "l_shoulder": {
@@ -1120,8 +856,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                144.13,
+                1174.89
               ]
             },
             "l_shoulder": {
@@ -1252,8 +988,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                140.56,
+                1174.9
               ]
             },
             "l_shoulder": {
@@ -1384,8 +1120,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                137.39,
+                1174.88
               ]
             },
             "l_shoulder": {
@@ -1516,8 +1252,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                134.72,
+                1174.84
               ]
             },
             "l_shoulder": {
@@ -1648,8 +1384,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                132.62,
+                1174.79
               ]
             },
             "l_shoulder": {
@@ -1780,8 +1516,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                131.16,
+                1174.75
               ]
             },
             "l_shoulder": {
@@ -1912,8 +1648,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                130.38,
+                1174.73
               ]
             },
             "l_shoulder": {
@@ -2044,8 +1780,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                130.31,
+                1174.73
               ]
             },
             "l_shoulder": {
@@ -2176,8 +1912,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                130.95,
+                1174.75
               ]
             },
             "l_shoulder": {
@@ -2308,7 +2044,7 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
+                132.28,
                 1174.78
               ]
             },
@@ -2440,8 +2176,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                134.25,
+                1174.83
               ]
             },
             "l_shoulder": {
@@ -2572,8 +2308,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                136.82,
+                1174.88
               ]
             },
             "l_shoulder": {
@@ -2704,8 +2440,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                139.89,
+                1174.9
               ]
             },
             "l_shoulder": {
@@ -2836,8 +2572,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                143.39,
+                1174.9
               ]
             },
             "l_shoulder": {
@@ -2968,8 +2704,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                147.2,
+                1174.85
               ]
             },
             "l_shoulder": {
@@ -3100,8 +2836,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                134.59,
-                1174.72
+                151.2,
+                1174.76
               ]
             },
             "l_shoulder": {
@@ -3232,8 +2968,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                139.22,
-                1174.59
+                155.27,
+                1174.61
               ]
             },
             "l_shoulder": {
@@ -3364,8 +3100,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                143.85,
-                1174.45
+                159.29,
+                1174.42
               ]
             },
             "l_shoulder": {
@@ -3496,8 +3232,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                148.48,
-                1174.32
+                163.14,
+                1174.19
               ]
             },
             "l_shoulder": {
@@ -3628,8 +3364,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                153.11,
-                1174.19
+                166.7,
+                1173.94
               ]
             },
             "l_shoulder": {
@@ -3760,8 +3496,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                157.74,
-                1174.06
+                169.86,
+                1173.68
               ]
             },
             "l_shoulder": {
@@ -3892,8 +3628,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                162.37,
-                1173.92
+                172.52,
+                1173.44
               ]
             },
             "l_shoulder": {
@@ -4024,8 +3760,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                167.01,
-                1173.79
+                174.61,
+                1173.24
               ]
             },
             "l_shoulder": {
@@ -4156,8 +3892,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                169.32,
-                1173.72
+                176.07,
+                1173.09
               ]
             },
             "l_shoulder": {
@@ -4288,8 +4024,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                169.32,
-                1173.72
+                176.84,
+                1173.01
               ]
             },
             "l_shoulder": {
@@ -4420,8 +4156,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                169.32,
-                1173.72
+                176.91,
+                1173
               ]
             },
             "l_shoulder": {
@@ -4552,8 +4288,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                169.32,
-                1173.72
+                176.28,
+                1173.07
               ]
             },
             "l_shoulder": {
@@ -4684,8 +4420,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                169.32,
-                1173.72
+                174.96,
+                1173.2
               ]
             },
             "l_shoulder": {
@@ -4816,8 +4552,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                169.32,
-                1173.72
+                172.99,
+                1173.4
               ]
             },
             "l_shoulder": {
@@ -4948,8 +4684,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                167.01,
-                1173.79
+                170.43,
+                1173.63
               ]
             },
             "l_shoulder": {
@@ -5080,8 +4816,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                162.37,
-                1173.92
+                167.37,
+                1173.88
               ]
             },
             "l_shoulder": {
@@ -5212,8 +4948,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                157.74,
-                1174.06
+                163.88,
+                1174.14
               ]
             },
             "l_shoulder": {
@@ -5344,8 +5080,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                153.11,
-                1174.19
+                160.08,
+                1174.37
               ]
             },
             "l_shoulder": {
@@ -5476,8 +5212,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                148.48,
-                1174.32
+                156.08,
+                1174.58
               ]
             },
             "l_shoulder": {
@@ -5608,8 +5344,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                143.85,
-                1174.45
+                152.01,
+                1174.73
               ]
             },
             "l_shoulder": {
@@ -5740,8 +5476,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                139.22,
-                1174.59
+                147.98,
+                1174.84
               ]
             },
             "l_shoulder": {
@@ -5872,8 +5608,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                134.59,
-                1174.72
+                144.13,
+                1174.89
               ]
             },
             "l_shoulder": {
@@ -6004,8 +5740,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                140.56,
+                1174.9
               ]
             },
             "l_shoulder": {
@@ -6136,8 +5872,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                137.39,
+                1174.88
               ]
             },
             "l_shoulder": {
@@ -6268,8 +6004,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                134.72,
+                1174.84
               ]
             },
             "l_shoulder": {
@@ -6400,8 +6136,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                132.62,
+                1174.79
               ]
             },
             "l_shoulder": {
@@ -6532,8 +6268,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                131.16,
+                1174.75
               ]
             },
             "l_shoulder": {
@@ -6664,8 +6400,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                130.38,
+                1174.73
               ]
             },
             "l_shoulder": {
@@ -6796,8 +6532,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                130.31,
+                1174.73
               ]
             },
             "l_shoulder": {
@@ -6928,8 +6664,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                130.95,
+                1174.75
               ]
             },
             "l_shoulder": {
@@ -7060,7 +6796,7 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
+                132.28,
                 1174.78
               ]
             },
@@ -7192,8 +6928,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                134.25,
+                1174.83
               ]
             },
             "l_shoulder": {
@@ -7324,8 +7060,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                136.82,
+                1174.88
               ]
             },
             "l_shoulder": {
@@ -7456,8 +7192,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                139.89,
+                1174.9
               ]
             },
             "l_shoulder": {
@@ -7588,8 +7324,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                143.39,
+                1174.9
               ]
             },
             "l_shoulder": {
@@ -7720,8 +7456,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                147.2,
+                1174.85
               ]
             },
             "l_shoulder": {
@@ -7852,8 +7588,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                151.2,
+                1174.76
               ]
             },
             "l_shoulder": {
@@ -7984,8 +7720,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                155.27,
+                1174.61
               ]
             },
             "l_shoulder": {
@@ -8116,8 +7852,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                132.27,
-                1174.78
+                159.29,
+                1174.42
               ]
             },
             "l_shoulder": {
@@ -8248,8 +7984,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                135.03,
-                1174.79
+                163.14,
+                1174.19
               ]
             },
             "l_shoulder": {
@@ -8380,8 +8116,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                139.75,
-                1174.73
+                166.7,
+                1173.94
               ]
             },
             "l_shoulder": {
@@ -8512,8 +8248,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                146.15,
-                1174.58
+                169.86,
+                1173.68
               ]
             },
             "l_shoulder": {
@@ -8644,8 +8380,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                153.81,
-                1174.32
+                172.52,
+                1173.44
               ]
             },
             "l_shoulder": {
@@ -8776,8 +8512,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                162.33,
-                1173.97
+                174.61,
+                1173.24
               ]
             },
             "l_shoulder": {
@@ -8908,8 +8644,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                171.23,
-                1173.56
+                176.07,
+                1173.09
               ]
             },
             "l_shoulder": {
@@ -9040,8 +8776,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                173.13,
-                1173.39
+                176.84,
+                1173.01
               ]
             },
             "l_shoulder": {
@@ -9172,8 +8908,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                173.99,
-                1173.31
+                176.91,
+                1173
               ]
             },
             "l_shoulder": {
@@ -9304,8 +9040,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                173.8,
-                1173.32
+                176.28,
+                1173.07
               ]
             },
             "l_shoulder": {
@@ -9436,8 +9172,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                172.56,
-                1173.44
+                174.96,
+                1173.2
               ]
             },
             "l_shoulder": {
@@ -9568,8 +9304,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                170.33,
-                1173.63
+                172.99,
+                1173.4
               ]
             },
             "l_shoulder": {
@@ -9700,8 +9436,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                167.13,
-                1173.89
+                170.43,
+                1173.63
               ]
             },
             "l_shoulder": {
@@ -9832,8 +9568,8 @@
             "r_wrist": {
               "state": "observed",
               "at": [
-                163.03,
-                1174.19
+                167.37,
+                1173.88
               ]
             },
             "l_shoulder": {
