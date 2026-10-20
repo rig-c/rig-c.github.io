@@ -78,17 +78,18 @@ CLIPS=(
   # animated WebP with alpha (assets/docs/getting-started-wave.webp +
   # -poster.png) drawn by @rig-c/play from the walkthrough's wave-build/ by
   # scripts/play-capture-webp.ts, like step 8's idle.
-  # Review page. Captured from @rig-c/review 0.7.0 with scripts/review-capture.ts:
+  # Review page. Captured from @rig-c/review 0.7.1 with scripts/review-capture.ts:
   # Character 1 built by @rig-c/parts 1.44.0 (rig-parts build) from its
   # config.json and inputs/ at parts-examples@c239b09 (family/roa), opened
   # with that producer handoff (baseline reproduced), and the tool driven
-  # through its own page in headless Chromium, 1600x1000, on a fake clock
-  # advanced 1/12 s per frame; the cursor is drawn by the script. The ~30 s
+  # through its own page in headless Chromium, 1600x1000, on a paused fake clock
+  # advanced 1/12 s per frame; the cursor is drawn by the script. Frames
+  # 85-109 are Edit mesh on the shoulder (the page's hero still). The
   # producer run behind Apply · Rebuild is cut (no frames while it runs); the
   # last 22 frames are the `rig-review feedback --format json` output. One
   # pass, not a loop (no seam zones). Captured and encoded there (same encode
   # settings otherwise); not rebuilt here.
-  "review-flow|assets/docs/review-flow.mp4|this repo|-|scripts/review-capture.ts|12|236|19.667|-|hold"
+  "review-flow|assets/docs/review-flow.mp4|this repo|-|scripts/review-capture.ts|12|277|23.083|-|hold"
   # Adapters page. rig-c/adapters' own demo pages (5423bf4: index.html, which
   # runs PixiRig or, with ?host=phaser, PhaserRig; and three-demo.html), served
   # with vite 6.4.4 against the npm releases @rig-c/pixi, @rig-c/phaser and

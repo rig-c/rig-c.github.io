@@ -3,8 +3,8 @@
 <p class="mod-role">A local workspace for a person: open what an agent built, find what looks wrong, try a setup change through the producer that built it, pin what is left to a frame and a slot, and hand it back as an issue.</p>
 
 <figure class="mod-hero">
-  <img src="/assets/docs/review-screen.jpg" alt="The rig-review page in Setup mode: the left column lists Character 1's 17 parts with topwear selected and Solo ticked, the stage shows the shirt alone at 800 percent with the screen-left shoulder cut flat and stepped, and the Inspector below describes the topwear mesh" width="1600" height="1000">
-  <figcaption>Character 1 as <code>rig-parts</code> 1.44.0 builds it from its config at parts-examples <code>c239b09</code>, open in <code>rig-review</code> 0.7.0: <code>topwear</code> soloed at 800 % on the screen-left shoulder, where the build's cloth cut leaves a flat, indented step.</figcaption>
+  <img src="/assets/docs/review-screen.jpg" alt="The rig-review page in Setup with Edit mesh on: the left column lists Character 1's 17 parts with topwear selected and Solo ticked; the stage shows the shirt at 800 percent with its mesh drawn over it — the orange hull outline, the triangulation's edges and the vertices, a dense grid of them over the chest — and the top vertex of the screen-left shoulder, where the outline runs flat, selected; the editor bar above reads Modify, Create, Delete, Edges, Undo, Redo, Reset, Download JSON, Apply · Rebuild and 0 ops · setup pose · preview only" width="1600" height="1000">
+  <figcaption>Character 1 as <code>rig-parts</code> 1.44.0 builds it from its config at parts-examples <code>c239b09</code>, open in <code>rig-review</code> 0.7.1 with <em>Edit mesh</em> on: the mesh the producer drafted for <code>topwear</code> (502 vertices, 885 triangles), read from the compiled model document and drawn in setup space, at 800 % on the screen-left shoulder where the cloth cut leaves a flat, indented step; its top vertex is selected. A move, an added vertex or a constraint edge is a typed delta, previewed only; <em>Apply · Rebuild</em> sends it to <code>rig-parts remesh --delta</code>, which retriangulates in scratch, and the revision loads in place.</figcaption>
 </figure>
 
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
@@ -19,12 +19,12 @@ Built by its producer from its config and painting, Character 1's shirt has a fl
 
 <figure class="figure-media">
   <div class="media">
-    <video data-loop="the review flow" controls muted playsinline preload="metadata" poster="/assets/docs/review-flow-poster.jpg" width="1600" height="1000" aria-label="Recorded video: the rig-review page with Character 1's build; the idle is paused at 1.25 seconds, the topwear slot is picked, soloed and zoomed until the step in the screen-left shoulder shows; in Setup the chest-region editor and mesh edges are turned on, the R region is dragged up and Apply · Rebuild reloads the shirt with the producer's line in the editor bar; the slot is used for feedback with frames 15 to 15, category Defect and a one-line summary, the review is submitted as changes requested, and the exported feedback JSON is shown down to its applied record">
+    <video data-loop="the review flow" controls muted playsinline preload="metadata" poster="/assets/docs/review-flow-poster.jpg" width="1600" height="1000" aria-label="Recorded video: the rig-review page with Character 1's build; the idle is paused at 1.25 seconds, the topwear slot is picked, soloed and zoomed until the step in the screen-left shoulder shows; in Setup Edit mesh draws the shirt's mesh over the shoulder and its top vertex is selected, then Edit mesh is turned off; the chest-region editor and mesh edges are turned on, the R region is dragged up and Apply · Rebuild reloads the shirt with the producer's line in the editor bar; the slot is used for feedback with frames 15 to 15, category Defect and a one-line summary, the review is submitted as changes requested, and the exported feedback JSON is shown down to its applied record">
       <source src="/assets/docs/review-flow.mp4" type="video/mp4">
       <img src="/assets/docs/review-flow-poster.jpg" alt="The rig-review page with Character 1's whole rig playing its idle" width="1600" height="1000">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> The whole case in 20 seconds: <code>rig-review</code> 0.7.0 driven through its own page on Character 1 as <code>@rig-c/parts</code> 1.44.0 builds it from parts-examples <code>c239b09</code> — pause at 1.25 s, pick and solo <code>topwear</code>, zoom on the shoulder; in Setup, drag the R chest region up 30 px and <em>Apply · Rebuild</em>; pin the shoulder as feedback, submit, and the export. The producer's ~30 s run behind Apply is cut to its result line; nothing else is edited but the two ends. The cursor is drawn in, and the last shots are <code>rig-review feedback --format json</code> opened in the same browser.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> The whole case in 23 seconds: <code>rig-review</code> 0.7.1 driven through its own page on Character 1 as <code>@rig-c/parts</code> 1.44.0 builds it from parts-examples <code>c239b09</code> — pause at 1.25 s, pick and solo <code>topwear</code>, zoom on the shoulder; in Setup, <em>Edit mesh</em> on the shoulder, then drag the R chest region up 30 px and <em>Apply · Rebuild</em>; pin the shoulder as feedback, submit, and the export. The producer's run behind Apply (remesh 109 s + compile 5 s in this capture) is cut to its result line; nothing else is edited but the two ends. The cursor is drawn in, and the last shots are <code>rig-review feedback --format json</code> opened in the same browser.</figcaption>
 </figure>
 
 <div class="case">
@@ -60,7 +60,7 @@ Motion edits work the same way: "The producer writes motion in scratch; review n
 {
   "schema": "rig-review-session/1",
   "reviewedSource": {
-    "viewerVersion": "0.7.0", "runtimeVersion": "1.12.0",
+    "viewerVersion": "0.7.1", "runtimeVersion": "1.12.0",
     "rig": { "path": "build/skeleton.model.json", "sha256": "1f0e98202ea9dadf…" },
     "handoff": { "schema": "rig-review-handoff/1", "how": "declared", "via": "open --config",
                  "config": { "path": "config.json", "sha256": "b132cc7680cdc3c4…" }, … }
@@ -124,7 +124,7 @@ Runs under Bun 1.3.0 or later, which must be on `PATH`; `open` prints a loopback
 - **`check` validates the delivery contract and model envelope**, not the upstream compiler gate or visual quality; a raw `skeleton.json` can be inspected but not played (README §"Existing output handoff").
 - **No frame rate is inferred**: without a declared clock the page shows `rate unknown`, and strip PNGs need the report's exact `frameTimes` (README §"Existing output handoff", §"Frame strip export").
 - **Never publishes an issue automatically**; saving or exporting feedback modifies no model (README §"Feedback ownership").
-- **Maturity**: "the CLI is the supported surface, and no importable API is promised yet" (README §"Start"; the README still says 0.1.x while npm is at 0.7.0).
+- **Maturity**: "the CLI is the supported surface, and no importable API is promised yet" (README §"Start"; the README still says 0.1.x while npm is at 0.7.1).
 
 ## Go deeper
 - [Place in the toolchain](https://github.com/rig-c/review#place-in-the-toolchain)

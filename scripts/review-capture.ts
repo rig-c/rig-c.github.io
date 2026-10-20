@@ -1,17 +1,17 @@
 #!/usr/bin/env bun
 /**
  * Rebuild the Review page's clip (assets/docs/review-flow.mp4 and its poster)
- * and its three stills (assets/docs/review-screen.jpg, review-in-context.jpg,
- * review-before-after.jpg) from one run of the tool.
+ * and its four stills (assets/docs/review-screen.jpg, review-in-context.jpg,
+ * review-before-after.jpg, review-weights.jpg) from one run of the tool.
  *
- * Pins: @rig-c/review 0.7.0, @rig-c/parts 1.44.0 (the producer review runs),
+ * Pins: @rig-c/review 0.7.1, @rig-c/parts 1.44.0 (the producer review runs),
  * and Character 1's config, painting and See-through layers at
  * rig-c/parts-examples@c239b09 (family/roa).
  *
  * Usage, from a scratch directory where the pinned tools are installed (open
  * is run from there, so review finds that @rig-c/parts):
  *
- *   bun add @rig-c/review@0.7.0 @rig-c/parts@1.44.0 playwright@1.63.0
+ *   bun add @rig-c/review@0.7.1 @rig-c/parts@1.44.0 playwright@1.63.0
  *   PARTS_EXAMPLES=/path/to/parts-examples \
  *   PLAYWRIGHT_MODULE=$PWD/node_modules/playwright/index.mjs \
  *     bun /path/to/site/scripts/review-capture.ts --bin $PWD/node_modules/.bin [--keep DIR]
@@ -32,25 +32,33 @@
  *   3. drives the page in headless Chromium (WebGL through --use-angle=metal),
  *      1600x1000: the idle plays; Animate, the time slider is set to 1.25 s
  *      (frame 15 at the check sampler's 12 fps); `topwear` is picked and
- *      soloed and the camera zoomed on the screen-left shoulder (the
- *      review-screen still; the in-context still is the same camera with
- *      Solo off); Setup, topwear fitted, Chest regions and Mesh edges on, the
+ *      soloed and the camera zoomed on the screen-left shoulder (nine wheel
+ *      steps of 1.1x to the 800 % limit; the
+ *      in-context still is that camera with Solo off); Setup, the view dragged
+ *      so the shoulder sits left of centre at the same 800 %, Edit mesh on
+ *      (the view-bar toggle: the slot's mesh from the model document at the
+ *      setup pose, vertices and edges over the shirt) and the shoulder's top
+ *      vertex clicked, which selects it and adds no op (the review-screen
+ *      still); Edit mesh off, and, with no frames taken, Weights · Show
+ *      weights for the bone `chest` at the same camera (the review-weights
+ *      still) and hidden again; topwear fitted, Chest regions and Mesh edges on, the
  *      R region's centre dragged up 30 crop px (y 665 -> 635); Apply ·
  *      Rebuild runs `rig-parts remesh` in scratch and reloads the result (the
- *      ~30 s run is cut: no frame is taken until the editor bar's "Applied"
- *      line is in); Use slot for feedback, frames 15-15, Defect, the summary
+ *      producer's run, one to two minutes, is cut: no frame is taken until
+ *      the editor bar's "Applied" line is in); Use slot for feedback, frames 15-15, Defect, the summary
  *      line, Add feedback, status Changes requested, Submit review;
- *   4. runs `rig-review feedback ... --format json` with the open's flags (0.7.0
+ *   4. runs `rig-review feedback ... --format json` with the open's flags (0.7.1
  *      has no export button) and shows that output in the same browser as the
  *      last shots: its head, the feedback item, its context.applied;
  *   5. opens the build committed at c239b09 (family/roa/out/check/build, with
  *      the shoulder repair) in a second instance, with that commit's config
- *      and out/ as its handoff (0.7.0 refuses part picks on a package opened
- *      without one), repeats the same pick, solo, zoom and pan, and puts the
+ *      and out/ as its handoff (0.7.0 refused part picks on a package opened
+ *      without one, review#150, fixed in 0.7.1; the handoff is kept), repeats the same pick, solo, zoom and pan, and puts the
  *      two shoulders side by side (review-before-after: left the build the
  *      producer makes from the config, right the committed one).
  *
- * Frames. The page's clock is Playwright's fake clock: before each screenshot
+ * Frames. The page's clock is Playwright's fake clock, paused (it does not
+ * follow wall time; the page loads without it): before each screenshot
  * it is advanced by exactly 1/12 s, so the capture is deterministic at 12 fps
  * however long a screenshot takes. While the producer runs, the clock is
  * advanced without screenshots. The cursor is drawn by this script (headless
@@ -76,8 +84,10 @@ const VIEW = { width: 1600, height: 1000 };
 const PKG = 'character-1';
 const R_FROM = 665, R_TO = 635;            // the chest region R's centre y, crop px
 const TARGET = { x: 880, y: 380 };         // where the shoulder is panned to, page px
-const WHEEL = 6;                           // wheel steps of -240 on the shoulder (1.1x each)
+const WHEEL = 9;                           // wheel steps of -240 on the shoulder (1.1x each; the 9th reaches the 800 % limit)
 const GRAB = { x: 1150, y: 520 };          // where the pan drag starts, page px (inside the stage)
+const MESH_AT = { x: 540, y: 290 };        // where the shoulder is dragged to for Edit mesh, page px
+const WEIGHTS_BONE = 'chest';              // the bone whose setup-pose weights the weights still shows
 
 const args = process.argv.slice(2);
 const opt = (name: string) => { const i = args.indexOf(name); return i < 0 ? undefined : args[i + 1]; };
@@ -123,8 +133,8 @@ for (const f of [`${SRC}/config.json`, `${SRC}/inputs/painting.png`, ...tree(`${
   writeFileSync(to, show(f));
 }
 // The committed build (with the shoulder repair) and the files it was made from, so it opens with a
-// handoff too: without one, 0.7.0 refuses every part pick ("Part selection refused: Cannot read
-// properties of undefined (reading 'map')"). Its baseline does not reproduce (the repair is not in
+// handoff too: without one, 0.7.0 refused every part pick ("Part selection refused: Cannot read
+// properties of undefined (reading 'map')"; review#150, fixed in 0.7.1 — the handoff is kept). Its baseline does not reproduce (the repair is not in
 // the config); nothing is applied on it.
 for (const f of [`${SRC}/config.json`, `${SRC}/out/parts.json`, ...tree(`${SRC}/out/parts`), ...tree(`${SRC}/out/rig`)]) {
   const to = join(committed, f.slice(SRC.length + 1));
@@ -161,7 +171,6 @@ console.log(baselineLine);
 
 const jpeg = (png: string, out: string, size?: [number, number]) =>
   execFileSync('python3', ['-I', '-c', 'import sys\nfrom PIL import Image\nim=Image.open(sys.argv[1]).convert("RGB")\nif len(sys.argv)>3: im=im.resize((int(sys.argv[3]),int(sys.argv[4])), Image.LANCZOS)\nim.save(sys.argv[2], quality=90)', png, out, ...(size ? size.map(String) : [])]);
-const decodeView = (hash: string) => JSON.parse(Buffer.from(hash.replace(/^#review=/, ''), 'base64').toString('utf8'));
 
 const browser = await chromium.launch({ args: ['--use-angle=metal'] });
 let status = 0;
@@ -170,31 +179,28 @@ try {
 
   const load = async (link: string) => {
     const page = await ctx.newPage();
+    // The clock is paused: it moves only by runFor, never with wall time, so the idle's phase in
+    // each shot does not depend on how long loading or a screenshot took.
     await page.clock.install({ time: new Date('2026-10-20T00:00:00Z') });
+    await page.clock.pauseAt(new Date('2026-10-20T00:00:01Z'));
     await page.goto(link);
-    for (let i = 0; ; i++) {
-      await page.clock.runFor(100);
-      await page.waitForTimeout(50);
-      const drawn = /WebGL|Canvas/.test((await page.locator('#renderer-state').textContent()) ?? '');
-      const parts = /17 declared slots/.test((await page.locator('[data-part-status]').textContent()) ?? '');
-      if (drawn && parts) break;
+    const ready = async () => /WebGL|Canvas/.test((await page.locator('#renderer-state').textContent()) ?? '')
+      && /17 declared slots/.test((await page.locator('[data-part-status]').textContent()) ?? '');
+    let ticked = 0;                                                          // clock steps the load needed
+    for (let i = 0; !(await ready()); i++) {
       if (i > 300) throw new Error('page did not finish loading');
+      if (i >= 100) { await page.clock.runFor(100); ticked++; }              // wall time first; the clock only if it waits on it
+      await page.waitForTimeout(50);
     }
+    console.log(`loaded with ${ticked} clock step(s)`);
     return page;
   };
-  // The rig pane's camera, as the page keeps it in its #review= view link
-  // (README, "Keep and share an inspection"): world (y up) -> page px.
+  // The rig pane's camera, world (y up) -> page px, through the page's own projection (the one its
+  // overlays draw with; window.rigReviewEditor.screen). Not the #review= view link: the page writes
+  // that 120 ms after the last change, on the paused clock that is later than the next shot.
   const camera = async (page: any) => {
-    const cam = decodeView(await page.evaluate(() => location.hash)).view.cameras.rig;
-    const v = cam.visible;
-    // The rig pane: the canvas the page reports this viewport size for.
-    const pane = await page.evaluate(([w, h]: number[]) => {
-      const c = [...document.querySelectorAll('canvas')].map(e => e.getBoundingClientRect())
-        .filter(r => Math.abs(r.width - w) < 2 && Math.abs(r.height - h) < 2)[0];
-      return c ? { x: c.x, y: c.y, width: c.width, height: c.height } : null;
-    }, [cam.viewport.width, cam.viewport.height]);
-    if (!pane) throw new Error('no canvas has the rig viewport size');
-    return (wx: number, wy: number) => [pane.x + (wx - v.x) * pane.width / v.width, pane.y + (v.y + v.height - wy) * pane.height / v.height] as const;
+    const [o, u] = await page.evaluate(() => [(window as any).rigReviewEditor.screen(0, 0), (window as any).rigReviewEditor.screen(1000, 1000)]);
+    return (wx: number, wy: number) => [o.x + wx * (u.x - o.x) / 1000, o.y + wy * (u.y - o.y) / 1000] as const;
   };
   const config = JSON.parse(readFileSync(join(pkg, 'config.json'), 'utf8'));
   // README, Chest regions: crop (x, y) is world (x - width/2, height - y).
@@ -260,15 +266,14 @@ try {
   await glide(sx, sy, 5);
   mark('zoom'); for (let i = 0; i < WHEEL; i++) { await page.mouse.wheel(0, -240); await shot(); }
   const [zx, zy] = (await camera(page))(...SHOULDER);                     // where the wheel left the shoulder
-  const viewNow = async (pg: any) => { const c = decodeView(await pg.evaluate(() => location.hash)).view.cameras.rig; return `zoom ${c.zoom.toFixed(4)} centre ${c.center.x.toFixed(2)},${c.center.y.toFixed(2)} visible ${JSON.stringify(c.visible)}`; };
+  const viewNow = async (pg: any) => `zoom ${((await pg.locator('#zoom-value').textContent()) ?? '').trim()}`;
   console.log(`shoulder at ${sx.toFixed(1)},${sy.toFixed(1)} before the wheel; after it ${zx.toFixed(1)},${zy.toFixed(1)}; ${await viewNow(page)}`);
   await glide(GRAB.x, GRAB.y, 3);                                         // drag the view so the shoulder lands on TARGET
   await page.mouse.down(); await glide(GRAB.x + TARGET.x - zx, GRAB.y + TARGET.y - zy, 5); await page.mouse.up();
   await glide(TARGET.x + 380, TARGET.y + 200, 4);                         // the cursor steps off the shoulder
   await hold(4);
   console.log(`after the pan: shoulder at ${(await camera(page))(...SHOULDER).map(v => v.toFixed(1)).join(',')}; ${await viewNow(page)}`);
-  await still('screen');
-  const zoomView = await page.evaluate(() => location.hash);
+  const zoomView = `${await viewNow(page)}, shoulder at ${(await camera(page))(...SHOULDER).map(v => v.toFixed(1)).join(',')}`;
   await page.locator('#part-solo').uncheck();
   await page.clock.runFor(1); await page.waitForTimeout(300);
   await still('in-context');
@@ -278,6 +283,52 @@ try {
 
   // The editor loop.
   mark('setup'); await clickOn('button:text-is("Setup")', 5); await hold(1);
+
+  // Edit mesh on the shoulder (the review-screen still). The camera is still the 800 % close-up; the
+  // view is dragged so the shoulder sits left of centre, then the view-bar toggle turns Edit mesh on.
+  // While it is on a plain drag box-selects, so the pan comes first.
+  const [mx, my] = (await camera(page))(...SHOULDER);
+  await glide(GRAB.x, GRAB.y, 3);
+  mark('mesh-pan'); await page.mouse.down(); await glide(GRAB.x + MESH_AT.x - mx, GRAB.y + MESH_AT.y - my, 5); await page.mouse.up();
+  mark('mesh'); await clickOn('#mesh-edit', 5);
+  let meshNow: any = null;
+  for (let i = 0; !(meshNow = await page.evaluate(() => (window as any).rigReviewEditor.meshEdit())); i++) {
+    if (i > 200) throw new Error(`Edit mesh did not open: ${await page.locator('#mesh-editor-status').textContent()}`);
+    await page.waitForTimeout(50);                                         // the attachment hash (no frames)
+  }
+  await hold(3);
+  // README, Chest regions: crop px; the mesh's vertices are crop px too. The shoulder's top hull vertex:
+  const crop = [topwear.x + 46, topwear.y + 76];
+  let vi = -1;
+  meshNow.vertices.forEach((v: number[], i: number) => { if (vi < 0 || Math.hypot(v[0] - crop[0], v[1] - crop[1]) < Math.hypot(meshNow.vertices[vi][0] - crop[0], meshNow.vertices[vi][1] - crop[1])) vi = i; });
+  meshNow = await page.evaluate(() => (window as any).rigReviewEditor.meshEdit());
+  const vtx = meshNow.drawn[vi];
+  console.log(`Edit mesh: ${meshNow.slot}/${meshNow.attachment} ${meshNow.vertices.length} vertices, ${meshNow.triangles} triangles, hull ${meshNow.hull}; shoulder vertex ${vi} at crop ${meshNow.vertices[vi].map((v: number) => v.toFixed(2)).join(',')}, page ${vtx.x.toFixed(1)},${vtx.y.toFixed(1)}; ${await viewNow(page)}`);
+  await glide(vtx.x, vtx.y, 5);
+  mark('vertex'); await page.mouse.click(vtx.x, vtx.y); await hold(2);   // selects it: no op
+  await glide(vtx.x + 16, vtx.y + 22, 2); await hold(8);
+  const ops = (await page.evaluate(() => (window as any).rigReviewEditor.meshEdit())).ops.length;
+  if (ops !== 0) throw new Error(`the vertex click added ${ops} op(s)`);
+  console.log(`mesh editor: ${((await page.locator('#mesh-editor-status').textContent()) ?? '').trim()}`);
+  await still('mesh');
+  mark('mesh-off'); await clickOn('#mesh-edit', 4); await hold(1);
+
+  // The weights view at the same camera, no frames: shown for one bone, then hidden again.
+  await page.evaluate(() => { for (const e of document.querySelectorAll<HTMLElement>('*')) e.dataset.captureScroll = String(e.scrollTop); });
+  await page.locator('#weights-show').click();
+  await page.locator('#weights-mode').selectOption('bone');
+  await page.locator('#weights-bone').selectOption(WEIGHTS_BONE);
+  await page.clock.runFor(1); await page.waitForTimeout(400);
+  console.log(`weights: ${((await page.locator('#weights-state').textContent()) ?? '').trim()}`);
+  { const [bx, by] = await centre('#weights-bone'); await place(bx + 30, by + 4); }    // the drawn cursor on the Bone menu
+  await still('weights');
+  await place(cx, cy);
+  await page.locator('#weights-show').click();
+  await page.evaluate(() => {                                              // the panels' scroll as it was
+    for (const e of document.querySelectorAll<HTMLElement>('*')) { const top = e.dataset.captureScroll; if (top !== undefined) { e.scrollTop = Number(top); delete e.dataset.captureScroll; } }
+  });
+  await page.clock.runFor(1); await page.waitForTimeout(300);
+
   await clickOn('#parts-explorer button:text-is("Whole rig")', 5);
   await clickOn('#parts-explorer button:has-text("topwear")', 5); await hold(3); // the camera fits topwear again
   if (!(await page.locator('#part-solo').isChecked())) { await clickOn('#part-solo', 4); await hold(2); } // Whole rig cleared Solo
@@ -363,11 +414,12 @@ try {
   await page2.mouse.up(); await page2.mouse.move(TARGET.x + 380, TARGET.y + 200);
   for (let i = 0; i < 6; i++) await tick();
   await page2.screenshot({ path: join(stills, 'shoulder-committed.png') });
-  const zoom2 = await page2.evaluate(() => location.hash);
+  const zoom2 = `${await viewNow(page2)}, shoulder at ${(await camera(page2))(...SHOULDER).map(v => v.toFixed(1)).join(',')}`;
   await page2.close();
 
   // Stills.
-  jpeg(join(stills, 'screen.png'), join(ROOT, 'assets/docs/review-screen.jpg'));
+  jpeg(join(stills, 'mesh.png'), join(ROOT, 'assets/docs/review-screen.jpg'));
+  jpeg(join(stills, 'weights.png'), join(ROOT, 'assets/docs/review-weights.jpg'));
   jpeg(join(stills, 'in-context.png'), join(ROOT, 'assets/docs/review-in-context.jpg'), [1200, 750]);
   execFileSync('python3', ['-I', '-c', [
     'import sys', 'from PIL import Image',
@@ -376,8 +428,7 @@ try {
     'o=Image.new("RGB",(1296,400)); o.paste(a.crop((x,y,x+648,y+400)),(0,0)); o.paste(b.crop((x,y,x+648,y+400)),(648,0))',
     'o.save(sys.argv[3], quality=90)', 'print("before-after crop at", x, y)',
   ].join('\n'), join(stills, 'shoulder-fresh.png'), join(stills, 'shoulder-committed.png'), join(ROOT, 'assets/docs/review-before-after.jpg'), String(TARGET.x), String(TARGET.y)], { stdio: 'inherit' });
-  const cam = (h: string) => { const c = decodeView(h).view.cameras.rig; return `zoom ${c.zoom.toFixed(4)} centre ${c.center.x.toFixed(2)},${c.center.y.toFixed(2)}`; };
-  console.log(`shoulder camera: built ${cam(zoomView)}; committed ${cam(zoom2)}`);
+  console.log(`shoulder camera: built ${zoomView}; committed ${zoom2}`);
 
   // Encode.
   const count = n;
