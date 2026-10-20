@@ -40,26 +40,30 @@ const FAMILY_SHA = 'c239b09328ca7364361b9761fac817502c09ede0';
 const FAMILY = ['Character 1', 'Character 2', 'Character 3', 'Character 4', 'Character 5'];
 const FAMILY_DIRS = ['roa', 'luna', 'jinni', 'naru', 'nova'];
 const OUTFITS = ['office', 'homewear', 'swimwear', 'uniform'];
+// Measured at FAMILY_SHA: skeleton.png 1.19–2.00 MB plus skeleton.model.json about 0.09 MB compressed (1.1 MB raw).
+// The site-served swing build: 1.25 MB of PNGs plus a 1.03 MB model, 0.09 MB compressed.
+const FAMILY_SIZE = 'about 1.3–2.1 MB';
+// The Character and Outfit options both demos offer; ?character=<dir>&outfit=<o> preselects them.
+const CHARACTER_OPTIONS = FAMILY.map((name, i) => `<option value="${FAMILY_DIRS[i]}">${name}</option>`).join('');
+const OUTFIT_OPTIONS = OUTFITS.map((o) => `<option value="${o}">${o}</option>`).join('');
 
 // The live demo is markup plus /assets/demo.js; the Markdown mirror gets a sentence instead.
 function liveDemo(target: 'html' | 'md'): string {
   if (target === 'md') {
     return `The live demo on ${SITE_ORIGIN}/examples/ plays the 20 Family rigs (5 characters × 4 outfits) in the browser with @rig-c/play, with play/pause and bone and mesh overlays. It needs JavaScript.`;
   }
-  const characters = FAMILY.map((name, i) => `<option value="${FAMILY_DIRS[i]}">${name}</option>`).join('');
-  const outfits = OUTFITS.map((o) => `<option value="${o}">${o}</option>`).join('');
-  return `<section class="live-demo" id="live-demo" data-sha="${FAMILY_SHA}" data-fallback-href="#1-see-the-result" data-fallback-text="The recorded preview at the top of this page shows the same rigs" aria-label="Live demo">
+  return `<section class="live-demo" id="live-demo" data-sha="${FAMILY_SHA}" data-family-size="${FAMILY_SIZE}" data-fallback-href="#1-see-the-result" data-fallback-text="The recorded preview at the top of this page shows the same rigs" aria-label="Live demo">
 <div class="demo-head"><span class="badge-live">Live</span><span>Running in your browser — not a recording</span></div>
 <div class="demo-body">
 <div class="demo-stage" id="demo-stage"><button type="button" class="btn btn-primary demo-start" id="demo-start">Start the live demo</button><canvas class="demo-overlay" id="demo-overlay" aria-hidden="true"></canvas></div>
 <div class="demo-panel">
 <div class="demo-controls" role="group" aria-label="Live demo controls">
-<label>Character <select id="demo-character">${characters}</select></label>
-<label>Outfit <select id="demo-outfit">${outfits}</select></label>
+<label>Character <select id="demo-character">${CHARACTER_OPTIONS}</select></label>
+<label>Outfit <select id="demo-outfit">${OUTFIT_OPTIONS}</select></label>
 <label>Motion <select id="demo-motion"><option>idle</option></select></label>
 <div class="demo-buttons"><button type="button" class="btn" id="demo-play">Play</button><button type="button" class="btn" id="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" id="demo-mesh" aria-pressed="false">Mesh</button></div>
 </div>
-<p class="demo-status" id="demo-status" role="status" aria-live="polite">Not loaded yet. Pressing Start downloads the player (about 0.4 MB) and one rig (about 1.5–2 MB); each outfit or character you pick loads another.</p>
+<p class="demo-status" id="demo-status" role="status" aria-live="polite">Not loaded yet. Pressing Start downloads the player (about 0.4 MB) and one rig (${FAMILY_SIZE}); each outfit or character you pick loads another.</p>
 <p class="demo-source" id="demo-source">Source for each rig: its config.json and built model, linked here once it loads.</p>
 <noscript><p class="demo-status" data-kind="error">The live demo needs JavaScript. The recorded preview above shows the same rigs.</p></noscript>
 </div>
@@ -89,22 +93,25 @@ function thread(slug: string, target: 'html' | 'md'): string {
   return `<nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol>${steps}</ol></nav>`;
 }
 
-// The Play page's player: Character 1 with the idle and the cup swing Pose wrote, served from this site.
+// The Play page's player: any of the 20 Family rigs from parts-examples at FAMILY_SHA, except that
+// Character 1 office (the default) loads the Pose page's build served from this site, which adds the cup swing.
 function playDemo(target: 'html' | 'md'): string {
   if (target === 'md') {
-    return 'The live player on this page plays Character 1 with two motions (idle and the cup swing from the Pose page), with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.';
+    return 'The live player on this page plays any of the 20 Family rigs (5 characters × 4 outfits) — Character 1 in the office outfit with two motions (idle and the cup swing from the Pose page), the others with their idle — with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.';
   }
-  return `<section class="live-demo live-demo-play" data-model-url="/assets/rigs/character-1-swing/skeleton.model.json" data-character="Character 1" data-label="Character 1" data-fit="0.78" data-fallback-href="/docs/pose/#how-the-swing-reached-character-1" data-fallback-text="Watch the recorded swing on the Pose page" aria-label="Live player">
+  return `<section class="live-demo live-demo-play" data-sha="${FAMILY_SHA}" data-model-url="/assets/rigs/character-1-swing/skeleton.model.json" data-model-for="${FAMILY_DIRS[0]}/office" data-model-label="${FAMILY[0]}, office, with the Pose page's swing" data-model-size="about 1.3 MB" data-family-size="${FAMILY_SIZE}" data-fit="0.78" data-fallback-href="/docs/pose/#how-the-swing-reached-character-1" data-fallback-text="Watch the recorded swing on the Pose page" aria-label="Live player">
 <div class="demo-head"><span class="badge-live">Live</span><span>@rig-c/play 1.12.0 running in your browser — not a recording</span></div>
 <div class="demo-body">
 <div class="demo-stage" id="demo-stage-play" data-part="demo-stage"><button type="button" class="btn btn-primary demo-start" data-part="demo-start">Start the player</button><canvas class="demo-overlay" data-part="demo-overlay" aria-hidden="true"></canvas></div>
 <div class="demo-panel">
 <div class="demo-controls" role="group" aria-label="Player controls">
+<label>Character <select data-part="demo-character">${CHARACTER_OPTIONS}</select></label>
+<label>Outfit <select data-part="demo-outfit">${OUTFIT_OPTIONS}</select></label>
 <label>Motion <select data-part="demo-motion"><option>idle</option></select></label>
 <label>Render mode <select data-part="demo-mode"><option value="dom">DOM (default)</option><option value="canvas">One canvas</option></select></label>
 <div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
 </div>
-<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 (about 2.2 MB).</p>
+<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 with the swing (about 1.3 MB); each other character or outfit you pick loads its rig (${FAMILY_SIZE}) from rig-c/parts-examples.</p>
 <p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted cup swing added.</p>
 <noscript><p class="demo-status" data-kind="error">The live player needs JavaScript. <a href="/docs/pose/">A recording of the same rig is on the Pose page</a>.</p></noscript>
 </div>

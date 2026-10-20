@@ -127,17 +127,19 @@
         <article>
 <h1 id="rig-cplay">@rig-c/play</h1>
 <p class="mod-role">The browser player for the model rigc writes — no Spine runtime, rigid parts as plain DOM elements or the whole rig in one canvas.</p>
-<section class="live-demo live-demo-play" data-model-url="/assets/rigs/character-1-swing/skeleton.model.json" data-character="Character 1" data-label="Character 1" data-fit="0.78" data-fallback-href="/docs/pose/#how-the-swing-reached-character-1" data-fallback-text="Watch the recorded swing on the Pose page" aria-label="Live player">
+<section class="live-demo live-demo-play" data-sha="c239b09328ca7364361b9761fac817502c09ede0" data-model-url="/assets/rigs/character-1-swing/skeleton.model.json" data-model-for="roa/office" data-model-label="Character 1, office, with the Pose page's swing" data-model-size="about 1.3 MB" data-family-size="about 1.3–2.1 MB" data-fit="0.78" data-fallback-href="/docs/pose/#how-the-swing-reached-character-1" data-fallback-text="Watch the recorded swing on the Pose page" aria-label="Live player">
 <div class="demo-head"><span class="badge-live">Live</span><span>@rig-c/play 1.12.0 running in your browser — not a recording</span></div>
 <div class="demo-body">
 <div class="demo-stage" id="demo-stage-play" data-part="demo-stage"><button type="button" class="btn btn-primary demo-start" data-part="demo-start">Start the player</button><canvas class="demo-overlay" data-part="demo-overlay" aria-hidden="true"></canvas></div>
 <div class="demo-panel">
 <div class="demo-controls" role="group" aria-label="Player controls">
+<label>Character <select data-part="demo-character"><option value="roa">Character 1</option><option value="luna">Character 2</option><option value="jinni">Character 3</option><option value="naru">Character 4</option><option value="nova">Character 5</option></select></label>
+<label>Outfit <select data-part="demo-outfit"><option value="office">office</option><option value="homewear">homewear</option><option value="swimwear">swimwear</option><option value="uniform">uniform</option></select></label>
 <label>Motion <select data-part="demo-motion"><option>idle</option></select></label>
 <label>Render mode <select data-part="demo-mode"><option value="dom">DOM (default)</option><option value="canvas">One canvas</option></select></label>
 <div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
 </div>
-<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 (about 2.2 MB).</p>
+<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 with the swing (about 1.3 MB); each other character or outfit you pick loads its rig (about 1.3–2.1 MB) from rig-c/parts-examples.</p>
 <p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted cup swing added.</p>
 <noscript><p class="demo-status" data-kind="error">The live player needs JavaScript. <a href="/docs/pose/">A recording of the same rig is on the Pose page</a>.</p></noscript>
 </div>
@@ -146,16 +148,16 @@
 <script type="module" src="/assets/demo.js"></script>
 <p class="mod-skip">Skip to <a href="#a-minimal-page">A minimal page</a> · <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 <nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol><li><a href="/docs/parts/"><strong>Parts</strong><span>split into parts</span></a></li><li><a href="/docs/pose/"><strong>Pose</strong><span>given a motion</span></a></li><li><a href="/docs/core/"><strong>Core</strong><span>checked</span></a></li><li><a href="/docs/review/"><strong>Review</strong><span>looked at</span></a></li><li><a href="/docs/play/" aria-current="step"><strong>Play</strong><span>played</span></a></li></ol></nav>
-<p>A rigged character usually means a canvas runtime that rasterizes everything. For a rigid part, though, the bone transform is a plain affine map that CSS <code>matrix()</code> expresses exactly — so the rigid parts can live in the DOM, where the browser composites them and you can inspect and style them like any element. Play keeps that path, and adds what the DOM cannot do alone: per-part mesh canvases, <code>clip-path</code> clipping, and skipping meshes that did not move. Switch the player above to <strong>One canvas</strong> to see the other mode draw the same pose.</p>
+<p>A rigged character usually means a canvas runtime that rasterizes everything. For a rigid part, though, the bone transform is a plain affine map that CSS <code>matrix()</code> expresses exactly — so the rigid parts can live in the DOM, where the browser composites them and you can inspect and style them like any element. Play keeps that path, and adds what the DOM cannot do alone: per-part mesh canvases, <code>clip-path</code> clipping, and skipping meshes that did not move. Switch the player above to <strong>One canvas</strong> to see the other mode draw the same pose, or pick another <strong>Character</strong> and <strong>Outfit</strong>: the player switches between the 20 Family rigs.</p>
 <h2 id="what-you-just-ran">What you just ran</h2>
 <p>The player above is the published package doing what any page does with it — nothing on this site poses the rig:</p>
 <ol>
-<li><code>loadModel()</code> read Character 1's <code>skeleton.model.json</code> and cut each atlas region into its own bitmap (the <code>.atlas</code> and <code>skeleton.json</code> beside it are not fetched).</li>
+<li><code>loadModel()</code> read the rig's <code>skeleton.model.json</code> — Character 1 office from this site, every other pick from rig-c/parts-examples at a pinned commit, fetched when you pick it — and cut each atlas region into its own bitmap (the <code>.atlas</code> and <code>skeleton.json</code> beside it are not fetched).</li>
 <li><code>new RigPlayer(root, assets, { mode })</code> opened the motion you picked on a live track; rig-c's core, bundled in the package, poses bones, constraints, physics and draw order on the CPU, one <code>frame(dt)</code> at a time.</li>
 <li>Each frame became a <code>PosedFrame</code> — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one <code>matrix()</code> string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).</li>
 <li><strong>Bones</strong> and <strong>Mesh</strong> draw from the player's own read-only queries, <code>bone(name)</code> and <code>posedFrame()</code>; <strong>Pause</strong> calls <code>pause()</code>.</li>
 </ol>
-<p><code>swing</code> — the cup swung like a pendulum — is the motion the <a href="/docs/pose/">Pose</a> page retargeted onto this rig; <code>idle</code> came with the rig from <a href="/docs/parts/">Parts</a>.</p>
+<p>Character 1 in the office outfit keeps both motions: <code>swing</code> — the cup swung like a pendulum — is the motion the <a href="/docs/pose/">Pose</a> page retargeted onto that rig, and <code>idle</code> came with it from <a href="/docs/parts/">Parts</a>. The other 19 rigs play the <code>idle</code> they were built with; the motion menu lists what the loaded rig carries.</p>
 <h2 id="a-minimal-page">A minimal page</h2>
 <p>Twenty-odd lines, from the README, load a model from jsDelivr, fit its stage box to a container and drive the clock:</p>
 <pre><code class="language-html">&lt;div id=&quot;stage&quot; style=&quot;position: relative; width: 480px; height: 640px; overflow: hidden&quot;&gt;&lt;/div&gt;

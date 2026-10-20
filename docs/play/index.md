@@ -2,24 +2,24 @@
 
 <p class="mod-role">The browser player for the model rigc writes — no Spine runtime, rigid parts as plain DOM elements or the whole rig in one canvas.</p>
 
-The live player on this page plays Character 1 with two motions (idle and the cup swing from the Pose page), with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.
+The live player on this page plays any of the 20 Family rigs (5 characters × 4 outfits) — Character 1 in the office outfit with two motions (idle and the cup swing from the Pose page), the others with their idle — with play/pause, DOM or canvas mode, and bone and mesh overlays. It needs JavaScript.
 
 <p class="mod-skip">Skip to <a href="#a-minimal-page">A minimal page</a> · <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
 *This page follows Character 1 from the Family set: here it is played. Every module works on its own; this order is one path, not a requirement.*
 
-A rigged character usually means a canvas runtime that rasterizes everything. For a rigid part, though, the bone transform is a plain affine map that CSS `matrix()` expresses exactly — so the rigid parts can live in the DOM, where the browser composites them and you can inspect and style them like any element. Play keeps that path, and adds what the DOM cannot do alone: per-part mesh canvases, `clip-path` clipping, and skipping meshes that did not move. Switch the player above to **One canvas** to see the other mode draw the same pose.
+A rigged character usually means a canvas runtime that rasterizes everything. For a rigid part, though, the bone transform is a plain affine map that CSS `matrix()` expresses exactly — so the rigid parts can live in the DOM, where the browser composites them and you can inspect and style them like any element. Play keeps that path, and adds what the DOM cannot do alone: per-part mesh canvases, `clip-path` clipping, and skipping meshes that did not move. Switch the player above to **One canvas** to see the other mode draw the same pose, or pick another **Character** and **Outfit**: the player switches between the 20 Family rigs.
 
 ## What you just ran
 
 The player above is the published package doing what any page does with it — nothing on this site poses the rig:
 
-1. `loadModel()` read Character 1's `skeleton.model.json` and cut each atlas region into its own bitmap (the `.atlas` and `skeleton.json` beside it are not fetched).
+1. `loadModel()` read the rig's `skeleton.model.json` — Character 1 office from this site, every other pick from rig-c/parts-examples at a pinned commit, fetched when you pick it — and cut each atlas region into its own bitmap (the `.atlas` and `skeleton.json` beside it are not fetched).
 2. `new RigPlayer(root, assets, { mode })` opened the motion you picked on a live track; rig-c's core, bundled in the package, poses bones, constraints, physics and draw order on the CPU, one `frame(dt)` at a time.
 3. Each frame became a `PosedFrame` — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one `matrix()` string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).
 4. **Bones** and **Mesh** draw from the player's own read-only queries, `bone(name)` and `posedFrame()`; **Pause** calls `pause()`.
 
-`swing` — the cup swung like a pendulum — is the motion the [Pose](/docs/pose/) page retargeted onto this rig; `idle` came with the rig from [Parts](/docs/parts/).
+Character 1 in the office outfit keeps both motions: `swing` — the cup swung like a pendulum — is the motion the [Pose](/docs/pose/) page retargeted onto that rig, and `idle` came with it from [Parts](/docs/parts/). The other 19 rigs play the `idle` they were built with; the motion menu lists what the loaded rig carries.
 
 ## A minimal page
 
