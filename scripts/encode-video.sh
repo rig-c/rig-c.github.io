@@ -38,11 +38,13 @@ CLIPS=(
   # assets/rigc-demo.gif (600x405; the MP4 is 600x404). Commit not recorded.
   # Waits for the re-render under the rig-c name.
   "rigc-demo|assets/rigc-demo.mp4|rig-c/core|unknown|assets/rigc-demo.gif|20|134|6.700|-|hold"
-  # Parts page hero. Source and script unknown; being re-cut separately.
-  "parts-explode|assets/docs/parts-explode.mp4|unknown|unknown|unknown|30|198|6.600|-|hold"
-  # Pose page hero. A rigc render beside a drawn source skeleton; the
-  # compositing script is unknown. Waits for its source.
-  "pose-swing|assets/docs/pose-swing.mp4|unknown|unknown|unknown|24|73|3.042|-|hold"
+  # Parts page hero. Rendered and encoded by scripts/parts-explode.py from
+  # rig-c/parts-examples@c239b09 (same encode settings); not rebuilt here.
+  "parts-explode|assets/docs/parts-explode.mp4|this repo|-|scripts/parts-explode.py|30|147|4.900|-|hold"
+  # Pose page hero. Rendered and encoded by scripts/pose-swing.py from the
+  # committed assets/rigs/character-1-swing/ (same encode settings); not
+  # rebuilt here.
+  "pose-swing|assets/docs/pose-swing.mp4|this repo|-|scripts/pose-swing.py|24|39|1.625|-|hold"
 )
 
 # Local clone of each source repo, set by the caller.
