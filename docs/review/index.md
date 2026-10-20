@@ -17,6 +17,16 @@ The checks that keep a broken rig off the disk are structural: a shoulder that r
 
 Character 1's shirt once had a flat, indented shoulder: an earlier preparation script had cut away cloth that the hair covers in the still and uncovers when it moves. The family suite records that repair in [its shoulder-repair note](https://github.com/rig-c/parts-examples/blob/main/family/roa/SHOULDER_REPAIR.md). Here it is replayed in Review on the build from before the repair.
 
+<figure class="figure-media">
+  <div class="media">
+    <video data-loop="the review flow" controls muted playsinline preload="metadata" poster="/assets/docs/review-flow-poster.jpg" width="1200" height="750" aria-label="Recorded video: the rig-review page with Character 1's build; the idle is paused at 1.25 seconds, the topwear slot is picked, soloed and zoomed until the step in the screen-left shoulder shows, the slot is used for feedback with frames 15 to 15, category Defect and a one-line summary, the feedback is added and the review submitted as changes requested, and the exported feedback JSON is shown">
+      <source src="/assets/docs/review-flow.mp4" type="video/mp4">
+      <img src="/assets/docs/review-flow-poster.jpg" alt="The rig-review page with Character 1's whole rig playing its idle" width="1200" height="750">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The whole case in 15 seconds: <code>rig-review</code> 0.2.1 driven through its own page on Character 1's check build at parts-examples <code>144f556</code>, before the repair — pause at 1.25 s, pick and solo <code>topwear</code>, zoom on the shoulder, pin it as feedback, submit, export. Nothing is edited but the cut at both ends; the cursor is drawn in, and the last shot is the downloaded JSON opened in the same browser.</figcaption>
+</figure>
+
 <div class="case">
 
 ### 1. Open the build, and look where the motion would reveal it

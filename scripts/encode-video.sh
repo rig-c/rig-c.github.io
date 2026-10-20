@@ -83,6 +83,13 @@ CLIPS=(
   # as frame 0), 388x640, opaque on rigc render's grey. 73 / 24 = 3.042 s.
   # That run's frames, f0000..f0072 concatenated: md5 e1cbb4c0b8d582bfe0855f21e2ea671e.
   "getting-started-wave|assets/docs/getting-started-wave.mp4|walkthrough|-|wave-render/wave@24fps|24|73|3.042|-|build"
+  # Review page. Captured from @rig-c/review 0.2.1 on parts-examples@144f556
+  # (family/roa/out/check/build, before the shoulder repair) with
+  # scripts/review-capture.ts: the tool driven through its own page in headless
+  # Chromium, 1200x750, on a fake clock advanced 1/12 s per frame; the cursor is
+  # drawn by the script. One pass, not a loop (no seam zones). Captured and
+  # encoded there (same encode settings otherwise); not rebuilt here.
+  "review-flow|assets/docs/review-flow.mp4|this repo|-|scripts/review-capture.ts|12|179|14.917|-|hold"
 )
 
 # Local clone of each source repo, set by the caller.
