@@ -1,5 +1,7 @@
-// The live demo on /examples/: the published @rig-c/play runtime playing the Family rigs from
-// rig-c/parts-examples, pinned to one commit. Nothing is fetched until the reader asks for it,
+// The live demos on /examples/ and /docs/play/: the published @rig-c/play runtime playing the Family
+// rigs from rig-c/parts-examples, pinned to one commit. A section may also carry data-model-url with
+// data-model-for="<character>/<outfit>": that one pick loads the site-served model instead (Play's
+// Character 1 office, the Pose page's build with the cup swing). ?character=<dir>&outfit=<o> preselects. Nothing is fetched until the reader asks for it,
 // motion waits for a click when the reader prefers reduced motion, and a failure only replaces
 // the demo's own status line — the rest of the page never depends on this script.
 const PLAY_URL = 'https://cdn.jsdelivr.net/npm/@rig-c/play@1.12.0/dist/index.js';
@@ -12,16 +14,20 @@ function init(section) {
   const repo = `https://github.com/rig-c/parts-examples/tree/${sha}/family`;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const $ = (id) => section.querySelector(`[data-part="${id}"]`) ?? section.querySelector(`#${id}`);
-  // A page may fix the rig (data-character / data-outfit) instead of offering the selects.
-  const fixed = (el, value) => el ?? { value, disabled: false, selectedOptions: [{ textContent: section.dataset.label ?? value }], addEventListener() {} };
   const ui = {
-    character: fixed($('demo-character'), section.dataset.character), outfit: fixed($('demo-outfit'), section.dataset.outfit), motion: $('demo-motion'), mode: $('demo-mode'),
+    character: $('demo-character'), outfit: $('demo-outfit'), motion: $('demo-motion'), mode: $('demo-mode'),
     play: $('demo-play'), bones: $('demo-bones'), mesh: $('demo-mesh'),
     start: $('demo-start'), stage: $('demo-stage'), overlay: $('demo-overlay'),
     status: $('demo-status'), source: $('demo-source'),
   };
   section.classList.add('demo-ready');
   setControls(false);
+  const modelSource = ui.source.innerHTML; // the site-served model's source sentence, as the page wrote it
+  const query = new URLSearchParams(location.search);
+  for (const [key, el] of [['character', ui.character], ['outfit', ui.outfit]]) {
+    const value = query.get(key);
+    if (value && [...el.options].some((opt) => opt.value === value)) el.value = value;
+  }
 
   let lib = null; // the imported @rig-c/play module
   let current = null; // { player, assets, el, bones }
@@ -33,7 +39,17 @@ function init(section) {
 
   const dir = (c, o) => (o === 'office' ? c : `outfits/${o}/${c}`);
   const config = (c, o) => (o === 'office' ? `${c}/config.json` : `outfits/${o}/${c}/authoring/config.json`);
-  const label = () => section.dataset.label ?? `${ui.character.selectedOptions[0].textContent}, ${ui.outfit.value}`;
+  const siteModel = (c, o) => Boolean(section.dataset.modelUrl) && section.dataset.modelFor === `${c}/${o}`;
+  const label = (c, o) => (siteModel(c, o) ? section.dataset.modelLabel : null) ?? `${ui.character.selectedOptions[0].textContent}, ${o}`;
+  const size = (c, o) => (siteModel(c, o) ? section.dataset.modelSize : null) ?? section.dataset.familySize ?? 'about 1.3–2.1 MB';
+
+  // Keep the pick in the address bar, so a link reopens the same rig.
+  function remember(c, o) {
+    const url = new URL(location.href);
+    url.searchParams.set('character', c);
+    url.searchParams.set('outfit', o);
+    history.replaceState(history.state, '', url);
+  }
 
   // A failure line ends with a pointer to a recording of the same rig (data-fallback-href / -text on the section).
   function status(text, kind = '', fallback = false) {
@@ -66,6 +82,10 @@ function init(section) {
   }
 
   function showSource(c, o) {
+    if (siteModel(c, o)) {
+      ui.source.innerHTML = modelSource;
+      return;
+    }
     ui.source.innerHTML = '';
     const links = [
       ['config.json', `${repo}/${config(c, o)}`],
@@ -175,11 +195,12 @@ function init(section) {
     const keepTime = current ? current.player.time : 0;
     const keepMotion = current ? current.player.current : null;
     setControls(false);
-    status(`Loading ${label()} — about 1.5–2 MB…`, 'loading');
+    const name = label(c, o);
+    status(`Loading ${name} — ${size(c, o)}…`, 'loading');
     try {
       let bones = [];
       const assets = await lib.loadModel({
-        modelUrl: section.dataset.modelUrl ?? `${base}/${dir(c, o)}/out/check/build/skeleton.model.json`,
+        modelUrl: siteModel(c, o) ? section.dataset.modelUrl : `${base}/${dir(c, o)}/out/check/build/skeleton.model.json`,
         crossOrigin: 'anonymous',
         setsUrl: null,
         fetch: async (input, init) => {
@@ -214,13 +235,13 @@ function init(section) {
       fit();
       player.frame(0);
       drawOverlay();
-      if (!section.dataset.modelUrl) showSource(c, o);
+      showSource(c, o);
       const backend = player.mode === 'canvas' ? 'everything in one canvas (canvas mode)' : `meshes drawn with ${player.renderer.meshBackendActive ?? 'canvas'} (DOM mode)`;
       const motions = names.length === 1 ? `its one motion, ${names[0]}` : `${names.length} motions`;
-      status(`Live: ${label()} — ${motions}, ${backend}.${playing ? '' : ' Paused; press Play.'}`, 'ready');
+      status(`Live: ${name} — ${motions}, ${backend}.${playing ? '' : ' Paused; press Play.'}`, 'ready');
     } catch (err) {
       if (id !== request) return;
-      status(`The live demo could not load ${label()}: ${err.message}.`, 'error', true);
+      status(`The live demo could not load ${name}: ${err.message}.`, 'error', true);
       offerRetry();
     } finally {
       if (id === request) setControls(true);
@@ -253,8 +274,12 @@ function init(section) {
   }
 
   ui.start.addEventListener('click', start);
-  ui.character.addEventListener('change', load);
-  ui.outfit.addEventListener('change', load);
+  const pick = () => {
+    remember(ui.character.value, ui.outfit.value);
+    if (lib) load();
+  };
+  ui.character.addEventListener('change', pick);
+  ui.outfit.addEventListener('change', pick);
   if (ui.mode) ui.mode.addEventListener('change', load);
   ui.motion.addEventListener('change', () => {
     if (!current) return;
