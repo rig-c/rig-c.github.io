@@ -162,12 +162,12 @@
 <div class="compare">
   <figure>
     <div class="media">
-      <video data-loop="the idle" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-idle-poster.jpg" width="246" height="640" aria-label="Recorded video: Character 1 breathing in its idle loop">
-        <source src="/assets/docs/parts-idle.mp4" type="video/mp4">
-        <img src="/assets/docs/parts-idle-poster.jpg" alt="Character 1 standing" width="246" height="640">
-      </video>
+      <picture>
+        <source srcset="/assets/docs/parts-idle.webp" type="image/webp" media="(prefers-reduced-motion: no-preference)">
+        <img src="/assets/docs/parts-idle-poster.png" alt="Animation: Character 1 standing, breathing in its idle loop" width="244" height="640">
+      </picture>
     </div>
-    <figcaption><span class="media-kind">Recorded video</span> The idle, as <code>build --loop</code> wrote it: 41 frames at 12 fps.</figcaption>
+    <figcaption><span class="media-kind">Animation</span> The idle, as <code>build --loop</code> wrote it: 41 frames at 12 fps, 0 to 3.33 s with both ends included. Here the same build plays the 3.33 s loop (40 frames, the 41st being where it wraps), drawn by <code>@rig-c/play</code> 1.12.0 over the page rather than by <code>rigc render</code>. With reduced motion on, the first frame stands still.</figcaption>
   </figure>
   <figure><img src="/assets/docs/parts-contact.jpg" alt="A contact sheet of the idle's 41 frames" width="401" height="775" loading="lazy"><figcaption><code>check</code>'s contact sheet of the same idle — what the measured bars read.</figcaption></figure>
 </div>

@@ -157,12 +157,12 @@ Open <http://localhost:3000/?model=wave-build/skeleton.model.json&anim=wave>: th
 
 <figure>
   <div class="media">
-    <video data-loop="the wave" controls muted loop playsinline preload="metadata" poster="/assets/docs/getting-started-wave-poster.jpg" width="388" height="640" aria-label="Recorded video: the example character raises her right arm above her head, waves, and lowers it back to rest">
-      <source src="/assets/docs/getting-started-wave.mp4" type="video/mp4">
-      <img src="/assets/docs/getting-started-wave-poster.jpg" alt="The example character standing at rest before the wave" width="388" height="640">
-    </video>
+    <picture>
+      <source srcset="/assets/docs/getting-started-wave.webp" type="image/webp" media="(prefers-reduced-motion: no-preference)">
+      <img src="/assets/docs/getting-started-wave-poster.png" alt="Animation: the example character raises her right arm above her head, waves, and lowers it back to rest" width="385" height="640">
+    </picture>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> The <code>wave</code> animation in this walkthrough's <code>wave-build/</code>, unedited: 73 frames, 3 s at 24 fps, from rest back to rest. Drawn frame by frame by rig-c's own poser (<code>bunx rigc render --candidate wave-build --animation wave --fps 24 --max 640 --poser core</code>) rather than filmed from the browser player. Same run as the idle above: <code>@rig-c/parts</code> 1.42.0, <code>rig-c</code> 2.64.1, <code>@rig-c/pose</code> 0.36.0.</figcaption>
+  <figcaption><span class="media-kind">Animation</span> The <code>wave</code> animation in this walkthrough's <code>wave-build/</code>, unedited: 3 s at 24 fps, from rest back to rest, looping (72 frames; the closing rest pose is frame 0 again). Drawn by <code>@rig-c/play</code> 1.12.0 over the page rather than by <code>rigc render</code>, whose frames are opaque by design. Same run as the idle above: <code>@rig-c/parts</code> 1.42.0, <code>rig-c</code> 2.64.1, <code>@rig-c/pose</code> 0.36.0. With reduced motion on, the first frame stands still.</figcaption>
 </figure>
 
 The full guide — making your own character, the GPU routes, troubleshooting and every measured figure — is the [rig-c/getting-started README](https://github.com/rig-c/getting-started#readme) and its [docs/REFERENCE.md](https://github.com/rig-c/getting-started/blob/main/docs/REFERENCE.md).
