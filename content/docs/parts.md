@@ -61,12 +61,12 @@ For this build `parts.json` records a mean difference of 0.873 per pixel, 98.3% 
 <div class="compare">
   <figure>
     <div class="media">
-      <video data-loop="the idle" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-idle-poster.jpg" width="246" height="640" aria-label="Recorded video: Character 1 breathing in its idle loop">
-        <source src="/assets/docs/parts-idle.mp4" type="video/mp4">
-        <img src="/assets/docs/parts-idle-poster.jpg" alt="Character 1 standing" width="246" height="640">
-      </video>
+      <picture>
+        <source srcset="/assets/docs/parts-idle.webp" type="image/webp" media="(prefers-reduced-motion: no-preference)">
+        <img src="/assets/docs/parts-idle-poster.png" alt="Animation: Character 1 standing, breathing in its idle loop" width="244" height="640">
+      </picture>
     </div>
-    <figcaption><span class="media-kind">Recorded video</span> The idle, as <code>build --loop</code> wrote it: 41 frames at 12 fps.</figcaption>
+    <figcaption><span class="media-kind">Animation</span> The idle, as <code>build --loop</code> wrote it: 41 frames at 12 fps, 0 to 3.33 s with both ends included. Here the same build plays the 3.33 s loop (40 frames, the 41st being where it wraps), drawn by <code>@rig-c/play</code> 1.12.0 over the page rather than by <code>rigc render</code>. With reduced motion on, the first frame stands still.</figcaption>
   </figure>
   <figure><img src="/assets/docs/parts-contact.jpg" alt="A contact sheet of the idle's 41 frames" width="401" height="775" loading="lazy"><figcaption><code>check</code>'s contact sheet of the same idle — what the measured bars read.</figcaption></figure>
 </div>
@@ -128,7 +128,8 @@ From the README's own *What it does not do*:
 - red = uncovered error, blue = covered error (>40 off): rig-c/parts docs/AUTHORING.md lines 2200, 2633
 - Limits: rig-c/parts README "What it does not do" (origin/main lines 325-362)
 - 12 fps idle: 41 frames at 80 ms = 12.5 fps per GIF timing; check renders at 12 fps (rig-parts AUTHORING check row)
-- parts-idle.mp4: encoded by scripts/encode-video.sh from parts-examples@c239b09 family/roa/docs/idle.png (lossless APNG, 41 frames at 83.33 ms = 12 fps, 3.417 s); loop seam 0.872 vs max step 0.937 (scripts/loop-seam.py)
+- parts-idle.webp + parts-idle-poster.png: scripts/play-capture-webp.ts --root <dir> --model build/skeleton.model.json --anim idle --fps 12 --frames 40 --settle 1 --out assets/docs/parts-idle, where <dir> holds node_modules/@rig-c/play 1.12.0 and build/ = parts-examples@c239b09 family/roa/out/check/build/skeleton.atlas, .json, .model.json, .png (git show); player rig-c/getting-started@2928714 scripts/play.html + serve.ts; Bun 1.4.2, Playwright 1.63.0 / Chromium 153, libwebp 1.6.0; run 2026-10-20. idle duration from loadModel's assets.animations: 3.3333 s = 40 frames at 12 fps. build --loop's docs/idle.png and check's idle_frames hold 41 (0..3.333 s, both ends); the 41st is where the loop wraps, so a looping clip shows 40. The rig has physics (check.json loop_physics: 23 constraints) and play's seek starts it from rest, so the first pass does not close (captured seam 0.753 vs max step 0.649 over #070b18); --settle 1 draws the second pass, frame i = seek(3.3333 + i/12), which does (0.508 vs 0.649; a second settle loop gives the same seams). Framing as rigc render --max 640: union of player.bounds() at 60 fps + 4% pad -> 244x640, scale 0.27876, viewport x -440.24 y -65.03 w 875.10 h 2295.92 = check's idle_frames/idle/geometry.json viewport (docs/idle.png is 246x640). Two runs gave identical frames (40 PNGs concatenated md5 0e864e728428a22cb8d527fadb11c620) and identical WebPs. WebP lossy q85 -m 6 -exact, alpha lossless (max error 0), durations 27 x 83 ms + 13 x 84 ms = 3333 ms per loop, background 0,0,0,0: 700112 bytes (md5 4b914c51df8301b952c3c4f32a6620f2); q75 562916. Poster = captured frame 0, 103721 bytes, md5 c953414dc9eef098af89618c7a7cbe69. Alpha: corners 0, interior 255, 5252 edge px on frame 0; border alpha 0 on every frame. Fringe: over 232, whole-frame mean luminance vs check's frames +0.035, edge px (0<alpha<255) -1.48 (darker, not a grey halo); semi-transparent px average 2.3 darker than their brightest opaque neighbour. Loop seam (scripts/loop-seam.py over #070b18): WebP 0.963 vs max step 1.164 PASS (over #e8e8e8 0.954 vs 1.135 PASS). Against rigc (check's idle_frames f0000-f0039, same viewport), capture over 232: MAD frame 0 2.445, mean 2.165, max 2.445 - resampling (browser at scale 0.279) plus the physics phase (play's second pass vs rigc's first); against docs/idle.png (246 wide, best at a 1 px shift) mean 2.479.
+- Replaced parts-idle.mp4 + poster (encode-video.sh from docs/idle.png, 41 frames, 246x640, opaque; loop seam 0.872 vs max step 0.937), deleted.
 
 - published version 1.40.0; origin/main = tag v1.40.0 (8718427) — `npm view @rig-c/parts version`; `git rev-parse v1.40.0^{} origin/main`
 - command name rig-parts — package.json "bin"; README.md:425-426

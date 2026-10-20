@@ -2,13 +2,13 @@
 # Rebuild the site's MP4s (and their posters) from pinned sources.
 #
 #   PARTS_EXAMPLES=/path/to/parts-examples scripts/encode-video.sh [clip ...]
-#   WALKTHROUGH=/path/to/rig-c-start/my-rig scripts/encode-video.sh getting-started-wave
 #   ADAPTERS_CAPTURE=/path/to/capture scripts/encode-video.sh adapters-three-engines
 #
 # With no clip names it rebuilds every clip whose status is "build".
 # Each source is read with `git show <sha>:<path>` from a local clone, so the
 # clone's working tree does not matter, only that it has the pinned commit.
-# Rows whose source repo is "walkthrough" have no commit: their source is a
+# Rows whose source repo is "walkthrough" (none at present: the Getting
+# Started clips are WebPs now) have no commit: their source is a
 # file or a frame directory a run of the Getting Started walkthrough wrote,
 # read from the folder WALKTHROUGH names (the walkthrough's my-rig). The row's
 # comment records the commands and package versions that wrote it; with
@@ -43,9 +43,12 @@ CLIPS=(
   # duration 3.333 s (49/50 ms each). 67 / 20.1 = 3.333 s. Composited over the
   # page background (--bg in styles.css), as the WebP's alpha is shown there.
   "family-preview|assets/family-preview.mp4|rig-c/parts-examples|c239b09328ca7364361b9761fac817502c09ede0|family/docs/family-preview.webp|201/10|67|3.333|#070b18|build"
-  # Parts page. Character 1's lossless idle (APNG, 41 frames at 83.33 ms;
-  # the GIF beside it is the same 41 frames at 80/90 ms). Opaque.
-  "parts-idle|assets/docs/parts-idle.mp4|rig-c/parts-examples|c239b09328ca7364361b9761fac817502c09ede0|family/roa/docs/idle.png|12|41|3.417|-|build"
+  # Parts page, "A drafted rig that idles": no longer an MP4. Character 1's
+  # idle (rig-c/parts-examples@c239b09 family/roa/out/check/build) is an
+  # animated WebP with alpha (assets/docs/parts-idle.webp + -poster.png),
+  # drawn by @rig-c/play over a transparent page by
+  # scripts/play-capture-webp.ts (its header has the command and versions).
+  # The old source, family/roa/docs/idle.png, is rigc render's and opaque.
   # Core page. rig-c/core film two (films/two-keypose/run.sh), the GIF as it
   # ships in core's README: 234 frames at 5 cs = 11.700 s, 600x405, opaque.
   # Its last 7 frames dissolve back into frame 0, so it is a loop.
@@ -67,21 +70,13 @@ CLIPS=(
   # Getting Started page, step 8: no longer an MP4. The idle is an animated
   # WebP with alpha (assets/docs/getting-started-idle.webp + -poster.png),
   # drawn by @rig-c/play over a transparent page and encoded by
-  # scripts/getting-started-idle-webp.ts (its header has the command and
-  # versions). rigc render's out/idle.png, the old source, is opaque by design.
+  # scripts/play-capture-webp.ts (its header has the command; the page's
+  # SOURCES the versions). rigc render's out/idle.png, the old source, is opaque by design.
 
-  # Getting Started page, step 10. The `wave` animation of step 9's
-  # wave-build/, written by the page's ten steps as given, run 2026-10-20 from
-  # an empty folder with Bun 1.4.2, which resolved @rig-c/parts 1.42.0,
-  # rig-c 2.64.1, @rig-c/pose 0.36.0, @rig-c/play 1.12.0 and
-  # rig-c/getting-started 2928714. Drawn frame by frame by rig-c's own poser
-  # rather than recorded from the browser player:
-  #   bunx rigc render --candidate wave-build --animation wave --fps 24 \
-  #     --max 640 --poser core --out wave-render
-  # 73 frames (0..3 s inclusive at 24 fps; frame 72 is the rest pose again,
-  # as frame 0), 388x640, opaque on rigc render's grey. 73 / 24 = 3.042 s.
-  # That run's frames, f0000..f0072 concatenated: md5 e1cbb4c0b8d582bfe0855f21e2ea671e.
-  "getting-started-wave|assets/docs/getting-started-wave.mp4|walkthrough|-|wave-render/wave@24fps|24|73|3.042|-|build"
+  # Getting Started page, step 10: no longer an MP4 either. The wave is an
+  # animated WebP with alpha (assets/docs/getting-started-wave.webp +
+  # -poster.png) drawn by @rig-c/play from the walkthrough's wave-build/ by
+  # scripts/play-capture-webp.ts, like step 8's idle.
   # Review page. Captured from @rig-c/review 0.2.1 on parts-examples@144f556
   # (family/roa/out/check/build, before the shoulder repair) with
   # scripts/review-capture.ts: the tool driven through its own page in headless

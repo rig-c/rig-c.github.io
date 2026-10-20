@@ -226,6 +226,7 @@ pre { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03); }
 .compare.cols-4 { --cols: 4; }
 .compare figure { margin: 0; }
 .compare img, .compare video { width: 100%; border-radius: var(--radius); border: 1px solid var(--border); background: #0b1020; }
+.compare picture img { border: 0; background: none; } /* a clip with alpha: the page shows through, no box */
 .compare figcaption { margin-top: 6px; }
 .figure-wide { margin: 1.4em 0; }
 .figure-wide img, .figure-wide video { width: 100%; border-radius: var(--radius); border: 1px solid var(--border); }
