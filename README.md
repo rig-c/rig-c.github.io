@@ -35,3 +35,18 @@ bun run build    # Emit all static HTML pages, Markdown mirrors, llms.txt, llms-
 bun run verify   # Verify HTML semantics, JSON-LD validity, canonical URLs, internal links, and zero inline styles
 bun run serve    # Start local static server on http://localhost:4321
 ```
+
+## Videos
+
+The MP4s under `assets/` are encoded from pinned sources by one script, which also writes each clip's poster (frame 0 of the encoded clip):
+
+```bash
+PARTS_EXAMPLES=../parts-examples scripts/encode-video.sh               # every clip marked "build"
+PARTS_EXAMPLES=../parts-examples scripts/encode-video.sh parts-idle    # one clip
+scripts/loop-seam.py assets/family-preview.mp4 assets/docs/parts-idle.mp4
+```
+
+- `scripts/encode-video.sh` holds one table: per clip, the output path, the source (repo, commit, path), the frame rate, frame count and duration, and the background a transparent source is composited over. Sources are read with `git show <sha>:<path>` from the local clone you name (`PARTS_EXAMPLES=`, `TRAILER=`, `CORE=`), so that clone's working tree does not matter. The encode is H.264 High, `yuv420p`, BT.709, `-tune animation`, CRF 20, a closed GOP of at most 60 frames, fast start, no audio; frame 0 and the last 3 frames are coded at QP 12 so the two sides of the loop's wrap are equally sharp. After each encode it checks the frame count, the duration (±0.02 s) and the loop seam, and exits non-zero if any is off. Clips whose source is not pinned yet are listed with status `hold` and are not rebuilt.
+- `scripts/loop-seam.py` prints, as mean absolute difference on 0–255 RGB, the first-vs-last difference (the seam) and the median and largest frame-to-frame step, then PASS when the seam is no larger than the largest step. It reads videos (through ffmpeg) and animated WebP/PNG/GIF (through Pillow, composited over `--bg`, default the page background `#070b18`), so a source and its MP4 can be compared.
+
+Needs `git`, `ffmpeg`/`ffprobe` with libx264, and `python3` with Pillow and numpy.
