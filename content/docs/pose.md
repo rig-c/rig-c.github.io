@@ -14,12 +14,12 @@ npmUrl: https://www.npmjs.com/package/@rig-c/pose
 
 <figure class="mod-hero">
   <div class="media">
-    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="608" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right arm loosely; on the right Character 1 swinging her coffee cup the same way">
+    <video data-loop="the swing comparison" controls muted loop playsinline preload="metadata" poster="/assets/docs/pose-swing-poster.jpg" width="804" height="792" aria-label="Recorded video: on the left a stick-figure pose swinging its right forearm; in the middle Character 1 swinging her coffee cup the same way, a few degrees; on the right an inset of her forearm and cup at twice the size, where the swing is easier to see">
       <source src="/assets/docs/pose-swing.mp4" type="video/mp4">
-      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm and Character 1 holding her cup" width="608" height="792">
+      <img src="/assets/docs/pose-swing-poster.jpg" alt="Side by side: the source pose's hanging arm, Character 1 holding her cup at rest, and an inset of her forearm and cup at twice the size" width="804" height="792">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints over 3 s at 24 fps, the right forearm swinging the cup like a pendulum about the elbow. Right: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source — 18 body joints at 24 fps, the right forearm swinging the cup like a pendulum about the elbow. Middle: Character 1's rig playing the motion <code>rig-pose retarget</code> wrote from it, drawn by <code>rigc render</code>; inset: forearm and cup at 2×. The swing is deliberately small — a few degrees, for reasons <a href="#a-motion-that-fits-the-rig">below</a>. The clip loops one swing of the motion (0.88–2.46 s).</figcaption>
 </figure>
 
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
@@ -32,7 +32,7 @@ A pose model reads each frame alone, so joints shake from frame to frame, and ev
 
 ### A motion that fits the rig
 
-The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, the coffee cup she is already holding, swung loosely like a pendulum from the elbow, two swings in three seconds so the loop closes.
+The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, the coffee cup she is already holding, swung loosely like a pendulum from the elbow, written as two swings in three seconds. The sequence was cleaned without <code>loop</code>, so the motion as retargeted does not return to its first frame at 3 s; the hero clip above loops one swing of it (0.88–2.46 s), where the wrap is an ordinary step.
 
 Getting that right took measuring rather than looking. Swung outward, the arm uncovered the edge of the trousers it hides in the painting, which See-through had to synthesize; swung inward, it slid under the shirt, because the arm part is drawn beneath `topwear`. And the hand-placed joints did not sit exactly on the rig's bones, so even "at rest" the retarget turned the upper arm 4.5° and the chest 2.6° away from how the rig was drawn. So the rest pose was aligned first — every track reads 0 at rest — and then the arm part was rendered alone and with the whole rig, counting, frame by frame, how many of its pixels end up covered by another part:
 
@@ -122,6 +122,7 @@ Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
 - [What it does not do](https://github.com/rig-c/pose#what-it-does-not-do)
 - [npm](https://www.npmjs.com/package/@rig-c/pose) · [CHANGELOG](https://github.com/rig-c/pose/blob/main/CHANGELOG.md)
 <!-- SOURCES (not published)
+- hero clip (2026-10-20, issue #23): scripts/pose-swing.py; rig panel and 2x inset drawn by rigc render (rig-c 2.61.0) from assets/rigs/character-1-swing/skeleton.model.json; source panel drawn from assets/rigs/character-1-swing/swing.pose.clean.json (the cleaned sequence the retarget read, 73 frames). The motion does not close at 3 s (clean ran with loop false and held the wrist at the outward end: sleeve_r1 2.355 deg at t=0, 4.108 at t=3), so the clip loops motion frames 21..59 (39 frames, 1.625 s, t 0.88-2.46 s), starting at frame 22 (sleeve_r1 0.034 deg, the poster); forearm over the clip -1.154..5.187 deg. Seam on the encoded file (MAD 0-255): rig panel 0.568 vs max step 0.634, whole frame 0.898 vs 0.950, both PASS. Rig panel vs the previous clip at the same frame: MAD 1.19 lossless, 2.40 encoded. pose-swing-ends.jpg unchanged (its rig panels match the render's f4/f67, MAD 1.46/1.44)
 - outward cut (2026-10-20, owner saw the trousers tear on the outward swing): swing.py out_k 0.3; body-side holes (scripts/holes.py, one fixed viewport) max 5173 -> 1124 px; all coverage rows re-measured on one fixed viewport: idle 926, previous 1854, this 1242
 - swing case, measured (2026-10-20, after owner review that the arm still slid under the torso): rest aligned with swing.py off1 -1.19, off2 0.37, off0 2.553 (all tracks 0 at rest); upper 0, forearm +-6 deg; arm coverage measured with rigc render --slot handwear_r vs the full render (scripts/core_hidden.py): idle max 926, #15 swing max 1828, this swing max 1218 core px
 - swing case (owner's idea, 2026-10-19; range cut after owner review: the arm slid under topwear): swing.py, upper arm +-3 deg, forearm +-10 deg trailing 0.18 s, centred 3 deg toward the body, period 1.5 s; outward swing uncovered the synthesized trouser edge, inward slid under topwear (handwear_r is slot 3, topwear slot 5 in rig.json); ends checked at 1400 px; track ranges and GATE/LAND/FOLD lines from the run
