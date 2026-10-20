@@ -22,6 +22,16 @@ Three packages, each versioned on its own, all at 0.1.1 with 0.x APIs:
 
 Each one reads the model document `rigc build` writes, `skeleton.model.json`, through `@rig-c/play`.
 
+<figure class="figure-wide">
+  <div class="media">
+    <video data-loop="the walk" controls muted loop playsinline preload="metadata" poster="/assets/docs/adapters-three-engines-poster.jpg" width="1424" height="638" aria-label="Recorded video: the same cartoon animal character walking in place in three panels, labelled PixiJS, Phaser and Three.js, in step with each other">
+      <source src="/assets/docs/adapters-three-engines.mp4" type="video/mp4">
+      <img src="/assets/docs/adapters-three-engines-poster.jpg" alt="The same walking character in three panels labelled @rig-c/pixi, @rig-c/phaser and @rig-c/three" width="1424" height="638">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> One rig, three hosts: <code>@rig-c/pixi</code> 0.1.1 on PixiJS 8.22.0, <code>@rig-c/phaser</code> 0.1.1 on Phaser 4.2.1 and <code>@rig-c/three</code> 0.1.1 on Three.js 0.186.1. Each panel is the adapters repository's own demo page, run against the npm releases, playing rigc's <code>walk</code> gallery rig and its 0.9 s <code>walk</code> animation; all three read the same <code>skeleton.model.json</code> through <code>@rig-c/play</code> 1.10.0, unmodified. Every frame was posed by seeking each page to the same time (30 fps) and reading its WebGL canvas, and the 0.9 s cycle plays four times. At equal times the panels differ by a mean of 0.03 (PixiJS vs Phaser) and 0.54 (PixiJS vs Three.js) on 0–255 RGB, against 2.4 between neighbouring frames; the Three.js demo draws the rig smaller, so its panel is enlarged more.</figcaption>
+</figure>
+
 ## When to use it
 
 Use an adapter when your game or page already renders with PixiJS, Phaser or Three.js, and the rig must sit in that scene graph with your other objects. Three.js is a 3D renderer, so its adapter is for 2D characters inside 3D scenes and interactive pages.
@@ -98,4 +108,10 @@ Swap in `@rig-c/phaser phaser` or `@rig-c/three three` for the other hosts.
 - install line — README.md:22; phaser/three install — README.md:48, packages/three/README.md:10
 - parity: same pose for same time held by a test — README.md:125-126
 - ADDING_A_HOST.md exists — README.md:85; repo tree docs/ADDING_A_HOST.md
+- figure: rig-c/adapters 5423bf4 index.html (PixiRig; ?host=phaser runs PhaserRig) and three-demo.html, src/ copied unmodified, public/rigs/ from that repo's scripts/fetch-assets.sh (rig-c 2.52.0 build of rig-c/core v2.52.0 gallery/walk, skeleton.model.json md5 b19607a17e5e74d4046eff62b716a389); served by vite 6.4.4 against npm @rig-c/pixi 0.1.1, @rig-c/phaser 0.1.1, @rig-c/three 0.1.1, @rig-c/play 1.10.0, pixi.js 8.22.0, phaser 4.2.1, three 0.186.1 (pixi.js/phaser/three/play versions are the adapters root package.json pins; peer ranges pixi.js ^8.0.0, phaser ^4.2.0, three ^0.186.1 — `npm view @rig-c/<host>@0.1.1 peerDependencies`)
+- capture: `bun scripts/adapters-capture.ts --base http://localhost:4391 --out capture` (Playwright 1.62.1 headless Chromium, --use-angle=metal; seek via each page's time control, canvas toDataURL; two runs md5-identical), `python3 scripts/adapters-composite.py capture capture/frames`, `ADAPTERS_CAPTURE=capture scripts/encode-video.sh adapters-three-engines` — 2026-10-20
+- walk animation 0.9 s — skeleton.model.json animations; 27 frames per cycle at 30 fps x 4 = 108 frames, 3.600 s, 1424x638, 622,390 bytes; loop seam 0.629 vs step median 2.202 max 3.221 PASS (scripts/loop-seam.py on the MP4)
+- inter-panel MAD (composite, same times, 448x560 panels after Lanczos resample): pixi-phaser mean 0.025 max 0.031; pixi-three mean 0.543 max 0.557; phaser-three mean 0.533 max 0.549; pixi-phaser on the 800x600 canvases before resampling mean 0.008 max 0.010; pixi panel frame-to-frame step median 2.428 max 3.503 — scripts/adapters-composite.py output
+- demo scale: Pixi/Phaser 0.6359 px/unit (src/main.ts computeStagePlacement, 78% of 800x600), Three.js 0.5842 (src/three-demo.ts, 430 px tall) — checked per frame against the drawn rectangle by the composite script
+- "It plays what @rig-c/play plays: the same pose for the same time, held to the player's output by a test" — README.md:125-126 (the caption's numbers are this page's measurement, not a parity claim)
 -->

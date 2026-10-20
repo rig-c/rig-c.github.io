@@ -3,6 +3,7 @@
 #
 #   PARTS_EXAMPLES=/path/to/parts-examples scripts/encode-video.sh [clip ...]
 #   WALKTHROUGH=/path/to/rig-c-start/my-rig scripts/encode-video.sh getting-started-idle
+#   ADAPTERS_CAPTURE=/path/to/capture scripts/encode-video.sh adapters-three-engines
 #
 # With no clip names it rebuilds every clip whose status is "build".
 # Each source is read with `git show <sha>:<path>` from a local clone, so the
@@ -12,6 +13,9 @@
 # read from the folder WALKTHROUGH names (the walkthrough's my-rig). The row's
 # comment records the commands and package versions that wrote it; with
 # WALKTHROUGH unset those rows are skipped, not failed.
+# Rows whose source repo is "capture" are the same, for frames this repo's own
+# capture scripts wrote from a browser run (the row's comment gives the
+# commands and versions), read from the folder ADAPTERS_CAPTURE names.
 # Needs: git, ffmpeg + ffprobe with libx264, python3 with Pillow and numpy.
 # After each encode it checks frame count, duration (±0.02 s) and the loop
 # seam (scripts/loop-seam.py), and fails if any of them is off.
@@ -29,8 +33,9 @@ export FFMPEG FFPROBE
 # must equal the source's own duration. background is the colour transparent
 # sources are composited over ("-" = source is opaque). status "build" means
 # this script rebuilds it; "hold" rows are recorded but not rebuilt here.
-# source path is an animated image, or (walkthrough rows only) a directory of
-# rendered frames f0000.png, f0001.png, ... as `rigc render` writes them.
+# source path is an animated image, or (walkthrough and capture rows only) a
+# directory of rendered frames f0000.png, f0001.png, ... as `rigc render`
+# writes them.
 # wrap qp (optional, default 12) is the QP frame 0 and the last 3 frames are
 # coded at (see loop_zones).
 CLIPS=(
@@ -90,6 +95,21 @@ CLIPS=(
   # drawn by the script. One pass, not a loop (no seam zones). Captured and
   # encoded there (same encode settings otherwise); not rebuilt here.
   "review-flow|assets/docs/review-flow.mp4|this repo|-|scripts/review-capture.ts|12|179|14.917|-|hold"
+  # Adapters page. rig-c/adapters' own demo pages (5423bf4: index.html, which
+  # runs PixiRig or, with ?host=phaser, PhaserRig; and three-demo.html), served
+  # with vite 6.4.4 against the npm releases @rig-c/pixi, @rig-c/phaser and
+  # @rig-c/three 0.1.1, @rig-c/play 1.10.0, pixi.js 8.22.0, phaser 4.2.1 and
+  # three 0.186.1, each showing the `walk` gallery rig (rig-c 2.52.0 build)
+  # playing `walk` (0.9 s). Captured and laid out by
+  #   bun scripts/adapters-capture.ts --base http://localhost:4391 --out capture
+  #   python3 scripts/adapters-composite.py capture capture/frames
+  # with ADAPTERS_CAPTURE=capture (run 2026-10-20, Playwright 1.62.1
+  # Chromium; the scripts' headers give the setup). One cycle is 27 frames
+  # at 30 fps; the composite repeats it 4 times: 108 frames / 30 = 3.600 s,
+  # 1424x638, opaque. The 27 frames per engine,
+  # concatenated: pixi md5 1396c54b71494016803c549e11c3401e, phaser
+  # 498095a24e00822aad0d808499d987c4, three edf77b197b5252203860daf0807c59fc.
+  "adapters-three-engines|assets/docs/adapters-three-engines.mp4|capture|-|frames|30|108|3.600|-|build"
 )
 
 # Local clone of each source repo, set by the caller.
@@ -99,6 +119,7 @@ clone_for() {
     rig-c/trailer) echo "${TRAILER:-}" ;;
     rig-c/core) echo "${CORE:-}" ;;
     walkthrough) echo "${WALKTHROUGH:-}" ;;
+    capture) echo "${ADAPTERS_CAPTURE:-}" ;;
     *) echo "" ;;
   esac
 }
@@ -174,6 +195,10 @@ encode_clip() {
     echo "skip $clip: set WALKTHROUGH to a walkthrough run's my-rig folder (source $path)" >&2
     return 0
   fi
+  if [[ -z "$clone" && "$repo" == capture ]]; then
+    echo "skip $clip: set ADAPTERS_CAPTURE to the capture folder (source $path)" >&2
+    return 0
+  fi
   if [[ -z "$clone" ]]; then
     echo "$clip: set the local clone of $repo (e.g. PARTS_EXAMPLES=...)" >&2
     return 1
@@ -183,7 +208,7 @@ encode_clip() {
   tmp="$(mktemp -d)"
   TMPDIRS+=("$tmp")
   mkdir "$tmp/frames"
-  if [[ "$repo" == walkthrough ]]; then
+  if [[ "$repo" == walkthrough || "$repo" == capture ]]; then
     dump_frames "$clone/$path" "$tmp/frames" "$bg"
   else
     git -C "$clone" show "$sha:$path" >"$tmp/source"
@@ -197,8 +222,8 @@ encode_clip() {
     return 1
   fi
 
-  if [[ "$repo" == walkthrough ]]; then
-    echo "== $clip <- walkthrough $path ($frames frames at $fps fps)"
+  if [[ "$repo" == walkthrough || "$repo" == capture ]]; then
+    echo "== $clip <- $repo $path ($frames frames at $fps fps)"
   else
     echo "== $clip <- $repo@${sha:0:7} $path ($frames frames at $fps fps)"
   fi

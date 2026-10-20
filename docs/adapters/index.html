@@ -135,6 +135,15 @@
 <li><code>@rig-c/three</code>: a native Three.js 0.186.1 renderer and live <code>Group</code>.</li>
 </ul>
 <p>Each one reads the model document <code>rigc build</code> writes, <code>skeleton.model.json</code>, through <code>@rig-c/play</code>.</p>
+<figure class="figure-wide">
+  <div class="media">
+    <video data-loop="the walk" controls muted loop playsinline preload="metadata" poster="/assets/docs/adapters-three-engines-poster.jpg" width="1424" height="638" aria-label="Recorded video: the same cartoon animal character walking in place in three panels, labelled PixiJS, Phaser and Three.js, in step with each other">
+      <source src="/assets/docs/adapters-three-engines.mp4" type="video/mp4">
+      <img src="/assets/docs/adapters-three-engines-poster.jpg" alt="The same walking character in three panels labelled @rig-c/pixi, @rig-c/phaser and @rig-c/three" width="1424" height="638">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> One rig, three hosts: <code>@rig-c/pixi</code> 0.1.1 on PixiJS 8.22.0, <code>@rig-c/phaser</code> 0.1.1 on Phaser 4.2.1 and <code>@rig-c/three</code> 0.1.1 on Three.js 0.186.1. Each panel is the adapters repository's own demo page, run against the npm releases, playing rigc's <code>walk</code> gallery rig and its 0.9 s <code>walk</code> animation; all three read the same <code>skeleton.model.json</code> through <code>@rig-c/play</code> 1.10.0, unmodified. Every frame was posed by seeking each page to the same time (30 fps) and reading its WebGL canvas, and the 0.9 s cycle plays four times. At equal times the panels differ by a mean of 0.03 (PixiJS vs Phaser) and 0.54 (PixiJS vs Three.js) on 0–255 RGB, against 2.4 between neighbouring frames; the Three.js demo draws the rig smaller, so its panel is enlarged more.</figcaption>
+</figure>
 <h2 id="when-to-use-it">When to use it</h2>
 <p>Use an adapter when your game or page already renders with PixiJS, Phaser or Three.js, and the rig must sit in that scene graph with your other objects. Three.js is a 3D renderer, so its adapter is for 2D characters inside 3D scenes and interactive pages.</p>
 <p>If you only need a rig in a web page, with no engine, use <a href="/docs/play/">Play</a> directly. It draws as DOM elements or one canvas. Native engines such as Godot or Unity are planned, not available.</p>
