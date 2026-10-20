@@ -153,7 +153,7 @@ function hero(page: Page): string {
               <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, smiles, kicks her legs and waves" width="960" height="540">
             </video>
           </div>
-          <figcaption><span class="media-kind">Recorded video</span> One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a></figcaption>
+          <figcaption><span class="media-kind">Recorded video</span> One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a>. The sky, the lights, the mesh-and-bone reveal and the captions are the film layer (<code>film/compose.py</code>); the rest is the rig.</figcaption>
         </figure>
       </section>`;
 }
