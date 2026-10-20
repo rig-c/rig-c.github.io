@@ -85,7 +85,7 @@
     {
       "@type": "SoftwareSourceCode",
       "name": "@rig-c/review",
-      "version": "0.7.0",
+      "version": "0.7.1",
       "codeRepository": "https://github.com/rig-c/review",
       "url": "https://rig-c.org/docs/review/",
       "programmingLanguage": "TypeScript",
@@ -123,13 +123,13 @@
         </nav>
       <main class="site-main docs-main">
         <nav aria-label="Breadcrumb" class="breadcrumb"><ol><li><a href="/">rig-c</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Review</li></ol></nav>
-        <div class="pkg-bar"><span class="pkg"><code>@rig-c/review</code> <span class="ver">0.7.0</span></span><a href="https://github.com/rig-c/review">github.com/rig-c/review</a><a href="https://www.npmjs.com/package/@rig-c/review">npm</a></div>
+        <div class="pkg-bar"><span class="pkg"><code>@rig-c/review</code> <span class="ver">0.7.1</span></span><a href="https://github.com/rig-c/review">github.com/rig-c/review</a><a href="https://www.npmjs.com/package/@rig-c/review">npm</a></div>
         <article>
 <h1 id="rig-creview">@rig-c/review</h1>
 <p class="mod-role">A local workspace for a person: open what an agent built, find what looks wrong, try a setup change through the producer that built it, pin what is left to a frame and a slot, and hand it back as an issue.</p>
 <figure class="mod-hero">
-  <img src="/assets/docs/review-screen.jpg" alt="The rig-review page in Setup mode: the left column lists Character 1's 17 parts with topwear selected and Solo ticked, the stage shows the shirt alone at 800 percent with the screen-left shoulder cut flat and stepped, and the Inspector below describes the topwear mesh" width="1600" height="1000">
-  <figcaption>Character 1 as <code>rig-parts</code> 1.44.0 builds it from its config at parts-examples <code>c239b09</code>, open in <code>rig-review</code> 0.7.0: <code>topwear</code> soloed at 800 % on the screen-left shoulder, where the build's cloth cut leaves a flat, indented step.</figcaption>
+  <img src="/assets/docs/review-screen.jpg" alt="The rig-review page in Setup with Edit mesh on: the left column lists Character 1's 17 parts with topwear selected and Solo ticked; the stage shows the shirt at 800 percent with its mesh drawn over it — the orange hull outline, the triangulation's edges and the vertices, a dense grid of them over the chest — and the top vertex of the screen-left shoulder, where the outline runs flat, selected; the editor bar above reads Modify, Create, Delete, Edges, Undo, Redo, Reset, Download JSON, Apply · Rebuild and 0 ops · setup pose · preview only" width="1600" height="1000">
+  <figcaption>Character 1 as <code>rig-parts</code> 1.44.0 builds it from its config at parts-examples <code>c239b09</code>, open in <code>rig-review</code> 0.7.1 with <em>Edit mesh</em> on: the mesh the producer drafted for <code>topwear</code> (502 vertices, 885 triangles), read from the compiled model document and drawn in setup space, at 800 % on the screen-left shoulder where the cloth cut leaves a flat, indented step; its top vertex is selected. A move, an added vertex or a constraint edge is a typed delta, previewed only; <em>Apply · Rebuild</em> sends it to <code>rig-parts remesh --delta</code>, which retriangulates in scratch, and the revision loads in place.</figcaption>
 </figure>
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 <nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol><li><a href="/docs/parts/"><strong>Parts</strong><span>split into parts</span></a></li><li><a href="/docs/pose/"><strong>Pose</strong><span>given a motion</span></a></li><li><a href="/docs/core/"><strong>Core</strong><span>checked</span></a></li><li><a href="/docs/review/" aria-current="step"><strong>Review</strong><span>looked at</span></a></li><li><a href="/docs/play/"><strong>Play</strong><span>played</span></a></li></ol></nav>
@@ -138,12 +138,12 @@
 <p>Built by its producer from its config and painting, Character 1's shirt has a flat, indented shoulder: the cloth cut leaves out what the hair covers in the still, and the hair uncovers it when it moves. The family suite records the repair in <a href="https://github.com/rig-c/parts-examples/blob/main/family/roa/SHOULDER_REPAIR.md">its shoulder-repair note</a>. Here review opens the build <code>rig-parts</code> 1.44.0 makes from that commit's config, finds the step, tries a setup edit through the producer on the way, and hands the defect back.</p>
 <figure class="figure-media">
   <div class="media">
-    <video data-loop="the review flow" controls muted playsinline preload="metadata" poster="/assets/docs/review-flow-poster.jpg" width="1600" height="1000" aria-label="Recorded video: the rig-review page with Character 1's build; the idle is paused at 1.25 seconds, the topwear slot is picked, soloed and zoomed until the step in the screen-left shoulder shows; in Setup the chest-region editor and mesh edges are turned on, the R region is dragged up and Apply · Rebuild reloads the shirt with the producer's line in the editor bar; the slot is used for feedback with frames 15 to 15, category Defect and a one-line summary, the review is submitted as changes requested, and the exported feedback JSON is shown down to its applied record">
+    <video data-loop="the review flow" controls muted playsinline preload="metadata" poster="/assets/docs/review-flow-poster.jpg" width="1600" height="1000" aria-label="Recorded video: the rig-review page with Character 1's build; the idle is paused at 1.25 seconds, the topwear slot is picked, soloed and zoomed until the step in the screen-left shoulder shows; in Setup Edit mesh draws the shirt's mesh over the shoulder and its top vertex is selected, then Edit mesh is turned off; the chest-region editor and mesh edges are turned on, the R region is dragged up and Apply · Rebuild reloads the shirt with the producer's line in the editor bar; the slot is used for feedback with frames 15 to 15, category Defect and a one-line summary, the review is submitted as changes requested, and the exported feedback JSON is shown down to its applied record">
       <source src="/assets/docs/review-flow.mp4" type="video/mp4">
       <img src="/assets/docs/review-flow-poster.jpg" alt="The rig-review page with Character 1's whole rig playing its idle" width="1600" height="1000">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> The whole case in 20 seconds: <code>rig-review</code> 0.7.0 driven through its own page on Character 1 as <code>@rig-c/parts</code> 1.44.0 builds it from parts-examples <code>c239b09</code> — pause at 1.25 s, pick and solo <code>topwear</code>, zoom on the shoulder; in Setup, drag the R chest region up 30 px and <em>Apply · Rebuild</em>; pin the shoulder as feedback, submit, and the export. The producer's ~30 s run behind Apply is cut to its result line; nothing else is edited but the two ends. The cursor is drawn in, and the last shots are <code>rig-review feedback --format json</code> opened in the same browser.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> The whole case in 23 seconds: <code>rig-review</code> 0.7.1 driven through its own page on Character 1 as <code>@rig-c/parts</code> 1.44.0 builds it from parts-examples <code>c239b09</code> — pause at 1.25 s, pick and solo <code>topwear</code>, zoom on the shoulder; in Setup, <em>Edit mesh</em> on the shoulder, then drag the R chest region up 30 px and <em>Apply · Rebuild</em>; pin the shoulder as feedback, submit, and the export. The producer's run behind Apply (remesh 109 s + compile 5 s in this capture) is cut to its result line; nothing else is edited but the two ends. The cursor is drawn in, and the last shots are <code>rig-review feedback --format json</code> opened in the same browser.</figcaption>
 </figure>
 <div class="case">
 <h3 id="1-open-the-build-and-look-where-the-motion-would-reveal-it">1. Open the build, and look where the motion would reveal it</h3>
@@ -164,7 +164,7 @@
 <pre><code class="language-json">{
   &quot;schema&quot;: &quot;rig-review-session/1&quot;,
   &quot;reviewedSource&quot;: {
-    &quot;viewerVersion&quot;: &quot;0.7.0&quot;, &quot;runtimeVersion&quot;: &quot;1.12.0&quot;,
+    &quot;viewerVersion&quot;: &quot;0.7.1&quot;, &quot;runtimeVersion&quot;: &quot;1.12.0&quot;,
     &quot;rig&quot;: { &quot;path&quot;: &quot;build/skeleton.model.json&quot;, &quot;sha256&quot;: &quot;1f0e98202ea9dadf…&quot; },
     &quot;handoff&quot;: { &quot;schema&quot;: &quot;rig-review-handoff/1&quot;, &quot;how&quot;: &quot;declared&quot;, &quot;via&quot;: &quot;open --config&quot;,
                  &quot;config&quot;: { &quot;path&quot;: &quot;config.json&quot;, &quot;sha256&quot;: &quot;b132cc7680cdc3c4…&quot; }, … }
@@ -223,7 +223,7 @@ npx rig-review open /absolute/path/to/output
 <li><strong><code>check</code> validates the delivery contract and model envelope</strong>, not the upstream compiler gate or visual quality; a raw <code>skeleton.json</code> can be inspected but not played (README §&quot;Existing output handoff&quot;).</li>
 <li><strong>No frame rate is inferred</strong>: without a declared clock the page shows <code>rate unknown</code>, and strip PNGs need the report's exact <code>frameTimes</code> (README §&quot;Existing output handoff&quot;, §&quot;Frame strip export&quot;).</li>
 <li><strong>Never publishes an issue automatically</strong>; saving or exporting feedback modifies no model (README §&quot;Feedback ownership&quot;).</li>
-<li><strong>Maturity</strong>: &quot;the CLI is the supported surface, and no importable API is promised yet&quot; (README §&quot;Start&quot;; the README still says 0.1.x while npm is at 0.7.0).</li>
+<li><strong>Maturity</strong>: &quot;the CLI is the supported surface, and no importable API is promised yet&quot; (README §&quot;Start&quot;; the README still says 0.1.x while npm is at 0.7.1).</li>
 </ul>
 <h2 id="go-deeper">Go deeper</h2>
 <ul>
