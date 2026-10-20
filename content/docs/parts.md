@@ -14,12 +14,12 @@ npmUrl: https://www.npmjs.com/package/@rig-c/parts
 
 <figure class="mod-hero">
   <div class="media">
-    <video data-loop="the parts coming together" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-explode-poster.jpg" width="1280" height="720" aria-label="Recorded video: Character 1's seventeen parts laid out in a grid, then moving to their places in the rig">
+    <video data-loop="the parts loop" controls muted loop playsinline preload="metadata" poster="/assets/docs/parts-explode-poster.jpg" width="1280" height="720" aria-label="Recorded video: Character 1 assembled from her seventeen parts, dissolving into a labelled grid of those parts and back">
       <source src="/assets/docs/parts-explode.mp4" type="video/mp4">
-      <img src="/assets/docs/parts-explode-poster.jpg" alt="Character 1's seventeen parts laid out in a grid" width="1280" height="720">
+      <img src="/assets/docs/parts-explode-poster.jpg" alt="Character 1 assembled from her seventeen parts" width="1280" height="720">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> Character 1's 17 parts as rig-parts assembled them, drawn from <code>out/parts/</code> at the positions <code>parts.json</code> records, in the rig's draw order.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> Character 1's 17 parts from <code>out/parts/</code>. The assembled figure that opens and closes the loop is drawn at the positions <code>parts.json</code> records, in the rig's draw order; the labelled grid and the dissolves between them are this page's illustration.</figcaption>
 </figure>
 
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
@@ -123,6 +123,7 @@ From the README's own *What it does not do*:
 - Character 1's own files: [its folder in rig-c/parts-examples](https://github.com/rig-c/parts-examples/tree/c239b09328ca7364361b9761fac817502c09ede0/family/roa)
 
 <!-- SOURCES (not published)
+- hero clip parts-explode.mp4 + poster: scripts/parts-explode.py (reads rig-c/parts-examples@c239b09 family/roa/out/parts/*.png + parts.json via git show; assembled frames = parts.json x/y in list order, placement vs out/recomposite_rig.png mean abs diff 0.0134; grid layout and dissolves are illustration)
 - Character 1 assets: rig-c/parts-examples@c239b09 family/roa — docs/roa_layers_sheet.png, out/parts/*.png, out/parts.json (17 parts, recomposite: mean_abs 0.873, within_share 0.9831, uncovered_error_px 6041, holes[0] 834 px bordering bottomwear), out/recomposite_rig.png, out/recomposite_error_rig.png, docs/idle.gif (41 frames, 80 ms), out/check/contact.png
 - red = uncovered error, blue = covered error (>40 off): rig-c/parts docs/AUTHORING.md lines 2200, 2633
 - Limits: rig-c/parts README "What it does not do" (origin/main lines 325-362)
