@@ -120,7 +120,19 @@ You should see a coverage line starting `coverage: 42 bone(s) — 29 checked and
 bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
 ```
 
-You should see `check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)`, then `build: PASS`. Open `out/idle.gif`: the character breathes and blinks in a loop. A skipped bar is named with its reason; any `FAIL` line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (`out/idle.gif`, or [Review](/docs/review/)).
+You should see `check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)`, then `build: PASS`. Open `out/idle.gif`: the character breathes and blinks in a loop.
+
+<figure>
+  <div class="media">
+    <video data-loop="the idle" controls muted loop playsinline preload="metadata" poster="/assets/docs/getting-started-idle-poster.jpg" width="316" height="640" aria-label="Recorded video: the example character standing, breathing and blinking once in her idle loop">
+      <source src="/assets/docs/getting-started-idle.mp4" type="video/mp4">
+      <img src="/assets/docs/getting-started-idle-poster.jpg" alt="The example character standing at rest" width="316" height="640">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The idle this walkthrough wrote, unedited: 40 frames at 12 fps from <code>out/idle.png</code>, the lossless copy <code>build --loop</code> writes beside <code>out/idle.gif</code>. Made by the commands above, run as written on 2026-10-20 with <code>@rig-c/parts</code> 1.42.0 and <code>rig-c</code> 2.64.1.</figcaption>
+</figure>
+
+A skipped bar is named with its reason; any `FAIL` line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (`out/idle.gif`, or [Review](/docs/review/)).
 
 ### 9. Give it a wave
 
@@ -151,6 +163,16 @@ bun ../getting-started/scripts/serve.ts
 
 Open <http://localhost:3000/?model=wave-build/skeleton.model.json&anim=wave>: the character raises her right arm and waves; the menu switches to `idle`. Ctrl+C stops the server.
 
+<figure>
+  <div class="media">
+    <video data-loop="the wave" controls muted loop playsinline preload="metadata" poster="/assets/docs/getting-started-wave-poster.jpg" width="388" height="640" aria-label="Recorded video: the example character raises her right arm above her head, waves, and lowers it back to rest">
+      <source src="/assets/docs/getting-started-wave.mp4" type="video/mp4">
+      <img src="/assets/docs/getting-started-wave-poster.jpg" alt="The example character standing at rest before the wave" width="388" height="640">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The <code>wave</code> animation in this walkthrough's <code>wave-build/</code>, unedited: 73 frames, 3 s at 24 fps, from rest back to rest. Drawn frame by frame by rig-c's own poser (<code>bunx rigc render --candidate wave-build --animation wave --fps 24 --max 640 --poser core</code>) rather than filmed from the browser player. Same run as the idle above: <code>@rig-c/parts</code> 1.42.0, <code>rig-c</code> 2.64.1, <code>@rig-c/pose</code> 0.36.0.</figcaption>
+</figure>
+
 The full guide — making your own character, the GPU routes, troubleshooting and every measured figure — is the [rig-c/getting-started README](https://github.com/rig-c/getting-started#readme) and its [docs/REFERENCE.md](https://github.com/rig-c/getting-started/blob/main/docs/REFERENCE.md).
 
 ## Three ways to use the output
@@ -160,3 +182,10 @@ The full guide — making your own character, the GPU routes, troubleshooting an
 3. **In a game engine via official Spine Runtimes**: Load `skeleton.json` and `skeleton.atlas` in Unity, Godot, Unreal, or C++ runtimes under the Spine Runtimes License.
 
 The example inputs in step 2 come from [rig-c/exam](https://github.com/rig-c/exam) and are **CC BY-NC 4.0**, not MIT: free to use with credit, not for commercial use, and what you build from them carries that licence. Which terms each route brings: [Licensing](/docs/licensing/).
+
+<!-- SOURCES (not published)
+- Both clips: one run of steps 1-10 as written, 2026-10-20, Apple M4, Bun 1.4.2, from an empty folder. `bun add` resolved @rig-c/parts 1.42.0, rig-c 2.64.1, @rig-c/pose 0.36.0, @rig-c/play 1.12.0 (bun.lock; `npm view` the same day gave the same four); rig-c/getting-started cloned at 2928714. Every command exited 0. Hand-placed keypoints (step 6's default), so step 7 printed 0 LINT lines; the 1.41.1 LINT line in step 6 is for the script-detected joints and was not re-run here.
+- Expected lines matched: st_input_full.png 2432x2432; 29 layer(s): 29 with opaque pixels; 0 WARN line(s); head_box [616,32,1132,548]; st_input_head.png 516x516; 22 part(s) on a 832x1216 rig; recomposite mean |d|=1.13, within 8: 97.8%; coverage: 42 bone(s) - 29 checked and clean; check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN); build: PASS; wave.ts: 73 frame(s), 3 s at 24 fps; GATE rigc build --profile spine-html: green; wrote wave.motion.json - animations: idle, wave.
+- getting-started-idle.mp4 + poster: scripts/encode-video.sh row getting-started-idle, from the run's out/idle.png (APNG, 40 frames at 83.33 ms = 12 fps, 3.333 s, 317x640, opaque; out/idle.gif is the same 40 frames at 80/90 ms, mean diff 0.38). Encoded 316x640, 40 frames, 3.333 s, wrap QP 10. Loop seam (scripts/loop-seam.py): source 0.497 vs max step 0.504; MP4 0.545 vs 0.551 PASS. One blink, closed at frame 29.
+- getting-started-wave.mp4 + poster: `bunx rigc render --candidate wave-build --animation wave --fps 24 --max 640 --poser core --out wave-render` (rig-c 2.64.1) -> 73 frames (0..3 s inclusive), 388x640, opaque on rigc render's grey (232,232,232); encode-video.sh row getting-started-wave, 73 frames, 3.042 s. Frame 72 is the rest pose of frame 0 (source seam 0.002, max step 0.755), so it loops; MP4 seam 0.319 vs max step 0.779 PASS.
+-->

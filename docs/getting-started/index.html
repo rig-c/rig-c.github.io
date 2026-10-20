@@ -192,7 +192,17 @@ bun ../getting-started/scripts/take.ts work/proposal.json config.json bones mesh
 <h3 id="8-build-the-rig">8. Build the rig</h3>
 <pre><code class="language-sh">bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
 </code></pre>
-<p>You should see <code>check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)</code>, then <code>build: PASS</code>. Open <code>out/idle.gif</code>: the character breathes and blinks in a loop. A skipped bar is named with its reason; any <code>FAIL</code> line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (<code>out/idle.gif</code>, or <a href="/docs/review/">Review</a>).</p>
+<p>You should see <code>check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)</code>, then <code>build: PASS</code>. Open <code>out/idle.gif</code>: the character breathes and blinks in a loop.</p>
+<figure>
+  <div class="media">
+    <video data-loop="the idle" controls muted loop playsinline preload="metadata" poster="/assets/docs/getting-started-idle-poster.jpg" width="316" height="640" aria-label="Recorded video: the example character standing, breathing and blinking once in her idle loop">
+      <source src="/assets/docs/getting-started-idle.mp4" type="video/mp4">
+      <img src="/assets/docs/getting-started-idle-poster.jpg" alt="The example character standing at rest" width="316" height="640">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The idle this walkthrough wrote, unedited: 40 frames at 12 fps from <code>out/idle.png</code>, the lossless copy <code>build --loop</code> writes beside <code>out/idle.gif</code>. Made by the commands above, run as written on 2026-10-20 with <code>@rig-c/parts</code> 1.42.0 and <code>rig-c</code> 2.64.1.</figcaption>
+</figure>
+<p>A skipped bar is named with its reason; any <code>FAIL</code> line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (<code>out/idle.gif</code>, or <a href="/docs/review/">Review</a>).</p>
 <h3 id="9-give-it-a-wave">9. Give it a wave</h3>
 <pre><code class="language-sh">bun ../getting-started/scripts/wave.ts keypoints.json wave.pose.json
 bunx rig-pose clean --pose wave.pose.json --out wave.pose.clean.json
@@ -214,6 +224,15 @@ bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json 
 <pre><code class="language-sh">bun ../getting-started/scripts/serve.ts
 </code></pre>
 <p>Open <a href="http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave">http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave</a>: the character raises her right arm and waves; the menu switches to <code>idle</code>. Ctrl+C stops the server.</p>
+<figure>
+  <div class="media">
+    <video data-loop="the wave" controls muted loop playsinline preload="metadata" poster="/assets/docs/getting-started-wave-poster.jpg" width="388" height="640" aria-label="Recorded video: the example character raises her right arm above her head, waves, and lowers it back to rest">
+      <source src="/assets/docs/getting-started-wave.mp4" type="video/mp4">
+      <img src="/assets/docs/getting-started-wave-poster.jpg" alt="The example character standing at rest before the wave" width="388" height="640">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> The <code>wave</code> animation in this walkthrough's <code>wave-build/</code>, unedited: 73 frames, 3 s at 24 fps, from rest back to rest. Drawn frame by frame by rig-c's own poser (<code>bunx rigc render --candidate wave-build --animation wave --fps 24 --max 640 --poser core</code>) rather than filmed from the browser player. Same run as the idle above: <code>@rig-c/parts</code> 1.42.0, <code>rig-c</code> 2.64.1, <code>@rig-c/pose</code> 0.36.0.</figcaption>
+</figure>
 <p>The full guide — making your own character, the GPU routes, troubleshooting and every measured figure — is the <a href="https://github.com/rig-c/getting-started#readme">rig-c/getting-started README</a> and its <a href="https://github.com/rig-c/getting-started/blob/main/docs/REFERENCE.md">docs/REFERENCE.md</a>.</p>
 <h2 id="three-ways-to-use-the-output">Three ways to use the output</h2>
 <ol>
