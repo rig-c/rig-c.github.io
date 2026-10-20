@@ -43,6 +43,16 @@ exit=0</code></pre></figure>
 
 An agent authoring a rig cannot tell whether it succeeded, because Spine's JSON parser accepts a lot of nonsense silently: a constraint in the 4.2 shape simply vanishes, a `size:` that disagrees with the PNG collapses every UV, a four-number curve array yields NaN. Each of these loads clean, plays, and is wrong. `rigc` makes the failure legible: every refusal names its rule and the value it found, ends with the command that explains it, and leaves nothing on disk.
 
+<figure class="figure-media">
+  <div class="media">
+    <video data-loop="the key-pose film" controls muted loop playsinline preload="metadata" poster="/assets/docs/core-keypose-poster.jpg" width="600" height="404" aria-label="Recorded video: two key poses of a drawn character side by side, rigc pose's report on where each part sits, two candidate in-between motions playing side by side, a rigc vote ballot with B chosen, and the chosen motion at full size — core's own film two">
+      <source src="/assets/docs/core-keypose.mp4" type="video/mp4">
+      <img src="/assets/docs/core-keypose-poster.jpg" alt="Two key poses of a drawn character side by side, with the command under them" width="600" height="404">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> rig-c core's own film two, the authoring loop on one character. Two key poses are the given conditions; <code>rigc pose</code> reads back where every part sits in each picture; two candidate in-betweenings are compiled from the same pair; and a real <code>rigc vote</code> ballot picks the winner — the movement between the poses is the one thing nothing in the toolchain grades. Five shots: the two pictures, <code>rigc pose</code>'s report on pose B, the two candidates, a photograph of the real ballot page, and the winner at full size; the command in the band is the one that produced the shot above it. Everything on screen is compiled output or a photograph of a real page, and every number on it was printed first by a tool. The character is film one's; the poses and the three motion specs are the only new authoring. From the <a href="https://github.com/rig-c/core">rig-c/core</a> README, built under the package's earlier name, <code>spine-rigc</code> — shot 2 is spine-rigc 0.9.0's report, not what <code>rigc pose</code> prints today.</figcaption>
+</figure>
+
 ## Three mistakes an agent makes, on one rig
 
 Each case starts from a fresh copy of Character 1's `rig.json`, `motion.json` and its 17 part images, built with `bunx rig-c@2.61.0 build --rig rig.json --motion motion.json --images images --out build`.
@@ -155,6 +165,7 @@ rigc runs on Bun 1.2.0 or later. The npm package is `rig-c`; `@rig-c/core` is th
 - Start here: [/docs/getting-started/](/docs/getting-started/)
 
 <!-- SOURCES (not published)
+- key-pose film: rig-c/core@539572d (539572d34bb034b9e905e30dc2d45bcd2650b34f, the commit that last changed it; identical at v2.64.1 51dba78) assets/rigc-keypose.gif — 234 frames, 600x405, 5 cs each = 11.70 s, opaque; encoded by scripts/encode-video.sh row core-keypose (20 fps, cropped to 600x404); caption from films/two-keypose/README.md (summary, shot table, honesty stance; shot 2 = spine-rigc@0.9.0 output); "spine-rigc" is drawn in the caption band of every frame
 - three cases: rig-c 2.61.0 on rig-c/parts-examples@c239b09 family/roa/out/rig — verbatim fail.log / pass.log / guide.txt of each case (case run 2026-10-19)
 - render contact: "idle 41 frame(s), 3.333s + contact.png"; inspect command and image from the same run
 - packing narrow: core README Install ("no trimming, no rotation, no scaling")

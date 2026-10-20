@@ -31,6 +31,10 @@ CLIPS=(
   # Parts page. Character 1's lossless idle (APNG, 41 frames at 83.33 ms;
   # the GIF beside it is the same 41 frames at 80/90 ms). Opaque.
   "parts-idle|assets/docs/parts-idle.mp4|rig-c/parts-examples|c239b09328ca7364361b9761fac817502c09ede0|family/roa/docs/idle.png|12|41|3.417|-|build"
+  # Core page. rig-c/core film two (films/two-keypose/run.sh), the GIF as it
+  # ships in core's README: 234 frames at 5 cs = 11.700 s, 600x405, opaque.
+  # Its last 7 frames dissolve back into frame 0, so it is a loop.
+  "core-keypose|assets/docs/core-keypose.mp4|rig-c/core|539572d34bb034b9e905e30dc2d45bcd2650b34f|assets/rigc-keypose.gif|20|234|11.700|-|build"
   # Landing hero. Built by rig-c/trailer build.sh -> out/scene/trailer.webp
   # (a build output); the commit the site's MP4 came from is not recorded.
   "trailer|assets/trailer.mp4|rig-c/trailer|unknown|out/scene/trailer.webp|20|240|12.000|-|hold"
