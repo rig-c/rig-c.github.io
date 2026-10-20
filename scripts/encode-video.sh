@@ -56,10 +56,11 @@ CLIPS=(
   # Landing hero. Built by rig-c/trailer build.sh -> out/scene/trailer.webp
   # (a build output); the commit the site's MP4 came from is not recorded.
   "trailer|assets/trailer.mp4|rig-c/trailer|unknown|out/scene/trailer.webp|20|240|12.000|-|hold"
-  # Landing, under the hero. rig-c/core films/one-assembly/run.sh ->
-  # assets/rigc-demo.gif (600x405; the MP4 is 600x404). Commit not recorded.
-  # Waits for the re-render under the rig-c name.
-  "rigc-demo|assets/rigc-demo.mp4|rig-c/core|unknown|assets/rigc-demo.gif|20|134|6.700|-|hold"
+  # Landing, under the hero ("From loose parts to a living rig"). Rendered and
+  # encoded by scripts/landing-film.py from rig-c/trailer@2248a13 (its pinned
+  # @rig-c/parts 1.12.0 and rig-c 2.47.1; build.sh steps 1-3, then the
+  # script's own rigc renders), CRF 23 with the wrap zones; not rebuilt here.
+  "landing-parts-to-rig|assets/landing-parts-to-rig.mp4|this repo|-|scripts/landing-film.py|30|417|13.900|-|hold"
   # Parts page hero. Rendered and encoded by scripts/parts-explode.py from
   # rig-c/parts-examples@c239b09 (same encode settings); not rebuilt here.
   "parts-explode|assets/docs/parts-explode.mp4|this repo|-|scripts/parts-explode.py|30|147|4.900|-|hold"

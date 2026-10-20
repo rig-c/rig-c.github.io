@@ -22,12 +22,12 @@ One character painting goes in; a rigged, animated 2D character that plays in th
 
 <figure class="figure-media">
   <div class="media">
-    <video data-loop="the assembly demo" controls muted loop playsinline preload="metadata" poster="/assets/rigc-demo-poster.jpg" width="600" height="404" aria-label="Recorded video: fourteen drawn-from-scratch part PNGs converge into a character that breathes, blinks and waves — core's own film, with its authored animations compiled by rig-c">
-      <source src="/assets/rigc-demo.mp4" type="video/mp4">
-      <img src="/assets/rigc-demo-poster.jpg" alt="Fourteen drawn-from-scratch part PNGs converge into a character that breathes, blinks and waves" width="600" height="404">
+    <video data-loop="the parts-to-rig film" controls muted loop playsinline preload="metadata" poster="/assets/landing-parts-to-rig-poster.jpg" width="1280" height="720" aria-label="Recorded video: rig-c's mascot as 23 labelled loose parts, which glide one by one into place, then breathe and blink in the drafted idle and, on a swing, kick, hop and wave">
+      <source src="/assets/landing-parts-to-rig.mp4" type="video/mp4">
+      <img src="/assets/landing-parts-to-rig-poster.jpg" alt="rig-c's mascot as 23 labelled loose parts: hair, face, eyes, clothes and shoes laid out around her long back hair" width="1280" height="720">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> rig-c core's own film: fourteen parts drawn from scratch and three authored animations — <code>assemble</code>, <code>idle</code>, <code>wave</code> — compiled and rendered by rig-c; the filename labels and the caption band are the film's. From the <a href="https://github.com/rig-c/core">rig-c/core</a> README (film one).</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> rig-c's mascot — the trailer's painting, built by <code>@rig-c/parts</code> 1.12.0 into 23 parts, a rig and an idle, then the film rig's performance compiled and rendered by <code>rig-c</code> 2.47.1; the labels, the glide and the dissolves are this film's; the placement and the motion are the rig's. From <a href="https://github.com/rig-c/trailer">rig-c/trailer</a>.</figcaption>
 </figure>
 
 1. **[Parts](/docs/parts/)** merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle.
@@ -109,3 +109,14 @@ rig-c's code is **MIT**. Which Spine terms apply depends on what plays the outpu
 - **Spine data in the Spine editor**: the [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license) applies.
 
 Sample paintings and layers carry their own licences — Getting Started's example inputs are CC BY-NC 4.0. The full table, with sources: **[Licensing](/docs/licensing/)**.
+
+<!-- SOURCES (not published)
+- "From loose parts to a living rig" clip landing-parts-to-rig.mp4 + poster: scripts/landing-film.py --trailer <clone> --crf 23, from rig-c/trailer@2248a13 with its pinned @rig-c/parts 1.12.0 and rig-c 2.47.1 (package.json devDependencies; npm ci). build.sh steps 1-3 as written: `rig-parts build --config inputs/config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --requirements inputs/requirements.json --out out/parts` -> "check: PASS; 9 of 9 bar(s) measured, 0 skipped"; film/palm.py + film/rig.py -> "bones 83 slots 29 physics 24 animations ['idle', 'show']"; `rigc build --rig out/film/rig.json --motion out/film/motion.json --out out/build --profile spine` (and rig_black.json) -> "53 assertions: 20 measured (20 passed, 0 failed), 17 skipped, 16 not in profile "spine"", "bones=83 slots=29 animations=2 regionAttachments=18 meshAttachments=11 physicsConstraints=24". Step 4 as written: show 321 frames, 16.000 s at 20 fps. Step 5 (compose.py: sky, lights, reveal, captions) not used.
+- Then the script runs, with that rigc: rigc build of out/parts/rig (rig.json + motion.json) and a black-tinted twin (every slot color 000000ff), --profile spine -> "bones=73 slots=23 animations=1"; `rigc render --animation idle --fps 30 --max 599` (121 frames, 4.000 s) and `rigc render --candidate out/build --animation show --fps 30 --max 840` (481 frames, 16.000 s), each also on the black twin; alpha recovered from the pair as compose.py does.
+- One scale for every shot: 0.493636 px per rig unit (the show render's); the idle render is 0.493947 (+0.063 %, not resampled). parts.json placement = rig x - 416, 1216 - y in world units (the skeleton box); assembled (parts.json) vs the idle's frame 0, stage area: mean abs diff 1.878 (0-255).
+- Timeline (30 fps, 417 frames = 13.900 s): loose parts with labels 0-47, labels fade 48-65; converge 66-131 (60 frames of glides, 18 frames each, starts in draw order, + 6 held); idle 132-221 (idle frames 0-89, the first 10 a dissolve from the assembled still); idle -> show dissolve 222-233 (idle frames 90-101 into show frames 282-293); show 234-401 (show frames 294-461; the stretch 282-461 = 9.40-15.37 s of `show`, 5.4-11.4 s of its loop: the kick's end, hop, wave); dissolve back to frame 0 402-416 (show frames 462-476).
+- Converge check (script): 3927 pair-frames with a part in flight and neither placed, 0 overlapping drawn rectangles, smallest gap 0.8 px.
+- Encode: H.264 High, yuv420p, BT.709, -tune animation, CRF 23 (CRF 20 1,992,894 bytes, 22 1,649,992, 24 1,374,920), closed GOP 60, x264 zones q=12 on frame 0 and the last 3, faststart: 1,506,310 bytes, md5 467ffef0053a2367574cfb19b787b556; 1280x720, 417 frames, 13.900 s. Poster = encoded frame 0, 89,606 bytes, md5 d021b813cad7d197205b724d4496bcbc. Loop seam (scripts/loop-seam.py): 0.399 vs max step 5.032 (at 77->78), PASS.
+- Current published @rig-c/parts 1.48.0 refuses the trailer's inputs at check: "check: FAIL — 3 bar(s) not met, 0 declared requirement(s) not PASS; 12 of 12 bar(s) measured, 0 skipped" (CHECK_STRESS_OFF_CHAIN on handwear_l), so the film uses the trailer's pinned versions.
+- Replaced rigc-demo.mp4 + poster (rig-c/core film one, 600x404, the old package name in its frames), deleted.
+-->
