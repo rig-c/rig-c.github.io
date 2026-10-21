@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Getting Started with rig-c — One Painting to a Browser Rig, No GPU</title>
-    <meta name="description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
+    <meta name="description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character that says hello from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
     <meta name="keywords" content="rig-c tutorial, getting started, 2D character rigging tutorial, See-through layers, rig-parts build, rig-pose retarget">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://rig-c.org/docs/getting-started/">
@@ -15,13 +15,13 @@
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="rig-c">
     <meta property="og:title" content="Getting Started with rig-c — One Painting to a Browser Rig, No GPU">
-    <meta property="og:description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
+    <meta property="og:description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character that says hello from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
     <meta property="og:url" content="https://rig-c.org/docs/getting-started/">
     <meta property="og:image" content="https://rig-c.org/assets/banner.svg">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Getting Started with rig-c — One Painting to a Browser Rig, No GPU">
-    <meta name="twitter:description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
+    <meta name="twitter:description" content="Step-by-step walkthrough to build a rigged, breathing, waving 2D character that says hello from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.">
     <meta name="twitter:image" content="https://rig-c.org/assets/banner.svg">
     <meta name="theme-color" content="#070b18">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,7 +37,7 @@
       "@type": "TechArticle",
       "@id": "https://rig-c.org/docs/getting-started/#article",
       "headline": "Getting Started with rig-c — One Painting to a Browser Rig, No GPU",
-      "description": "Step-by-step walkthrough to build a rigged, breathing, waving 2D character from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.",
+      "description": "Step-by-step walkthrough to build a rigged, breathing, waving 2D character that says hello from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.",
       "url": "https://rig-c.org/docs/getting-started/",
       "datePublished": "2026-10-19",
       "dateModified": "2026-10-19",
@@ -127,21 +127,23 @@
 </ol>
 <h2 id="try-it-first-no-gpu-no-python">Try it first — no GPU, no Python</h2>
 <p>This builds a published example character whose painting and See-through layers are already made, then plays it in your browser. The joints come from a hand-placed file that ships with the guide, so the only tools you need are <a href="https://bun.sh">Bun</a> 1.2 or later, <code>git</code> and <code>curl</code>, on macOS or Linux (Windows is not tested).</p>
-<p><strong>How long it takes.</strong> Every command below was run as written, in order, from an empty folder on 2026-10-19 — Apple M4, Bun 1.4.2, and whatever <code>bun add</code> resolved that day (<code>rig-c</code> 2.61.0, <code>@rig-c/parts</code> 1.41.0, <code>@rig-c/pose</code> 0.35.0, <code>@rig-c/play</code> 1.12.0):</p>
+<p><strong>How long it takes.</strong> Every command below was run as written, in order, from an empty folder on 2026-10-21 — Apple M4, Bun 1.4.2, and whatever <code>bun add</code> resolved that day (<code>rig-c</code> 2.65.1, <code>@rig-c/parts</code> 1.54.0, <code>@rig-c/pose</code> 0.38.0, <code>@rig-c/play</code> 1.12.0). Other jobs kept the machine's load average between 20 and 95 throughout, so both figures are upper bounds:</p>
 <table>
 <thead>
-<tr><th>Run</th><th>Steps 1–10</th></tr>
+<tr><th>Run</th><th>Steps 1–10, with 9b and 9c</th></tr>
 </thead>
 <tbody>
-<tr><td>Empty Bun cache (includes downloading the packages and the 41 MB example)</td><td>56 s</td></tr>
-<tr><td>A second run, caches warm</td><td>62 s</td></tr>
+<tr><td>Empty Bun cache (includes downloading the packages and the 41 MB example)</td><td>536 s</td></tr>
+<tr><td>A second run, caches warm, step 6 by the script (pose models already downloaded)</td><td>571 s</td></tr>
 </tbody>
 </table>
-<p>Steps 5 (assemble) and 8 (build) are most of it. A slower machine or network takes longer; the two runs above are the only measurements.</p>
+<p>The three builds (steps 8, 9b and 9c, 100–190 s each here) and step 5 (assemble) are most of it. A quiet machine takes less; the two runs above are the only measurements.</p>
 <h3 id="1-install-the-packages">1. Install the packages</h3>
-<pre><code class="language-sh">mkdir rig-c-start &amp;&amp; cd rig-c-start
+<pre><code class="language-sh">mkdir rig-c-start
+cd rig-c-start
 git clone https://github.com/rig-c/getting-started
-mkdir my-rig &amp;&amp; cd my-rig
+mkdir my-rig
+cd my-rig
 bun add @rig-c/parts rig-c @rig-c/pose @rig-c/play
 </code></pre>
 <p>Every command from here on runs in <code>my-rig</code>.</p>
@@ -175,7 +177,7 @@ bunx rig-parts inputs --source inputs/painting.png --config config.json --out wo
 bun ../getting-started/scripts/take.ts work/plan.json config.json assemble.plan=plan assemble.extend_below_crop=extend_below_crop
 bunx rig-parts assemble --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json --out work
 </code></pre>
-<p>You should see <code>22 part(s) on a 832x1216 rig</code>, then <code>recomposite vs source: mean |d|=1.13, within 8: 97.8%</code>.</p>
+<p>You should see 22 parts, then <code>recomposite vs source: mean |d|=1.13, within 8: 97.8%</code>.</p>
 <h3 id="6-put-the-joints-in-place">6. Put the joints in place</h3>
 <pre><code class="language-sh">sed -n '/^```json$/,/^```$/p' ../getting-started/docs/KEYPOINTS.md | sed '1d;$d' &gt; keypoints.json
 </code></pre>
@@ -183,16 +185,18 @@ bunx rig-parts assemble --source inputs/painting.png --full inputs/layers/full -
 <p><strong>Detecting the joints with a script instead</strong> needs <a href="https://docs.astral.sh/uv/">uv</a> and downloads about 300 MB of pose models on first run:</p>
 <pre><code class="language-sh">uv run --with rtmlib --with onnxruntime python ../getting-started/scripts/keypoints.py inputs/painting.png --out keypoints.json
 </code></pre>
-<p>With this painting the script puts the left ankle just off the shoe art. On <code>@rig-c/parts</code> 1.41.1, step 7 then prints one <code>LINT</code> beginning <code>LINT foot_l at [428, 1077], the l_ankle joint and leg_l1's tip, lies on none of leg_l's art within 1 px along its joint line</code>, drafts that leg without its ankle cut, and the build goes green (measured 2026-10-20 from empty caches: all ten steps in 166 s, the model download included). From 1.17.0 through 1.41.0 the same joints made step 8 refuse with <code>ASSEMBLE_LIMB_JOINT_ON_ART</code>; use the hand-placed file if you are on one of those.</p>
+<p>You should see <code>18 observed, 0 occluded, 0 missing -&gt; keypoints.json</code>. The hand-placed file was tuned to the script's joints, so every step prints what this page quotes either way, except step 9b's settle, which reads <code>33.2 px in</code> and <code>15.96 -&gt; 12.87 deg</code> on the script's joints.</p>
 <h3 id="7-draft-the-bones">7. Draft the bones</h3>
-<pre><code class="language-sh">bunx rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json
+<pre><code class="language-sh">bun -e 'const f = &quot;keypoints.json&quot;, k = await Bun.file(f).json(); k.people[0].joints.l_ankle.at = [848, 2140]; await Bun.write(f, JSON.stringify(k, null, 1) + &quot;\n&quot;)'
+bunx rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json
 bun ../getting-started/scripts/take.ts work/proposal.json config.json bones meshes regions motion limbs
 </code></pre>
-<p>You should see a coverage line starting <code>coverage: 42 bone(s) — 29 checked and clean</code>. This is where a person would correct the draft; the example uses it as is.</p>
+<p>This is where a person corrects the draft, and the first line is the example's one correction: it puts the left ankle on the shin at <code>[848, 2140]</code>, so both ankles lie on the leg art and <code>propose</code> cuts the shoes into one part per foot. The hand-placed file already has it there; the script puts it 12 px off the art, and without the line <code>propose</code> prints a <code>LINT</code> and leaves the shoes one part that no leg bone moves.</p>
+<p>You should see <code>0 LINT line(s) over 6 mesh(es) and the hip</code> and a coverage line ending <code>44 bone(s) — 29 checked and clean, 0 checked with a LINT line, 15 not checked</code>.</p>
 <h3 id="8-build-the-rig">8. Build the rig</h3>
 <pre><code class="language-sh">bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
 </code></pre>
-<p>You should see <code>check: PASS; 11 of 12 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN)</code>, then <code>build: PASS</code>. Open <code>out/idle.gif</code>: the character breathes and blinks in a loop.</p>
+<p>You should see <code>limb cut: &quot;shoes&quot; opaque 13735 = &quot;foot_r&quot; 8071 + &quot;foot_l&quot; 5664</code>, then <code>check: PASS; 11 of 13 bar(s) measured, 2 skipped (FEET_STAY_LEVEL, STRESS_OFF_CHAIN)</code>, then <code>build: PASS</code>. <code>FEET_STAY_LEVEL</code> is skipped because the idle turns no leg; step 9b's hello does. Open <code>out/idle.gif</code>: the character breathes and blinks in a loop.</p>
 <figure>
   <div class="media">
     <picture>
@@ -219,11 +223,40 @@ cat &gt; map.json &lt;&lt;'EOF'
 EOF
 bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json --out wave.motion.json --name wave --profile spine-html --build wave-build
 </code></pre>
-<p>You should see <code>wave.ts: 73 frame(s), 3 s at 24 fps</code>, a <code>GATE … green</code> line, and <code>wrote wave.motion.json — animations: idle, wave</code>. <code>wave-build/</code> holds the rig with both animations.</p>
+<p>You should see <code>73 frame(s), 3 s at 24 fps</code>, a <code>GATE … green</code> line, and <code>wrote wave.motion.json — animations: idle, wave</code>. <code>wave-build/</code> holds the rig with both animations.</p>
+<h3 id="9b-say-hello">9b. Say hello</h3>
+<p>A motion can also be written as keys on the bones and handed to the build, which checks it with the rig. The guide's <code>scripts/hello.ts</code> writes a hello of under five seconds that way from the rig step 8 built; the config names the file in <code>motion.animations_from</code>, and the build runs again.</p>
+<pre><code class="language-sh">bun ../getting-started/scripts/hello.ts out/rig/rig.json
+echo '{&quot;animations_from&quot;: &quot;hello.anim.json&quot;}' &gt; work/hello-from.json
+bun ../getting-started/scripts/take.ts work/hello-from.json config.json motion.animations_from=animations_from
+bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
+</code></pre>
+<p>You should see <code>hello.ts: 4 beats (hm?, heh, wave, settle), 4.75 s at 24 fps, 16 tracks of 115 keys; sleeve_r0 at most 4.0 deg</code> and a settle of <code>33.6 px in</code> and <code>16.05 -&gt; 12.92 deg</code> on the hand-placed joints, then from the build <code>FEET_STAY_LEVEL: PASS</code>, <code>check: PASS; 12 of 13 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN); 1 warning(s)</code> and <code>build: PASS</code>. The warning is <code>SEAM_OVER_MOTION</code>, never a bar: a sliver of the forearm shows past the sleeve's cuff where it turns at the elbow. The wave is the forearm's, because on this painting swinging the whole arm out, as step 9 does, opens a gap at the armhole. As the arm comes down she re-plants her weight, her right foot sliding in toward the other and back, on the two feet step 7's correction made.</p>
+<h3 id="9c-let-the-hair-and-the-skirt-answer">9c. Let the hair and the skirt answer</h3>
+<p>A <code>cloth</code> block in the config hands the skirt (<code>bottomwear</code>) and the hair around the face (<code>front hair</code>) to physics, <code>propose --cloth</code> drafts chains with a physics constraint on each link, and the build carries them. Then her breath, her head and the hello's hip move them, and no key does.</p>
+<pre><code class="language-sh">bun ../getting-started/scripts/hello.ts out/rig/rig.json --no-skirt-keys
+cat &gt; work/cloth.json &lt;&lt;'EOF'
+{
+  &quot;cloth&quot;: {
+    &quot;bottomwear&quot;: { &quot;chains&quot;: 3, &quot;links&quot;: 3, &quot;wind&quot;: [1, 6], &quot;gravity&quot;: [2, 12], &quot;translate&quot;: 0.2,
+                    &quot;swing&quot;: { &quot;scales&quot;: [1.2, 1, 1.2] } },
+    &quot;front hair&quot;: { &quot;chains&quot;: 1, &quot;links&quot;: 3, &quot;wind&quot;: [1, 6], &quot;gravity&quot;: [2, 12], &quot;translate&quot;: 0.2,
+                    &quot;strength&quot;: { &quot;trunk&quot;: 100, &quot;branch&quot;: 100, &quot;edge&quot;: 100 } }
+  }
+}
+EOF
+bun ../getting-started/scripts/take.ts work/cloth.json config.json cloth
+bunx rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json --cloth config.json --write-config config.cloth.json
+mv config.cloth.json config.json
+bun -e 'const f = &quot;config.json&quot;, c = await Bun.file(f).json(); c.motion.tracks.find((t) =&gt; t.bone === &quot;bun&quot;).amp = 1; await Bun.write(f, JSON.stringify(c, null, 2) + &quot;\n&quot;)'
+bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop --lead-in 1
+</code></pre>
+<p>The first line writes the hello again without its skirt keys (<code>14 tracks of 115 keys</code>): from here physics follows her hip. <code>propose --cloth</code> writes the config with the new chains and <code>every other byte as read</code>, and <code>mv</code> makes it yours. Two lines correct the draft: <code>strength</code> makes the side locks stiff enough not to pull off her cheek when her head turns, and the <code>bun -e</code> line raises the bun's swing, without which the build stops at <code>CHECK_CHAIN_LAG</code>.</p>
+<p>You should see <code>check: PASS; 12 of 13 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN); 5 warning(s) (SEAM_OVER_MOTION, CLOTH_SETTLES, not a bar)</code>, a <code>lead-in:</code> line ending <code>max |d| 0, 0 px over 40 — the jump at the wrap</code>, and <code>build: PASS</code>. <code>CLOTH_SETTLES</code> is a warning, not a failure: the skirt hangs into place within 2 seconds and then rests, because the idle never moves her hip. <code>--lead-in 1</code> plays the idle once before <code>out/idle.gif</code> is cut from it, so the loop starts after the skirt has settled.</p>
 <h3 id="10-play-it-in-your-browser">10. Play it in your browser</h3>
 <pre><code class="language-sh">bun ../getting-started/scripts/serve.ts
 </code></pre>
-<p>Open <a href="http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave">http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave</a>: the character raises her right arm and waves; the menu switches to <code>idle</code>. Ctrl+C stops the server. The guide goes on to a hello written as keys (step 9b) and physics for the hair and skirt (step 9c), and its step 10 opens <a href="http://localhost:3000/?model=out/check/build/skeleton.model.json&amp;anim=hello&amp;under=idle">http://localhost:3000/?model=out/check/build/skeleton.model.json&amp;anim=hello&amp;under=idle</a>: that hello is the clip below.</p>
+<p>Open <a href="http://localhost:3000/?model=out/check/build/skeleton.model.json&amp;anim=hello&amp;under=idle">http://localhost:3000/?model=out/check/build/skeleton.model.json&amp;anim=hello&amp;under=idle</a>: she notices you, smiles with two little shrugs, waves with her forearm beside her shoulder and re-plants her weight, while the locks beside her face and the skirt trail after her. <code>&amp;under=idle</code> keeps the idle playing beneath, so she breathes through it. The page also blows a light breeze through <code>@rig-c/play</code>'s <code>player.environment()</code>; untick <strong>breeze</strong>, or add <code>&amp;wind=0</code>, for the runtime's own steady wind. Step 9's wave is at <a href="http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave">http://localhost:3000/?model=wave-build/skeleton.model.json&amp;anim=wave</a>; the menu switches animations. Ctrl+C stops the server.</p>
 <figure>
   <div class="media">
     <picture>
