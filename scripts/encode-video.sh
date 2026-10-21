@@ -74,10 +74,11 @@ CLIPS=(
   # scripts/play-capture-webp.ts (its header has the command; the page's
   # SOURCES the versions). rigc render's out/idle.png, the old source, is opaque by design.
 
-  # Getting Started page, step 10: no longer an MP4 either. The wave is an
-  # animated WebP with alpha (assets/docs/getting-started-wave.webp +
-  # -poster.png) drawn by @rig-c/play from the walkthrough's wave-build/ by
-  # scripts/play-capture-webp.ts, like step 8's idle.
+  # Getting Started page, step 10: no longer an MP4 either. The hello is an
+  # animated WebP with alpha (assets/docs/getting-started-hello.webp +
+  # -poster.png) drawn by @rig-c/play from the walkthrough's out/check/build
+  # (steps 9b-9c) in the page's breeze by scripts/play-capture-webp.ts, like
+  # step 8's idle (it replaced the wave from wave-build/ on 2026-10-21).
   # Review page. Captured from @rig-c/review 0.7.1 with scripts/review-capture.ts:
   # Character 1 built by @rig-c/parts 1.44.0 (rig-parts build) from its
   # config.json and inputs/ at parts-examples@c239b09 (family/roa), opened
