@@ -4,7 +4,7 @@ rig-c is a set of small packages that hand files to each other: a painting split
 
 ## Start here
 
-- [**Getting Started**](/docs/getting-started/): Tested 10-step no-GPU, no-Python walkthrough (about a minute of commands on an Apple M4) from pre-decomposed character layers to a compiled rig with idle and wave animations playing in the browser, plus downstream export routes.
+- [**Getting Started**](/docs/getting-started/): Tested no-GPU, no-Python walkthrough (steps 1-10 with 9b and 9c, under ten minutes of commands on a loaded Apple M4) from pre-decomposed character layers to a compiled rig with idle, wave and a keyed hello with hair and skirt physics playing in the browser, plus downstream export routes.
 - [**Parts**](/docs/parts/) — `@rig-c/parts`: @rig-c/parts is a Bun CLI that turns one character painting and its See-through layer decomposition into measured parts, a rig-c rig spec and an idle, gated and packed by rig-c into Spine 4.3 skeleton data.
 - [**Pose**](/docs/pose/) — `@rig-c/pose`: @rig-c/pose is a Bun CLI that cleans a body-18 joint-position sequence and retargets it onto a rig-c rig as gated, verified bone keys.
 - [**Core**](/docs/core/) — `rig-c`: rig-c (also @rig-c/core, CLI rigc) compiles a JSON rig spec and motion spec plus loose part PNGs into Spine 4.3 skeleton data, gated by named assertions so nothing invalid is written.
