@@ -95,7 +95,7 @@
  * Run 2026-10-20 with Bun 1.4.2, Playwright 1.63.0 (Chromium 153), libwebp
  * 1.6.0 (img2webp, webpmux), @rig-c/play 1.12.0 and rig-c/getting-started
  * 2928714's play.html + serve.ts; the hello on 2026-10-21 with the same tools
- * and getting-started 066a7ef's play.html + serve.ts.
+ * and getting-started 0932046's play.html + serve.ts.
  */
 import { spawn, execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
