@@ -606,11 +606,11 @@ Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
 
 ## Go deeper
 - [Try it](https://github.com/rig-c/pose#try-it) — a self-contained wave example in the repository
-- [Clean first: `rig-pose clean`](https://github.com/rig-c/pose#clean-first-rig-pose-clean)
-- [What it does](https://github.com/rig-c/pose#what-it-does)
-- [The pose: `rig-pose-sequence/1`](https://github.com/rig-c/pose#the-pose-rig-pose-sequence1)
-- [The map: `rig-pose-map/1`](https://github.com/rig-c/pose#the-map-rig-pose-map1)
-- [Compare: the rig's render against the video](https://github.com/rig-c/pose#compare-the-rigs-render-against-the-video)
+- [Clean first: `rig-pose clean`](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#clean-first-rig-pose-clean)
+- [What it does](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#what-it-does)
+- [The pose: `rig-pose-sequence/1`](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#the-pose-rig-pose-sequence1)
+- [The map: `rig-pose-map/1`](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#the-map-rig-pose-map1)
+- [Compare: the rig's render against the video](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#compare-the-rigs-render-against-the-video)
 - [What it does not do](https://github.com/rig-c/pose#what-it-does-not-do)
 - [npm](https://www.npmjs.com/package/@rig-c/pose) · [CHANGELOG](https://github.com/rig-c/pose/blob/main/CHANGELOG.md)
 
@@ -1012,10 +1012,10 @@ From the README's *Status* and *No counterpart in 1.0.0* (it has no limits secti
 
 ## Go deeper
 - [Install](https://github.com/rig-c/play#install) · [A minimal page](https://github.com/rig-c/play#a-minimal-page)
-- [Status](https://github.com/rig-c/play#status)
-- [Attachment sets (`sets.json`)](https://github.com/rig-c/play#attachment-sets-setsjson)
-- [Runtime knobs and what they cost](https://github.com/rig-c/play#runtime-knobs-and-what-they-cost)
-- [Benchmark: DOM, canvas and official WebGL](https://github.com/rig-c/play#benchmark-dom-canvas-and-official-webgl)
+- [Status](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#status)
+- [Attachment sets (`sets.json`)](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#attachment-sets-setsjson)
+- [Runtime knobs and what they cost](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#runtime-knobs-and-what-they-cost)
+- [Benchmark: DOM, canvas and official WebGL](https://github.com/rig-c/play/blob/main/docs/BENCHMARK.md#benchmark-dom-canvas-and-official-webgl)
 - [How it works](https://github.com/rig-c/play#how-it-works)
 - [npm](https://www.npmjs.com/package/@rig-c/play) · [CHANGELOG](https://github.com/rig-c/play/blob/main/CHANGELOG.md)
 
