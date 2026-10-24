@@ -92,7 +92,7 @@ Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and d
       <img src="/assets/docs/pose-dance.png" alt="A source skeleton beside a rigged character at the start of a dance" width="600" height="540">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> Left: the source pose with camera movement removed. Right: the rig following the dance. Use the controls to play the 13-second recording. <a href="https://github.com/rig-c/pose/blob/8ebf36569c5ef77534d4ea362a04106a7df4e6fd/docs/demos/visible-retarget/README.md">Source pose and reproduction steps</a>.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source pose with camera movement removed. Right: the rig following the dance — retargeted by pose, then finished by hand. Use the controls to play the 13-second recording. <a href="https://github.com/rig-c/pose/blob/8ebf36569c5ef77534d4ea362a04106a7df4e6fd/docs/demos/visible-retarget/README.md">Source pose and reproduction steps</a>.</figcaption>
 </figure>
 
 This recording illustrates pose retargeting; it is not an exam sitting or a leaderboard score. [The Pose page](/docs/pose/#dance-retarget) also shows the smaller cup swing, which you can run in [Play](/docs/play/).

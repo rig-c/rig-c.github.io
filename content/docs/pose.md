@@ -38,7 +38,7 @@ A pose model reads each frame alone, so joints shake from frame to frame, and ev
       <img src="/assets/docs/pose-dance.png" alt="A source skeleton beside a rigged character at the start of a dance" width="600" height="540">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> Left: the source pose with camera movement removed. Right: the rig following the dance. Use the controls to play the 13-second recording. <a href="https://github.com/rig-c/pose/blob/8ebf36569c5ef77534d4ea362a04106a7df4e6fd/docs/demos/visible-retarget/README.md">Source pose and reproduction steps</a>.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source pose with camera movement removed. Right: the rig following the dance — retargeted by pose, then finished by hand. Use the controls to play the 13-second recording. <a href="https://github.com/rig-c/pose/blob/8ebf36569c5ef77534d4ea362a04106a7df4e6fd/docs/demos/visible-retarget/README.md">Source pose and reproduction steps</a>.</figcaption>
 </figure>
 
 This example shows larger arm and leg movements alongside the source skeleton. The cup swing below follows a different rig and a smaller range of motion; [Play](/docs/play/) still runs that swing live.
