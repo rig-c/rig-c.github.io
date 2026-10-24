@@ -514,6 +514,21 @@ Repository: https://github.com/rig-c/pose
 
 A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones has traps of its own: setup rotations, and parents that turn their children. `rig-pose` cleans the sequence once, where it can be inspected, then turns each mapped bone to point along its segment — and refuses to write keys that do not land where the pose asked.
 
+## A dance beside its source pose
+
+<figure id="dance-retarget">
+  <div class="media">
+    <video controls muted playsinline preload="metadata" poster="/assets/docs/pose-dance.png" width="600" height="540" aria-label="Recorded video: a source skeleton on the left and a rigged character following the dance on the right">
+      <source src="/assets/docs/pose-dance.webm" type="video/webm">
+      <source src="/assets/docs/pose-dance.mp4" type="video/mp4">
+      <img src="/assets/docs/pose-dance.png" alt="A source skeleton beside a rigged character at the start of a dance" width="600" height="540">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source pose with camera movement removed. Right: the rig following the dance — retargeted by pose, then finished by hand. Use the controls to play the 13-second recording. <a href="https://github.com/rig-c/pose/blob/8ebf36569c5ef77534d4ea362a04106a7df4e6fd/docs/demos/visible-retarget/README.md">Source pose and reproduction steps</a>.</figcaption>
+</figure>
+
+This example shows larger arm and leg movements alongside the source skeleton. The cup swing below follows a different rig and a smaller range of motion; [Play](/docs/play/) still runs that swing live.
+
 ## How the swing reached Character 1
 
 ### A motion that fits the rig
@@ -1292,6 +1307,21 @@ Kept, and not counted — 2 runs:
 ## Advanced Exam Leaderboard (Walk · Run · Dance Pose Retargeting)
 
 Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and dance (R3) pose sequences with [`@rig-c/pose`](/docs/pose/), one round per fresh session, fixing what the diagnostic numbers report without ever seeing the footage. 18 sittings of 6 models: 15 graded on edition 0.20 and, from 2026-10-20, 3 on edition 0.21, whose R1 · R2 · R3 tables are 10 · 15 · 14 rows (the shin-scale row is 0.21's one new row; for a 0.20 sitting it is a what-if):
+
+### A dance retarget example
+
+<figure id="dance-retarget">
+  <div class="media">
+    <video controls muted playsinline preload="metadata" poster="/assets/docs/pose-dance.png" width="600" height="540" aria-label="Recorded video: a source skeleton on the left and a rigged character following the dance on the right">
+      <source src="/assets/docs/pose-dance.webm" type="video/webm">
+      <source src="/assets/docs/pose-dance.mp4" type="video/mp4">
+      <img src="/assets/docs/pose-dance.png" alt="A source skeleton beside a rigged character at the start of a dance" width="600" height="540">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source pose with camera movement removed. Right: the rig following the dance — retargeted by pose, then finished by hand. Use the controls to play the 13-second recording. <a href="https://github.com/rig-c/pose/blob/8ebf36569c5ef77534d4ea362a04106a7df4e6fd/docs/demos/visible-retarget/README.md">Source pose and reproduction steps</a>.</figcaption>
+</figure>
+
+This recording illustrates pose retargeting; it is not an exam sitting or a leaderboard score. [The Pose page](/docs/pose/#dance-retarget) also shows the smaller cup swing, which you can run in [Play](/docs/play/).
 
 | Model | R1 Walk | R2 Run | R3 Dance | 0.21 Shin-Scale Row (What-If) | Minutes (R1 · R2 · R3) |
 | --- | :-: | :-: | :-: | --- | --- |

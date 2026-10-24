@@ -181,6 +181,18 @@
 </table>
 <h2 id="advanced-exam-leaderboard-walk-run-dance-pose-retargeting">Advanced Exam Leaderboard (Walk · Run · Dance Pose Retargeting)</h2>
 <p>Starts from a built rig: the agent retargets recorded walk (R1), run (R2), and dance (R3) pose sequences with <a href="/docs/pose/"><code>@rig-c/pose</code></a>, one round per fresh session, fixing what the diagnostic numbers report without ever seeing the footage. 18 sittings of 6 models: 15 graded on edition 0.20 and, from 2026-10-20, 3 on edition 0.21, whose R1 · R2 · R3 tables are 10 · 15 · 14 rows (the shin-scale row is 0.21's one new row; for a 0.20 sitting it is a what-if):</p>
+<h3 id="a-dance-retarget-example">A dance retarget example</h3>
+<figure id="dance-retarget">
+  <div class="media">
+    <video controls muted playsinline preload="metadata" poster="/assets/docs/pose-dance.png" width="600" height="540" aria-label="Recorded video: a source skeleton on the left and a rigged character following the dance on the right">
+      <source src="/assets/docs/pose-dance.webm" type="video/webm">
+      <source src="/assets/docs/pose-dance.mp4" type="video/mp4">
+      <img src="/assets/docs/pose-dance.png" alt="A source skeleton beside a rigged character at the start of a dance" width="600" height="540">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source pose with camera movement removed. Right: the rig following the dance — retargeted by pose, then finished by hand. Use the controls to play the 13-second recording. <a href="https://github.com/rig-c/pose/blob/8ebf36569c5ef77534d4ea362a04106a7df4e6fd/docs/demos/visible-retarget/README.md">Source pose and reproduction steps</a>.</figcaption>
+</figure>
+<p>This recording illustrates pose retargeting; it is not an exam sitting or a leaderboard score. <a href="/docs/pose/#dance-retarget">The Pose page</a> also shows the smaller cup swing, which you can run in <a href="/docs/play/">Play</a>.</p>
 <table>
 <thead>
 <tr><th>Model</th><th align="center">R1 Walk</th><th align="center">R2 Run</th><th align="center">R3 Dance</th><th>0.21 Shin-Scale Row (What-If)</th><th>Minutes (R1 · R2 · R3)</th></tr>
