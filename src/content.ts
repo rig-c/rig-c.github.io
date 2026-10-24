@@ -50,6 +50,7 @@ export const REDIRECTS: Readonly<Record<string, string>> = {
   '/review/': '/docs/review/',
   '/play/': '/docs/play/',
   '/adapters/': '/docs/adapters/',
+  '/licensing/': '/docs/licensing/',
 };
 
 function parse(file: string, raw: string): { meta: Record<string, string>; body: string } {

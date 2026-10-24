@@ -7,7 +7,7 @@
 ================================================================================
 URL: https://rig-c.org/
 Markdown: https://rig-c.org/index.md
-Package: rig-c@2.61.0
+Package: rig-c@2.68.0
 Repository: https://github.com/rig-c
 ================================================================================
 
@@ -41,12 +41,12 @@ Try it end to end with no GPU and no Python — about a minute of commands on an
 
 | Package | Latest | Install | What it does |
 | --- | --- | --- | --- |
-| [**@rig-c/parts**](/docs/parts/) | `1.41.0` | `npm i -D @rig-c/parts` | Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them. |
-| [**@rig-c/pose**](/docs/pose/) | `0.35.0` | `npm i -D @rig-c/pose` | Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written. |
-| [**rig-c / @rig-c/core**](/docs/core/) | `2.61.0` | `npm i -D rig-c` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and `skeleton.model.json` out — gated by named assertions before a byte is written (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`). |
-| [**@rig-c/review**](/docs/review/) | `0.7.1` | `npm i -D @rig-c/review` | Local human inspection workspace: compare setup geometry, compiled-model playback, source video/sheets, and export frame/bone/slot-bound feedback ready to become an issue. |
-| [**@rig-c/play**](/docs/play/) | `1.12.0` | `npm i @rig-c/play` | Plays `skeleton.model.json` in the browser with no Spine runtime — as plain DOM elements (`<img>` with CSS `matrix()`) or one `<canvas>` per player. |
-| [**@rig-c/adapters**](/docs/adapters/) | `0.1.1` | `npm i @rig-c/pixi`<br>`npm i @rig-c/phaser`<br>`npm i @rig-c/three` | Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through `@rig-c/play`'s posing core, with no Spine runtime. |
+| [**@rig-c/parts**](/docs/parts/) | `1.60.2` | `npm i -D @rig-c/parts` | Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them. |
+| [**@rig-c/pose**](/docs/pose/) | `1.0.2` | `npm i -D @rig-c/pose` | Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written. |
+| [**rig-c / @rig-c/core**](/docs/core/) | `2.68.0` | `npm i -D rig-c` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and `skeleton.model.json` out — gated by named assertions before a byte is written (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`). |
+| [**@rig-c/review**](/docs/review/) | `0.11.2` | `npm i -D @rig-c/review` | Local human inspection workspace: compare setup geometry, compiled-model playback, source video/sheets, and export frame/bone/slot-bound feedback ready to become an issue. |
+| [**@rig-c/play**](/docs/play/) | `1.17.0` | `npm i @rig-c/play` | Plays `skeleton.model.json` in the browser with no Spine runtime — as plain DOM elements (`<img>` with CSS `matrix()`) or one `<canvas>` per player. |
+| [**@rig-c/adapters**](/docs/adapters/) | `pixi 0.1.1 / phaser 0.1.1 / three 0.1.1` | `npm i @rig-c/pixi`<br>`npm i @rig-c/phaser`<br>`npm i @rig-c/three` | Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through `@rig-c/play`'s posing core, with no Spine runtime. |
 
 ## Built for agents that cannot see
 

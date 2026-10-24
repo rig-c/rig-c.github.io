@@ -19,7 +19,9 @@ Every page is one Markdown file under `content/` (frontmatter + body). `bun run 
 
 The first version's routes (`/parts/`, `/core/`, `/getting-started/`, …) are redirect stubs to their `/docs/` pages (`REDIRECTS` in `src/content.ts`); they are `noindex` and stay out of the sitemap.
 
-Each docs page keeps a `<!-- SOURCES … -->` comment listing where every claim comes from. It is stripped at build time and never published. `{{version:<slug>}}` in any page prints that docs page's `packageVersion`.
+Each docs page keeps a `<!-- SOURCES … -->` comment listing where every claim comes from. It is stripped at build time and never published. `{{version:<slug>}}` resolves the docs page's package names against npm's `latest` manifests at build time. Each engine adapter is resolved separately and labelled by name. The landing table, its software-version structured data and its LLM package metadata use these registry versions; docs metadata and recorded demo versions stay pinned to the versions they describe.
+
+The build requires access to `https://registry.npmjs.org`. Before writing any output, `src/versions.ts` fetches each package's `/latest` manifest once, with a 15-second timeout and no retries or stale fallback. HTTP, network, JSON, package-name or version errors fail the build. Build stdout records each exact endpoint, version and SHA-256 of the response body for reproduction. `/play/` and `/licensing/` are compatibility stubs to `/docs/play/` and `/docs/licensing/`.
 
 ### Machine / AI Crawler Endpoints
 

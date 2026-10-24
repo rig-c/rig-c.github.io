@@ -1,11 +1,12 @@
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { htmlRel, mdRoute, PAGES, type Page, REDIRECTS, SITE_ORIGIN } from './content.ts';
+import { publishedVersions, versionLabel } from './versions.ts';
 
 const ROOT_DIR = resolve(import.meta.dir, '..');
 const TODAY = '2026-10-19';
 const DOCS = PAGES.filter((p) => p.section === 'docs');
-const CORE = PAGES.find((p) => p.route === '/docs/core/');
+let latestVersions: ReadonlyMap<string, string> = new Map();
 const AUTHOR = { '@type': 'Person', name: 'firejune', url: 'https://github.com/firejune', sameAs: ['https://github.com/firejune'] };
 
 function escapeHtml(value: string): string {
@@ -27,12 +28,11 @@ function docsMap(): string {
     .join('\n');
 }
 
-// {{version:<docs slug>}} prints that docs page's published version, so a page never quotes a stale one.
+// Latest-version tokens use npm, while page metadata and recorded demo versions stay pinned.
 function version(slug: string): string {
   const doc = DOCS.find((p) => p.route === `/docs/${slug}/`);
-  const v = doc?.packageVersion?.split(',')[0]?.trim();
-  if (!v) throw new Error(`{{version:${slug}}}: no docs page with a packageVersion`);
-  return v;
+  if (!doc?.packageName) throw new Error(`{{version:${slug}}}: no docs page with a packageName`);
+  return versionLabel(doc.packageName.split(',').map((name) => name.trim()), latestVersions);
 }
 
 // The Family rigs the live demo plays, pinned to one rig-c/parts-examples commit.
@@ -195,7 +195,7 @@ function buildJsonLd(page: Page): string {
         name: 'rig-c',
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'macOS, Linux, Windows, Web Browser',
-        softwareVersion: CORE?.packageVersion,
+        softwareVersion: version('core'),
         url: `${SITE_ORIGIN}/`,
         downloadUrl: 'https://www.npmjs.com/package/rig-c',
         codeRepository: 'https://github.com/rig-c/core',
@@ -456,7 +456,8 @@ function buildLlmsTxt(): string {
     '',
   ];
   for (const page of PAGES) {
-    const badge = page.packageName && page.packageVersion ? ` (\`${page.packageName}@${page.packageVersion}\`)` : '';
+    const packageVersion = page.route === '/' ? version('core') : page.packageVersion;
+    const badge = page.packageName && packageVersion ? ` (\`${page.packageName}@${packageVersion}\`)` : '';
     lines.push(
       `- [${page.navLabel}](${SITE_ORIGIN}${page.route}) ([Markdown](${SITE_ORIGIN}${mdRoute(page.route)}))${badge}: ${page.summaryForLlms}`,
     );
@@ -499,7 +500,8 @@ function buildLlmsFullTxt(): string {
     '',
   ].join('\n');
   const sections = PAGES.map((page) => {
-    const pkg = page.packageName && page.packageVersion ? `\nPackage: ${page.packageName}@${page.packageVersion}` : '';
+    const packageVersion = page.route === '/' ? version('core') : page.packageVersion;
+    const pkg = page.packageName && packageVersion ? `\nPackage: ${page.packageName}@${packageVersion}` : '';
     return [
       '================================================================================',
       `URL: ${SITE_ORIGIN}${page.route}`,
@@ -547,7 +549,15 @@ function writeOut(relPath: string, content: string): void {
   writeFileSync(absPath, content, 'utf8');
 }
 
-function main(): void {
+async function main(): Promise<void> {
+  // Resolve every package before copying assets or writing any generated file.
+  const names = DOCS.flatMap((page) => page.packageName?.split(',').map((name) => name.trim()) ?? []);
+  const published = await publishedVersions(names);
+  latestVersions = new Map(published.map(({ name, version }) => [name, version]));
+  for (const item of published) {
+    console.log(`npm latest: ${item.name}@${item.version} ${item.url} sha256=${item.sha256}`);
+  }
+
   for (const asset of ['banner.svg', 'logo.svg']) {
     const source = resolve(ROOT_DIR, `../rigc/assets/${asset}`);
     if (existsSync(source)) {
@@ -575,4 +585,4 @@ function main(): void {
   );
 }
 
-main();
+await main();
