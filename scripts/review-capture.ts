@@ -6,13 +6,13 @@
  *
  * Pins: @rig-c/review 0.7.1, @rig-c/parts 1.44.0 (the producer review runs),
  * and Character 1's config, painting and See-through layers at
- * rig-c/parts-examples@c239b09 (family/roa).
+ * rig-c/examples@c239b09 (family/roa).
  *
  * Usage, from a scratch directory where the pinned tools are installed (open
  * is run from there, so review finds that @rig-c/parts):
  *
  *   bun add @rig-c/review@0.7.1 @rig-c/parts@1.44.0 playwright@1.63.0
- *   PARTS_EXAMPLES=/path/to/parts-examples \
+ *   EXAMPLES=/path/to/examples \
  *   PLAYWRIGHT_MODULE=$PWD/node_modules/playwright/index.mjs \
  *     bun /path/to/site/scripts/review-capture.ts --bin $PWD/node_modules/.bin [--keep DIR]
  *
@@ -93,9 +93,9 @@ const args = process.argv.slice(2);
 const opt = (name: string) => { const i = args.indexOf(name); return i < 0 ? undefined : args[i + 1]; };
 const bin = opt('--bin');
 const keep = opt('--keep');
-const clone = process.env.PARTS_EXAMPLES;
+const clone = process.env.EXAMPLES;
 if (!bin || !clone) {
-  console.error('usage: PARTS_EXAMPLES=<clone> PLAYWRIGHT_MODULE=<playwright> bun scripts/review-capture.ts --bin <node_modules/.bin> [--keep DIR]');
+  console.error('usage: EXAMPLES=<clone> PLAYWRIGHT_MODULE=<playwright> bun scripts/review-capture.ts --bin <node_modules/.bin> [--keep DIR]');
   process.exit(2);
 }
 const ffmpeg = process.env.FFMPEG ?? 'ffmpeg';
@@ -441,7 +441,7 @@ try {
   execFileSync(ffmpeg, ['-v', 'error', '-y', '-i', join(ROOT, OUT), '-frames:v', '1', '-q:v', '3', join(ROOT, OUT.replace(/\.mp4$/, '-poster.jpg'))], { stdio: 'inherit' });
   const nb = execFileSync(ffprobe, ['-v', 'error', '-count_frames', '-select_streams', 'v:0', '-show_entries', 'stream=nb_read_frames', '-of', 'default=nw=1:nk=1', join(ROOT, OUT)]).toString().trim();
   const dur = execFileSync(ffprobe, ['-v', 'error', '-show_entries', 'format=duration', '-of', 'default=nw=1:nk=1', join(ROOT, OUT)]).toString().trim();
-  console.log(`@rig-c/review ${versions.review} (play ${versions.play}), @rig-c/parts ${versions.parts}, rig-c ${versions.rigc}; parts-examples@${SHA} ${SRC}`);
+  console.log(`@rig-c/review ${versions.review} (play ${versions.play}), @rig-c/parts ${versions.parts}, rig-c ${versions.rigc}; examples@${SHA} ${SRC}`);
   console.log(`marks ${Object.entries(marks).map(([k, v]) => `${k}=${v}`).join(' ')}`);
   console.log(`frames ${nb} (captured ${count}), duration ${dur} s at ${FPS} fps, ${statSync(join(ROOT, OUT)).size} bytes`);
   if (Number(nb) !== count) { console.error('frame count is off'); status = 1; }

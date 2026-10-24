@@ -110,4 +110,4 @@ From the README's own *What it does not do*:
 - [docs/AUTHORING.md](https://github.com/rig-c/parts/blob/main/docs/AUTHORING.md): every config field, what to read after each stage, every refusal
 - [docs/PAINTING.md](https://github.com/rig-c/parts/blob/main/docs/PAINTING.md): what makes a painting riggable
 - [docs/STABILITY.md](https://github.com/rig-c/parts/blob/main/docs/STABILITY.md) · [NOTICE.md](https://github.com/rig-c/parts/blob/main/NOTICE.md) · [CHANGELOG.md](https://github.com/rig-c/parts/blob/main/CHANGELOG.md) · [npm](https://www.npmjs.com/package/@rig-c/parts)
-- Character 1's own files: [its folder in rig-c/parts-examples](https://github.com/rig-c/parts-examples/tree/c239b09328ca7364361b9761fac817502c09ede0/family/roa)
+- Character 1's own files: [its folder in rig-c/examples](https://github.com/rig-c/examples/tree/c239b09328ca7364361b9761fac817502c09ede0/family/roa)

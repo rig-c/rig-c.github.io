@@ -57,7 +57,7 @@
  *   --root $WALKTHROUGH --model out/check/build/skeleton.model.json --anim hello \
  *     --breeze --settle 1 --fps 12 --frames 57 --out assets/docs/getting-started-hello
  *   # Parts page: a folder holding node_modules/@rig-c/play 1.12.0 and, under
- *   # build/, rig-c/parts-examples@c239b09 family/roa/out/check/build/*
+ *   # build/, rig-c/examples@c239b09 family/roa/out/check/build/*
  *   # (skeleton.atlas, .json, .model.json, .png, read with git show)
  *   --root $PARTS_ROOT --model build/skeleton.model.json --anim idle \
  *     --fps 12 --frames 40 --settle 1 --player $WALKTHROUGH/../getting-started/scripts \

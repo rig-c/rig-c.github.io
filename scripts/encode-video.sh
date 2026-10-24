@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Rebuild the site's MP4s (and their posters) from pinned sources.
 #
-#   PARTS_EXAMPLES=/path/to/parts-examples scripts/encode-video.sh [clip ...]
+#   EXAMPLES=/path/to/examples scripts/encode-video.sh [clip ...]
 #   ADAPTERS_CAPTURE=/path/to/capture scripts/encode-video.sh adapters-three-engines
 #
 # With no clip names it rebuilds every clip whose status is "build".
@@ -42,9 +42,9 @@ CLIPS=(
   # Examples page. Source metadata family/docs/family-preview.json: 67 frames,
   # duration 3.333 s (49/50 ms each). 67 / 20.1 = 3.333 s. Composited over the
   # page background (--bg in styles.css), as the WebP's alpha is shown there.
-  "family-preview|assets/family-preview.mp4|rig-c/parts-examples|c239b09328ca7364361b9761fac817502c09ede0|family/docs/family-preview.webp|201/10|67|3.333|#070b18|build"
+  "family-preview|assets/family-preview.mp4|rig-c/examples|c239b09328ca7364361b9761fac817502c09ede0|family/docs/family-preview.webp|201/10|67|3.333|#070b18|build"
   # Parts page, "A drafted rig that idles": no longer an MP4. Character 1's
-  # idle (rig-c/parts-examples@c239b09 family/roa/out/check/build) is an
+  # idle (rig-c/examples@c239b09 family/roa/out/check/build) is an
   # animated WebP with alpha (assets/docs/parts-idle.webp + -poster.png),
   # drawn by @rig-c/play over a transparent page by
   # scripts/play-capture-webp.ts (its header has the command and versions).
@@ -62,7 +62,7 @@ CLIPS=(
   # script's own rigc renders), CRF 23 with the wrap zones; not rebuilt here.
   "landing-parts-to-rig|assets/landing-parts-to-rig.mp4|this repo|-|scripts/landing-film.py|30|417|13.900|-|hold"
   # Parts page hero. Rendered and encoded by scripts/parts-explode.py from
-  # rig-c/parts-examples@c239b09 (same encode settings); not rebuilt here.
+  # rig-c/examples@c239b09 (same encode settings); not rebuilt here.
   "parts-explode|assets/docs/parts-explode.mp4|this repo|-|scripts/parts-explode.py|30|147|4.900|-|hold"
   # Pose page hero. Rendered and encoded by scripts/pose-swing.py from the
   # committed assets/rigs/character-1-swing/ (same encode settings); not
@@ -81,7 +81,7 @@ CLIPS=(
   # step 8's idle (it replaced the wave from wave-build/ on 2026-10-21).
   # Review page. Captured from @rig-c/review 0.7.1 with scripts/review-capture.ts:
   # Character 1 built by @rig-c/parts 1.44.0 (rig-parts build) from its
-  # config.json and inputs/ at parts-examples@c239b09 (family/roa), opened
+  # config.json and inputs/ at examples@c239b09 (family/roa), opened
   # with that producer handoff (baseline reproduced), and the tool driven
   # through its own page in headless Chromium, 1600x1000, on a paused fake clock
   # advanced 1/12 s per frame; the cursor is drawn by the script. Frames
@@ -111,7 +111,7 @@ CLIPS=(
 # Local clone of each source repo, set by the caller.
 clone_for() {
   case "$1" in
-    rig-c/parts-examples) echo "${PARTS_EXAMPLES:-}" ;;
+    rig-c/examples) echo "${EXAMPLES:-}" ;;
     rig-c/trailer) echo "${TRAILER:-}" ;;
     rig-c/core) echo "${CORE:-}" ;;
     walkthrough) echo "${WALKTHROUGH:-}" ;;
@@ -196,7 +196,7 @@ encode_clip() {
     return 0
   fi
   if [[ -z "$clone" ]]; then
-    echo "$clip: set the local clone of $repo (e.g. PARTS_EXAMPLES=...)" >&2
+    echo "$clip: set the local clone of $repo (e.g. EXAMPLES=...)" >&2
     return 1
   fi
 

@@ -4,7 +4,7 @@
 
 <figure class="mod-hero">
   <img src="/assets/docs/review-screen.jpg" alt="The rig-review page in Setup with Edit mesh on: the left column lists Character 1's 17 parts with topwear selected and Solo ticked; the stage shows the shirt at 800 percent with its mesh drawn over it — the orange hull outline, the triangulation's edges and the vertices, a dense grid of them over the chest — and the top vertex of the screen-left shoulder, where the outline runs flat, selected; the editor bar above reads Modify, Create, Delete, Edges, Undo, Redo, Reset, Download JSON, Apply · Rebuild and 0 ops · setup pose · preview only" width="1600" height="1000">
-  <figcaption>Character 1 as <code>rig-parts</code> 1.44.0 builds it from its config at parts-examples <code>c239b09</code>, open in <code>rig-review</code> 0.7.1 with <em>Edit mesh</em> on: the mesh the producer drafted for <code>topwear</code> (502 vertices, 885 triangles), read from the compiled model document and drawn in setup space, at 800 % on the screen-left shoulder where the cloth cut leaves a flat, indented step; its top vertex is selected. A move, an added vertex or a constraint edge is a typed delta, previewed only; <em>Apply · Rebuild</em> sends it to <code>rig-parts remesh --delta</code>, which retriangulates in scratch, and the revision loads in place.</figcaption>
+  <figcaption>Character 1 as <code>rig-parts</code> 1.44.0 builds it from its config at examples <code>c239b09</code>, open in <code>rig-review</code> 0.7.1 with <em>Edit mesh</em> on: the mesh the producer drafted for <code>topwear</code> (502 vertices, 885 triangles), read from the compiled model document and drawn in setup space, at 800 % on the screen-left shoulder where the cloth cut leaves a flat, indented step; its top vertex is selected. A move, an added vertex or a constraint edge is a typed delta, previewed only; <em>Apply · Rebuild</em> sends it to <code>rig-parts remesh --delta</code>, which retriangulates in scratch, and the revision loads in place.</figcaption>
 </figure>
 
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
@@ -15,7 +15,7 @@ The checks that keep a broken rig off the disk are structural: a shoulder that r
 
 ## One problem, from seeing it to the fix
 
-Built by its producer from its config and painting, Character 1's shirt has a flat, indented shoulder: the cloth cut leaves out what the hair covers in the still, and the hair uncovers it when it moves. The family suite records the repair in [its shoulder-repair note](https://github.com/rig-c/parts-examples/blob/main/family/roa/SHOULDER_REPAIR.md). Here review opens the build `rig-parts` 1.44.0 makes from that commit's config, finds the step, tries a setup edit through the producer on the way, and hands the defect back.
+Built by its producer from its config and painting, Character 1's shirt has a flat, indented shoulder: the cloth cut leaves out what the hair covers in the still, and the hair uncovers it when it moves. The family suite records the repair in [its shoulder-repair note](https://github.com/rig-c/examples/blob/main/family/roa/SHOULDER_REPAIR.md). Here review opens the build `rig-parts` 1.44.0 makes from that commit's config, finds the step, tries a setup edit through the producer on the way, and hands the defect back.
 
 <figure class="figure-media">
   <div class="media">
@@ -24,7 +24,7 @@ Built by its producer from its config and painting, Character 1's shirt has a fl
       <img src="/assets/docs/review-flow-poster.jpg" alt="The rig-review page with Character 1's whole rig playing its idle" width="1600" height="1000">
     </video>
   </div>
-  <figcaption><span class="media-kind">Recorded video</span> The whole case in 23 seconds: <code>rig-review</code> 0.7.1 driven through its own page on Character 1 as <code>@rig-c/parts</code> 1.44.0 builds it from parts-examples <code>c239b09</code> — pause at 1.25 s, pick and solo <code>topwear</code>, zoom on the shoulder; in Setup, <em>Edit mesh</em> on the shoulder, then drag the R chest region up 30 px and <em>Apply · Rebuild</em>; pin the shoulder as feedback, submit, and the export. The producer's run behind Apply (remesh 109 s + compile 5 s in this capture) is cut to its result line; nothing else is edited but the two ends. The cursor is drawn in, and the last shots are <code>rig-review feedback --format json</code> opened in the same browser.</figcaption>
+  <figcaption><span class="media-kind">Recorded video</span> The whole case in 23 seconds: <code>rig-review</code> 0.7.1 driven through its own page on Character 1 as <code>@rig-c/parts</code> 1.44.0 builds it from examples <code>c239b09</code> — pause at 1.25 s, pick and solo <code>topwear</code>, zoom on the shoulder; in Setup, <em>Edit mesh</em> on the shoulder, then drag the R chest region up 30 px and <em>Apply · Rebuild</em>; pin the shoulder as feedback, submit, and the export. The producer's run behind Apply (remesh 109 s + compile 5 s in this capture) is cut to its result line; nothing else is edited but the two ends. The cursor is drawn in, and the last shots are <code>rig-review feedback --format json</code> opened in the same browser.</figcaption>
 </figure>
 
 <div class="case">

@@ -1,5 +1,5 @@
 // The live demos on /examples/ and /docs/play/: the published @rig-c/play runtime playing the Family
-// rigs from rig-c/parts-examples, pinned to one commit. A section may also carry data-model-url with
+// rigs from rig-c/examples, pinned to one commit. A section may also carry data-model-url with
 // data-model-for="<character>/<outfit>": that one pick loads the site-served model instead (Play's
 // Character 1 office, the Pose page's build with the cup swing). ?character=<dir>&outfit=<o> preselects. Nothing is fetched until the reader asks for it,
 // motion waits for a click when the reader prefers reduced motion, and a failure only replaces
@@ -10,8 +10,8 @@ for (const root of document.querySelectorAll('.live-demo')) init(root);
 
 function init(section) {
   const sha = section.dataset.sha;
-  const base = `https://cdn.jsdelivr.net/gh/rig-c/parts-examples@${sha}/family`;
-  const repo = `https://github.com/rig-c/parts-examples/tree/${sha}/family`;
+  const base = `https://raw.githubusercontent.com/rig-c/examples/${sha}/family`;
+  const repo = `https://github.com/rig-c/examples/tree/${sha}/family`;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const $ = (id) => section.querySelector(`[data-part="${id}"]`) ?? section.querySelector(`#${id}`);
   const ui = {
@@ -90,7 +90,7 @@ function init(section) {
     const links = [
       ['config.json', `${repo}/${config(c, o)}`],
       ['built model', `${repo}/${dir(c, o)}/out/check/build`],
-      ['how to rebuild it', `https://github.com/rig-c/parts-examples/blob/${sha}/family/README.md`],
+      ['how to rebuild it', `https://github.com/rig-c/examples/blob/${sha}/family/README.md`],
     ];
     ui.source.append('Source for this rig: ');
     links.forEach(([text, href], i) => {

@@ -139,8 +139,8 @@
 <label>Render mode <select data-part="demo-mode"><option value="dom">DOM (default)</option><option value="canvas">One canvas</option></select></label>
 <div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
 </div>
-<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 with the swing (about 1.3 MB); each other character or outfit you pick loads its rig (about 1.3–2.1 MB) from rig-c/parts-examples.</p>
-<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted cup swing added.</p>
+<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 with the swing (about 1.3 MB); each other character or outfit you pick loads its rig (about 1.3–2.1 MB) from rig-c/examples.</p>
+<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/examples with the retargeted cup swing added.</p>
 <noscript><p class="demo-status" data-kind="error">The live player needs JavaScript. <a href="/docs/pose/">A recording of the same rig is on the Pose page</a>.</p></noscript>
 </div>
 </div>
@@ -152,7 +152,7 @@
 <h2 id="what-you-just-ran">What you just ran</h2>
 <p>The player above is the published package doing what any page does with it — nothing on this site poses the rig:</p>
 <ol>
-<li><code>loadModel()</code> read the rig's <code>skeleton.model.json</code> — Character 1 office from this site, every other pick from rig-c/parts-examples at a pinned commit, fetched when you pick it — and cut each atlas region into its own bitmap (the <code>.atlas</code> and <code>skeleton.json</code> beside it are not fetched).</li>
+<li><code>loadModel()</code> read the rig's <code>skeleton.model.json</code> — Character 1 office from this site, every other pick from rig-c/examples at a pinned commit, fetched when you pick it — and cut each atlas region into its own bitmap (the <code>.atlas</code> and <code>skeleton.json</code> beside it are not fetched).</li>
 <li><code>new RigPlayer(root, assets, { mode })</code> opened the motion you picked on a live track; rig-c's core, bundled in the package, poses bones, constraints, physics and draw order on the CPU, one <code>frame(dt)</code> at a time.</li>
 <li>Each frame became a <code>PosedFrame</code> — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one <code>matrix()</code> string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).</li>
 <li><strong>Bones</strong> and <strong>Mesh</strong> draw from the player's own read-only queries, <code>bone(name)</code> and <code>posedFrame()</code>; <strong>Pause</strong> calls <code>pause()</code>.</li>

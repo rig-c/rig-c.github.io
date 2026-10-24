@@ -24,7 +24,7 @@ Esoteric Software's licence pages read *Last updated April 5, 2025* when this pa
 | Assets | Licence | Source |
 | --- | --- | --- |
 | The painting and layers [Getting started](/docs/getting-started/) downloads | **CC BY-NC 4.0** — credit required, no commercial use; what you build from them carries that licence | [rig-c/exam `LICENSE`](https://github.com/rig-c/exam/blob/main/LICENSE) |
-| The paintings, See-through inputs and layers in [rig-c/parts-examples](https://github.com/rig-c/parts-examples) | MIT | [`LICENSE`](https://github.com/rig-c/parts-examples/blob/main/LICENSE) |
+| The paintings, See-through inputs and layers in [rig-c/examples](https://github.com/rig-c/examples) | MIT | [`LICENSE`](https://github.com/rig-c/examples/blob/main/LICENSE) |
 | The trailer's painting, layers, sky, palm and rendered trailer | MIT | [rig-c/trailer `LICENSE`](https://github.com/rig-c/trailer/blob/main/LICENSE) |
 
 The image models that generated those paintings, and See-through itself, have their own terms; each repository's `NOTICE.md` records them, and [rig-c/parts `NOTICE.md`](https://github.com/rig-c/parts/blob/main/NOTICE.md) collects See-through's. No rig-c package contains See-through code or weights.

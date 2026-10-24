@@ -14,7 +14,7 @@ A rigged character usually means a canvas runtime that rasterizes everything. Fo
 
 The player above is the published package doing what any page does with it — nothing on this site poses the rig:
 
-1. `loadModel()` read the rig's `skeleton.model.json` — Character 1 office from this site, every other pick from rig-c/parts-examples at a pinned commit, fetched when you pick it — and cut each atlas region into its own bitmap (the `.atlas` and `skeleton.json` beside it are not fetched).
+1. `loadModel()` read the rig's `skeleton.model.json` — Character 1 office from this site, every other pick from rig-c/examples at a pinned commit, fetched when you pick it — and cut each atlas region into its own bitmap (the `.atlas` and `skeleton.json` beside it are not fetched).
 2. `new RigPlayer(root, assets, { mode })` opened the motion you picked on a live track; rig-c's core, bundled in the package, poses bones, constraints, physics and draw order on the CPU, one `frame(dt)` at a time.
 3. Each frame became a `PosedFrame` — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one `matrix()` string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).
 4. **Bones** and **Mesh** draw from the player's own read-only queries, `bone(name)` and `posedFrame()`; **Pause** calls `pause()`.
