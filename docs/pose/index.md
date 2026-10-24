@@ -18,6 +18,21 @@
 
 A pose model reads each frame alone, so joints shake from frame to frame, and every key would carry that shake. Mapping picture angles onto bones has traps of its own: setup rotations, and parents that turn their children. `rig-pose` cleans the sequence once, where it can be inspected, then turns each mapped bone to point along its segment — and refuses to write keys that do not land where the pose asked.
 
+## A dance beside its source pose
+
+<figure id="dance-retarget">
+  <div class="media">
+    <video controls muted playsinline preload="metadata" poster="/assets/docs/pose-dance.png" width="600" height="540" aria-label="Recorded video: a source skeleton on the left and a rigged character following the dance on the right">
+      <source src="/assets/docs/pose-dance.webm" type="video/webm">
+      <source src="/assets/docs/pose-dance.mp4" type="video/mp4">
+      <img src="/assets/docs/pose-dance.png" alt="A source skeleton beside a rigged character at the start of a dance" width="600" height="540">
+    </video>
+  </div>
+  <figcaption><span class="media-kind">Recorded video</span> Left: the source pose with camera movement removed. Right: the rig following the dance. Use the controls to play the 13-second recording. <a href="https://github.com/rig-c/pose/blob/8ebf36569c5ef77534d4ea362a04106a7df4e6fd/docs/demos/visible-retarget/README.md">Source pose and reproduction steps</a>.</figcaption>
+</figure>
+
+This example shows larger arm and leg movements alongside the source skeleton. The cup swing below follows a different rig and a smaller range of motion; [Play](/docs/play/) still runs that swing live.
+
 ## How the swing reached Character 1
 
 ### A motion that fits the rig
