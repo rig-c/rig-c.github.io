@@ -81,6 +81,7 @@ figcaption { font-size: 0.82rem; color: var(--fg-muted); margin-top: 10px; }
 
 .home-body { max-width: 980px; padding-bottom: 64px; }
 .home-body > p:first-of-type { font-size: 1.15rem; }
+figure { margin: 1.4em 0; }
 .figure-media { margin: 1.4em 0; }
 .figure-media video { border-radius: var(--radius); border: 1px solid var(--border); }
 
