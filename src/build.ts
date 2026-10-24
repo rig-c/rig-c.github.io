@@ -35,7 +35,7 @@ function version(slug: string): string {
   return versionLabel(doc.packageName.split(',').map((name) => name.trim()), latestVersions);
 }
 
-// The Family rigs the live demo plays, pinned to one rig-c/parts-examples commit.
+// The Family rigs the live demo plays, pinned to one rig-c/examples commit.
 const FAMILY_SHA = 'c239b09328ca7364361b9761fac817502c09ede0';
 const FAMILY = ['Character 1', 'Character 2', 'Character 3', 'Character 4', 'Character 5'];
 const FAMILY_DIRS = ['roa', 'luna', 'jinni', 'naru', 'nova'];
@@ -93,7 +93,7 @@ function thread(slug: string, target: 'html' | 'md'): string {
   return `<nav class="thread" aria-label="Character 1 through the modules"><p>One character through the modules — Character 1 from the <a href="/examples/">Family set</a>. Each module works on its own; this order is one path, not a requirement.</p><ol>${steps}</ol></nav>`;
 }
 
-// The Play page's player: any of the 20 Family rigs from parts-examples at FAMILY_SHA, except that
+// The Play page's player: any of the 20 Family rigs from examples at FAMILY_SHA, except that
 // Character 1 office (the default) loads the Pose page's build served from this site, which adds the cup swing.
 function playDemo(target: 'html' | 'md'): string {
   if (target === 'md') {
@@ -111,8 +111,8 @@ function playDemo(target: 'html' | 'md'): string {
 <label>Render mode <select data-part="demo-mode"><option value="dom">DOM (default)</option><option value="canvas">One canvas</option></select></label>
 <div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
 </div>
-<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 with the swing (about 1.3 MB); each other character or outfit you pick loads its rig (${FAMILY_SIZE}) from rig-c/parts-examples.</p>
-<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/parts-examples with the retargeted cup swing added.</p>
+<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads the player (about 0.4 MB) and Character 1 with the swing (about 1.3 MB); each other character or outfit you pick loads its rig (${FAMILY_SIZE}) from rig-c/examples.</p>
+<p class="demo-source" data-part="demo-source">The model is the <a href="/docs/pose/">Pose</a> page's build: Character 1's rig from rig-c/examples with the retargeted cup swing added.</p>
 <noscript><p class="demo-status" data-kind="error">The live player needs JavaScript. <a href="/docs/pose/">A recording of the same rig is on the Pose page</a>.</p></noscript>
 </div>
 </div>

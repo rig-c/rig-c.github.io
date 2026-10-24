@@ -24,7 +24,7 @@ A rigged character usually means a canvas runtime that rasterizes everything. Fo
 
 The player above is the published package doing what any page does with it — nothing on this site poses the rig:
 
-1. `loadModel()` read the rig's `skeleton.model.json` — Character 1 office from this site, every other pick from rig-c/parts-examples at a pinned commit, fetched when you pick it — and cut each atlas region into its own bitmap (the `.atlas` and `skeleton.json` beside it are not fetched).
+1. `loadModel()` read the rig's `skeleton.model.json` — Character 1 office from this site, every other pick from rig-c/examples at a pinned commit, fetched when you pick it — and cut each atlas region into its own bitmap (the `.atlas` and `skeleton.json` beside it are not fetched).
 2. `new RigPlayer(root, assets, { mode })` opened the motion you picked on a live track; rig-c's core, bundled in the package, poses bones, constraints, physics and draw order on the CPU, one `frame(dt)` at a time.
 3. Each frame became a `PosedFrame` — region corners or mesh vertices, UVs, tint and clip, in draw order. A region is written as one `matrix()` string; meshes draw through one shared WebGL context and fall back to canvas2d (the status line says which ran).
 4. **Bones** and **Mesh** draw from the player's own read-only queries, `bone(name)` and `posedFrame()`; **Pause** calls `pause()`.
@@ -97,8 +97,8 @@ From the README's *Status* and *No counterpart in 1.0.0* (it has no limits secti
 - [How it works](https://github.com/rig-c/play#how-it-works)
 - [npm](https://www.npmjs.com/package/@rig-c/play) · [CHANGELOG](https://github.com/rig-c/play/blob/main/CHANGELOG.md)
 <!-- SOURCES (not published)
-- live player picks: the 20 Family rigs = rig-c/parts-examples@c239b09 family/ (same pin as /examples/), each with one animation `idle` (skeleton.model.json animations); sizes measured on jsDelivr: skeleton.png 1.19–2.00 MB + model ~0.09 MB compressed
-- live player: @rig-c/play 1.12.0 from jsDelivr; Character 1 office model assets/rigs/character-1-swing = the Pose case's swing-build (Character 1 rig @parts-examples c239b09 + retargeted cup swing; rig-c 2.61.0, @rig-c/pose 0.35.0)
+- live player picks: the 20 Family rigs = rig-c/examples@c239b09 family/ (same pin as /examples/), each with one animation `idle` (skeleton.model.json animations); sizes measured on jsDelivr: skeleton.png 1.19–2.00 MB + model ~0.09 MB compressed
+- live player: @rig-c/play 1.12.0 from jsDelivr; Character 1 office model assets/rigs/character-1-swing = the Pose case's swing-build (Character 1 rig @examples c239b09 + retargeted cup swing; rig-c 2.61.0, @rig-c/pose 0.35.0)
 - minimal page: rig-c/play README "A minimal page" (lines 301-326), style attribute only in the sample code
 - mode switch / meshBackendActive / pause / bone / posedFrame: dist/player.d.ts, DomRenderer.d.ts 1.12.0
 

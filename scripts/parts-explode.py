@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Render the /docs/parts/ hero clip: assembled Character 1 -> labelled parts grid -> assembled.
 
-Source:  rig-c/parts-examples @ c239b09328ca7364361b9761fac817502c09ede0, family/roa/out/
+Source:  rig-c/examples @ c239b09328ca7364361b9761fac817502c09ede0, family/roa/out/
          (parts/*.png and parts.json, read with `git show <sha>:<path>` so the working tree
          of the clone does not matter).
-Command: python3 scripts/parts-explode.py --examples <path to a rig-c/parts-examples clone>
+Command: python3 scripts/parts-explode.py --examples <path to a rig-c/examples clone>
 Output:  assets/docs/parts-explode.mp4, assets/docs/parts-explode-poster.jpg
 Needs:   Python 3, Pillow, NumPy, git, ffmpeg with libx264 (`--ffmpeg` or $FFMPEG to override).
 
@@ -98,11 +98,11 @@ def ease(t):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--examples", required=True, help="path to a rig-c/parts-examples clone holding " + SHA[:7])
+    ap.add_argument("--examples", required=True, help="path to a rig-c/examples clone holding " + SHA[:7])
     ap.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "..", "assets", "docs"))
     ap.add_argument("--ffmpeg", default=os.environ.get("FFMPEG", "ffmpeg"))
     a = ap.parse_args()
-    print(f"parts-examples {SHA} {ROOT}")
+    print(f"examples {SHA} {ROOT}")
     print("command: python3 scripts/parts-explode.py --examples <clone>")
 
     meta = json.loads(git_bytes(a.examples, "parts.json"))

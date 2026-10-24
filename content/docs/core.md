@@ -166,7 +166,7 @@ rigc runs on Bun 1.2.0 or later. The npm package is `rig-c`; `@rig-c/core` is th
 
 <!-- SOURCES (not published)
 - key-pose film: rig-c/core@539572d (539572d34bb034b9e905e30dc2d45bcd2650b34f, the commit that last changed it; identical at v2.64.1 51dba78) assets/rigc-keypose.gif — 234 frames, 600x405, 5 cs each = 11.70 s, opaque; encoded by scripts/encode-video.sh row core-keypose (20 fps, cropped to 600x404); caption from films/two-keypose/README.md (summary, shot table, honesty stance; shot 2 = spine-rigc@0.9.0 output); "spine-rigc" is drawn in the caption band of every frame
-- three cases: rig-c 2.61.0 on rig-c/parts-examples@c239b09 family/roa/out/rig — verbatim fail.log / pass.log / guide.txt of each case (case run 2026-10-19)
+- three cases: rig-c 2.61.0 on rig-c/examples@c239b09 family/roa/out/rig — verbatim fail.log / pass.log / guide.txt of each case (case run 2026-10-19)
 - render contact: "idle 41 frame(s), 3.333s + contact.png"; inspect command and image from the same run
 - packing narrow: core README Install ("no trimming, no rotation, no scaling")
 
