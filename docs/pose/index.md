@@ -110,10 +110,10 @@ Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
 
 ## Go deeper
 - [Try it](https://github.com/rig-c/pose#try-it) — a self-contained wave example in the repository
-- [Clean first: `rig-pose clean`](https://github.com/rig-c/pose#clean-first-rig-pose-clean)
-- [What it does](https://github.com/rig-c/pose#what-it-does)
-- [The pose: `rig-pose-sequence/1`](https://github.com/rig-c/pose#the-pose-rig-pose-sequence1)
-- [The map: `rig-pose-map/1`](https://github.com/rig-c/pose#the-map-rig-pose-map1)
-- [Compare: the rig's render against the video](https://github.com/rig-c/pose#compare-the-rigs-render-against-the-video)
+- [Clean first: `rig-pose clean`](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#clean-first-rig-pose-clean)
+- [What it does](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#what-it-does)
+- [The pose: `rig-pose-sequence/1`](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#the-pose-rig-pose-sequence1)
+- [The map: `rig-pose-map/1`](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#the-map-rig-pose-map1)
+- [Compare: the rig's render against the video](https://github.com/rig-c/pose/blob/main/docs/REFERENCE.md#compare-the-rigs-render-against-the-video)
 - [What it does not do](https://github.com/rig-c/pose#what-it-does-not-do)
 - [npm](https://www.npmjs.com/package/@rig-c/pose) · [CHANGELOG](https://github.com/rig-c/pose/blob/main/CHANGELOG.md)

@@ -80,9 +80,9 @@ From the README's *Status* and *No counterpart in 1.0.0* (it has no limits secti
 
 ## Go deeper
 - [Install](https://github.com/rig-c/play#install) · [A minimal page](https://github.com/rig-c/play#a-minimal-page)
-- [Status](https://github.com/rig-c/play#status)
-- [Attachment sets (`sets.json`)](https://github.com/rig-c/play#attachment-sets-setsjson)
-- [Runtime knobs and what they cost](https://github.com/rig-c/play#runtime-knobs-and-what-they-cost)
-- [Benchmark: DOM, canvas and official WebGL](https://github.com/rig-c/play#benchmark-dom-canvas-and-official-webgl)
+- [Status](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#status)
+- [Attachment sets (`sets.json`)](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#attachment-sets-setsjson)
+- [Runtime knobs and what they cost](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#runtime-knobs-and-what-they-cost)
+- [Benchmark: DOM, canvas and official WebGL](https://github.com/rig-c/play/blob/main/docs/BENCHMARK.md#benchmark-dom-canvas-and-official-webgl)
 - [How it works](https://github.com/rig-c/play#how-it-works)
 - [npm](https://www.npmjs.com/package/@rig-c/play) · [CHANGELOG](https://github.com/rig-c/play/blob/main/CHANGELOG.md)
