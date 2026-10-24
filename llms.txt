@@ -8,7 +8,7 @@ All pages on https://rig-c.org are served as static semantic HTML (`/<path>/`) w
 
 ## Pages
 
-- [Overview](https://rig-c.org/) ([Markdown](https://rig-c.org/index.md)) (`rig-c@2.61.0`): Toolchain overview, package index (parts, pose, core, review, play, adapters), installation commands, AI agent skill setup, and licensing boundaries.
+- [Overview](https://rig-c.org/) ([Markdown](https://rig-c.org/index.md)) (`rig-c@2.68.0`): Toolchain overview, package index (parts, pose, core, review, play, adapters), installation commands, AI agent skill setup, and licensing boundaries.
 - [Overview](https://rig-c.org/docs/) ([Markdown](https://rig-c.org/docs/index.md)): Docs hub: the rig-c packages in pipeline order, each with what it is, when to use it, what it produces, and how it works.
 - [Getting Started](https://rig-c.org/docs/getting-started/) ([Markdown](https://rig-c.org/docs/getting-started/index.md)): Tested no-GPU, no-Python walkthrough (steps 1-10 with 9b and 9c, under ten minutes of commands on a loaded Apple M4) from pre-decomposed character layers to a compiled rig with idle, wave and a keyed hello with hair and skirt physics playing in the browser, plus downstream export routes.
 - [Parts](https://rig-c.org/docs/parts/) ([Markdown](https://rig-c.org/docs/parts/index.md)) (`@rig-c/parts@1.41.0`): @rig-c/parts is a Bun CLI that turns one character painting and its See-through layer decomposition into measured parts, a rig-c rig spec and an idle, gated and packed by rig-c into Spine 4.3 skeleton data.
