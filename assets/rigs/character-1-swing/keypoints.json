@@ -1,0 +1,27 @@
+{
+  "spec": "spine-parts-keypoints/1",
+  "space": { "units": "painting-px", "origin": "top-left", "y": "down" },
+  "width": 800, "height": 2284,
+  "source": "placed by hand on inputs/painting.png, read off a labelled pixel grid",
+  "people": [
+    { "id": "a", "joints": {
+        "nose":       { "state": "observed", "at": [384, 348] },
+        "neck":       { "state": "observed", "at": [345, 470] },
+        "r_shoulder": { "state": "occluded", "at": [130, 540] },
+        "r_elbow":    { "state": "observed", "at": [135, 840] },
+        "r_wrist":    { "state": "observed", "at": [128, 1175] },
+        "l_shoulder": { "state": "occluded", "at": [480, 520] },
+        "l_elbow":    { "state": "observed", "at": [715, 560] },
+        "l_wrist":    { "state": "observed", "at": [570, 580] },
+        "r_hip":      { "state": "occluded", "at": [285, 960] },
+        "r_knee":     { "state": "occluded", "at": [330, 1500] },
+        "r_ankle":    { "state": "occluded", "at": [290, 2150] },
+        "l_hip":      { "state": "occluded", "at": [425, 960] },
+        "l_knee":     { "state": "occluded", "at": [440, 1520] },
+        "l_ankle":    { "state": "occluded", "at": [400, 2170] },
+        "r_eye":      { "state": "observed", "at": [336, 296] },
+        "l_eye":      { "state": "observed", "at": [416, 326] },
+        "r_ear":      { "state": "observed", "at": [268, 300] },
+        "l_ear":      { "state": "missing" } } }
+  ]
+}
