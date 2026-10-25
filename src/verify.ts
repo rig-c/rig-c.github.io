@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
+import { artifactManifest, verifyManifest } from './deployment.ts';
+import { DEFAULT_OUTPUT, outputRoot, parseOutputArgs, ROOT_DIR as SOURCE_ROOT } from './output.ts';
 import { htmlRel, mdRoute, PAGES, REDIRECTS, SITE_ORIGIN } from './content.ts';
 
-const ROOT_DIR = resolve(import.meta.dir, '..');
-
-function resolveLocalHref(href: string): string | null {
+function resolveLocalHref(href: string, ROOT_DIR: string): string | null {
   const clean = href.split('#')[0]?.split('?')[0] ?? '';
   if (!clean.startsWith('/')) {
     return null;
@@ -18,16 +18,18 @@ function resolveLocalHref(href: string): string | null {
   return join(ROOT_DIR, clean.slice(1));
 }
 
-function main(): void {
+export function verifySite(outDir = DEFAULT_OUTPUT): void {
+  const ROOT_DIR = outputRoot(outDir);
   const errors: string[] = [];
 
   for (const requiredFile of [
+    'CNAME',
+    'deployment-manifest.json',
     'styles.css',
     'llms.txt',
     'llms-full.txt',
     'sitemap.xml',
     'robots.txt',
-    '.nojekyll',
   ]) {
     if (!existsSync(join(ROOT_DIR, requiredFile))) {
       errors.push(`Missing root file: ${requiredFile}`);
@@ -97,7 +99,7 @@ function main(): void {
     let match: RegExpExecArray | null = hrefRegex.exec(html);
     while (match !== null) {
       const href = match[1] ?? '';
-      const targetPath = resolveLocalHref(href);
+      const targetPath = resolveLocalHref(href, ROOT_DIR);
       if (targetPath && !existsSync(targetPath)) {
         errors.push(`[${route}] Broken internal link href="${href}" -> ${targetPath}`);
       }
@@ -141,12 +143,27 @@ function main(): void {
     }
   }
 
+  // A valid digest alone cannot prove that authored assets were copied completely.
+  for (const file of ['CNAME', 'styles.css']) {
+    if (!existsSync(join(ROOT_DIR, file)) || !readFileSync(join(SOURCE_ROOT, file)).equals(readFileSync(join(ROOT_DIR, file)))) {
+      errors.push(`Authored static file missing or changed: ${file}`);
+    }
+  }
+  try {
+    const sourceAssets = artifactManifest(join(SOURCE_ROOT, 'assets')).files;
+    const outputAssets = artifactManifest(join(ROOT_DIR, 'assets')).files;
+    if (JSON.stringify(sourceAssets) !== JSON.stringify(outputAssets)) errors.push('Authored asset file set differs');
+    verifyManifest(ROOT_DIR);
+  } catch (error) {
+    errors.push(String(error));
+  }
+
   if (errors.length > 0) {
     console.error('Verification failed:');
     for (const err of errors) {
       console.error(`  - ${err}`);
     }
-    process.exit(1);
+    throw new Error(`Verification failed with ${errors.length} error(s)`);
   }
 
   console.log(
@@ -154,4 +171,4 @@ function main(): void {
   );
 }
 
-main();
+if (import.meta.main) verifySite(parseOutputArgs());

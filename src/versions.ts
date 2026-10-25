@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-type RegistryFetch = (url: string, init: RequestInit) => Promise<Response>;
+export type RegistryFetch = (url: string, init: RequestInit) => Promise<Response>;
 
 export interface PublishedVersion {
   name: string;
@@ -41,6 +41,6 @@ export function versionLabel(names: readonly string[], versions: ReadonlyMap<str
   return names.map((name) => {
     const version = versions.get(name);
     if (!version) throw new Error(`npm latest version not resolved for ${name}`);
-    return names.length === 1 ? version : `${name.split('/').at(-1)} ${version}`;
-  }).join(' / ');
+    return names.length === 1 ? version : `${name} ${version}`;
+  }).join('\n');
 }

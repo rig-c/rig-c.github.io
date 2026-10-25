@@ -49,6 +49,8 @@ Try it end to end with no GPU and no Python — about a minute of commands on an
 | [**@rig-c/play**](/docs/play/) | `{{version:play}}` | `npm i @rig-c/play` | Plays `skeleton.model.json` in the browser with no Spine runtime — as plain DOM elements (`<img>` with CSS `matrix()`) or one `<canvas>` per player. |
 | [**@rig-c/adapters**](/docs/adapters/) | `{{version:adapters}}` | `npm i @rig-c/pixi`<br>`npm i @rig-c/phaser`<br>`npm i @rig-c/three` | Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through `@rig-c/play`'s posing core, with no Spine runtime. |
 
+{{published-versions}}
+
 ## Built for agents that cannot see
 
 An AI agent asked to author a 2D rig cannot see the screen, and standard JSON parsers accept broken rigs in silence — a 4.2-shaped constraint vanishes in 4.3, a mismatched `size:` collapses every UV, a four-number curve array yields `NaN`, and a mesh whose vertex count equals its UV count silently loses its bone weights.
