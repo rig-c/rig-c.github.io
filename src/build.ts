@@ -1,14 +1,15 @@
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { cpSync, mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { basename, dirname, join } from 'node:path';
 import { htmlRel, mdRoute, PAGES, type Page, REDIRECTS, SITE_ORIGIN } from './content.ts';
-import { publishedVersions, versionLabel } from './versions.ts';
+import { publishedVersions, versionLabel, type RegistryFetch } from './versions.ts';
+import { assertReplaceableOutput, DEFAULT_OUTPUT, outputRoot, parseOutputArgs, ROOT_DIR } from './output.ts';
+import { writeManifest } from './deployment.ts';
 
-const ROOT_DIR = resolve(import.meta.dir, '..');
 const TODAY = '2026-10-19';
 const DOCS = PAGES.filter((p) => p.section === 'docs');
-let latestVersions: ReadonlyMap<string, string> = new Map();
 const AUTHOR = { '@type': 'Person', name: 'firejune', url: 'https://github.com/firejune', sameAs: ['https://github.com/firejune'] };
 
+function renderSite(latestVersions: ReadonlyMap<string, string>): Map<string, string> {
 function escapeHtml(value: string): string {
   return value
     .replaceAll('&', '&amp;')
@@ -29,10 +30,15 @@ function docsMap(): string {
 }
 
 // Latest-version tokens use npm, while page metadata and recorded demo versions stay pinned.
-function version(slug: string): string {
+function version(slug: string, target?: 'html' | 'md'): string {
   const doc = DOCS.find((p) => p.route === `/docs/${slug}/`);
   if (!doc?.packageName) throw new Error(`{{version:${slug}}}: no docs page with a packageName`);
-  return versionLabel(doc.packageName.split(',').map((name) => name.trim()), latestVersions);
+  const names = doc.packageName.split(',').map((name) => name.trim());
+  const lines = versionLabel(names, latestVersions).split('\n');
+  if (target === 'html') return lines.map((line) => `<code>${escapeHtml(line)}</code>`).join('<br>');
+  // Keep a Markdown table row on one physical line; the full per-package list follows it.
+  if (target === 'md') return lines.map((line) => `\`${line}\``).join('; ');
+  return lines.join('\n');
 }
 
 // The Family rigs the live demo plays, pinned to one rig-c/examples commit.
@@ -126,7 +132,8 @@ function expand(page: Page, target: 'html' | 'md' = 'md'): string {
     .replace(/\{\{thread:([a-z-]+)\}\}/g, (_, slug: string) => thread(slug, target))
     .replace('{{live-demo}}', liveDemo(target))
     .replace('{{docs-map}}', docsMap())
-    .replace(/\{\{version:([a-z-]+)\}\}/g, (_, slug: string) => version(slug));
+    .replace(/`?\{\{version:([a-z-]+)\}\}`?/g, (_, slug: string) => version(slug, target))
+    .replace('{{published-versions}}', target === 'md' ? publishedList() : '');
 }
 
 // Verdict words inside code blocks get a class, so a gate transcript reads at a glance.
@@ -442,6 +449,10 @@ function renderRedirect(from: string, to: string): string {
 `;
 }
 
+function publishedList(): string {
+  return [...latestVersions].map(([name, version]) => `- \`${name}\`: \`${version}\``).join('\n');
+}
+
 function buildLlmsTxt(): string {
   const lines: string[] = [
     '# rig-c',
@@ -463,6 +474,10 @@ function buildLlmsTxt(): string {
     );
   }
   lines.push(
+    '',
+    '## Latest published packages (npm latest at build time)',
+    '',
+    publishedList(),
     '',
     '## Install',
     '',
@@ -543,46 +558,56 @@ function buildRobotsTxt(): string {
   return `${blocks.join('\n\n')}\n`;
 }
 
-function writeOut(relPath: string, content: string): void {
-  const absPath = join(ROOT_DIR, relPath);
-  mkdirSync(dirname(absPath), { recursive: true });
-  writeFileSync(absPath, content, 'utf8');
+const files = new Map<string, string>();
+for (const page of PAGES) {
+  files.set(htmlRel(page.route), renderPage(page));
+  files.set(mdRoute(page.route).slice(1), `${expand(page).trim()}\n`);
+}
+for (const [from, to] of Object.entries(REDIRECTS)) files.set(htmlRel(from), renderRedirect(from, to));
+files.set('llms.txt', buildLlmsTxt());
+files.set('llms-full.txt', buildLlmsFullTxt());
+files.set('sitemap.xml', buildSitemapXml());
+files.set('robots.txt', buildRobotsTxt());
+return files;
 }
 
-async function main(): Promise<void> {
-  // Resolve every package before copying assets or writing any generated file.
+export interface BuildOptions {
+  outDir?: string;
+  fetchRegistry?: RegistryFetch;
+}
+
+export async function buildSite({ outDir = DEFAULT_OUTPUT, fetchRegistry }: BuildOptions = {}): Promise<void> {
+  const destination = outputRoot(outDir);
+  assertReplaceableOutput(destination);
+  // Resolve AND render before any disk writes, including creation of a staging directory.
   const names = DOCS.flatMap((page) => page.packageName?.split(',').map((name) => name.trim()) ?? []);
-  const published = await publishedVersions(names);
-  latestVersions = new Map(published.map(({ name, version }) => [name, version]));
+  const published = await publishedVersions(names, fetchRegistry);
   for (const item of published) {
     console.log(`npm latest: ${item.name}@${item.version} ${item.url} sha256=${item.sha256}`);
   }
-
-  for (const asset of ['banner.svg', 'logo.svg']) {
-    const source = resolve(ROOT_DIR, `../rigc/assets/${asset}`);
-    if (existsSync(source)) {
-      mkdirSync(join(ROOT_DIR, 'assets'), { recursive: true });
-      copyFileSync(source, join(ROOT_DIR, 'assets', asset));
+  const files = renderSite(new Map(published.map(({ name, version }) => [name, version])));
+  mkdirSync(dirname(destination), { recursive: true });
+  const staging = mkdtempSync(join(dirname(destination), `.${basename(destination)}-`));
+  try {
+    // These are authored inputs in this repository. Never read a sibling checkout.
+    for (const name of ['assets', 'styles.css', 'CNAME']) {
+      cpSync(join(ROOT_DIR, name), join(staging, name), { recursive: true, dereference: false, errorOnExist: true });
     }
+    for (const [relPath, content] of files) {
+      const absolute = join(staging, relPath);
+      mkdirSync(dirname(absolute), { recursive: true });
+      writeFileSync(absolute, content, 'utf8');
+    }
+    writeManifest(staging);
+    // Recheck ownership after async lookups, before replacing any existing output.
+    assertReplaceableOutput(destination);
+    // Replace only the previously recorded generated tree; unknown files are never removed.
+    rmSync(destination, { recursive: true, force: true });
+    renameSync(staging, destination);
+  } finally {
+    rmSync(staging, { recursive: true, force: true });
   }
-
-  for (const page of PAGES) {
-    writeOut(htmlRel(page.route), renderPage(page));
-    writeOut(mdRoute(page.route).slice(1), `${expand(page).trim()}\n`);
-  }
-  for (const [from, to] of Object.entries(REDIRECTS)) {
-    writeOut(htmlRel(from), renderRedirect(from, to));
-  }
-
-  writeOut('llms.txt', buildLlmsTxt());
-  writeOut('llms-full.txt', buildLlmsFullTxt());
-  writeOut('sitemap.xml', buildSitemapXml());
-  writeOut('robots.txt', buildRobotsTxt());
-  writeOut('.nojekyll', '');
-
-  console.log(
-    `Built ${PAGES.length} pages (HTML + Markdown mirror), ${Object.keys(REDIRECTS).length} redirect stubs, llms.txt, llms-full.txt, sitemap.xml, and robots.txt in ${ROOT_DIR}`,
-  );
+  console.log(`Built ${PAGES.length} pages and ${Object.keys(REDIRECTS).length} redirects in ${destination}`);
 }
 
-await main();
+if (import.meta.main) await buildSite({ outDir: parseOutputArgs() });

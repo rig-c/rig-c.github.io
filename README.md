@@ -6,7 +6,7 @@ Built flat-first for **zero-JS `curl` readability**, **AI agent ingestion (`llms
 
 ## Routes & Static Outputs
 
-Every page is one Markdown file under `content/` (frontmatter + body). `bun run build` renders it to `<route>/index.html` and copies it to `<route>/index.md`.
+Every page is one Markdown file under `content/` (frontmatter + body). `bun run build` renders it to `_site/<route>/index.html` and copies it to `_site/<route>/index.md`. Only `_site/` is published; the repository root contains authored inputs and tooling.
 
 | Route | Source | Subject |
 | --- | --- | --- |
@@ -32,11 +32,61 @@ The build requires access to `https://registry.npmjs.org`. Before writing any ou
 
 ## Commands
 
+Use **Bun 1.4.4** (the Actions runtime is pinned to that release). There are no third-party build dependencies to install. Build and full verification bundles run on the project's approved remote verification runner, against frozen inputs; the commands below are also the exact pipeline run by Actions.
+
 ```bash
-bun run build    # Emit all static HTML pages, Markdown mirrors, llms.txt, llms-full.txt, sitemap.xml, robots.txt
-bun run verify   # Verify HTML semantics, JSON-LD validity, canonical URLs, internal links, and zero inline styles
-bun run serve    # Start local static server on http://localhost:4321
+bun run test       # Offline resolver/layout/artifact/live-comparison/workflow tests
+bun run build      # Fetch eight npm latest manifests, emit an isolated _site/ artifact
+bun run verify     # Check _site/: all routes, redirects, static assets and deployment manifest
+bun run compare:live # Read-only comparison with the currently served deployment manifest
+bun run serve      # Serve only _site/ on http://localhost:4321 (after a build)
 ```
+
+Build, verify, serve and live comparison all accept `--out <directory>`:
+
+```bash
+bun run build --out dist
+bun run verify --out dist
+bun run compare:live --out dist
+bun run serve --out dist
+```
+
+Inside this repository, output is restricted to `_site/` or `dist/`; an external isolated output directory is also supported. The repository root and authored directories cannot be output targets. New or empty output directories are allowed. A nonempty destination is replaceable only if its valid `deployment-manifest.json` identifies a previous generated site and every current file/directory is recorded by that marker (or is the marker itself). Unknown files are preserved by refusing the build; checkout/`.git` destinations are always refused, including other checkout ancestors. The marker's own digest is validated without requiring current file bytes to match, so regeneration can remove previously recorded stale files. Ownership is checked before fetching and again immediately before replacement. A successful build replaces only that owned output directory. Output paths must have canonical, symlink-free ancestors: on macOS use `/private/tmp/...` rather than `/tmp/...` (or resolve a parent with `realpath` before choosing the output path). Aliases into authored input are rejected rather than followed. All version lookups and rendering finish before any output is written; failed lookups preserve an existing output directory unchanged. Asset copying or filesystem errors fail the build and prevent publication.
+
+The builder copies **only this repository's** `assets/`, `styles.css` and `CNAME`, byte for byte. It never reads a sibling checkout or runs the media scripts. Source Markdown, scripts and configuration are not published. Generated HTML/Markdown, redirect stubs, `llms*.txt`, `robots.txt` and `sitemap.xml` belong exclusively in the output directory and must be removed from source tracking during migration; authored `assets/`, `styles.css` and `CNAME` stay tracked. Actions publishes an already-rendered artifact without Jekyll. It does not need `.nojekyll`, and the official upload action excludes dotfiles, so the builder emits none and rejects hidden artifact files or symlinks rather than silently publishing an incomplete file set.
+
+The landing HTML gives each adapter version its own escaped `<code>` item separated by `<br>`. Its Markdown table remains one physical line per row, followed by a plain per-package list of all eight independently resolved packages; the same list appears in `llms.txt` and `llms-full.txt`. `@rig-c/core` and `@rig-c/adapters` are labels/aliases, not additional latest lookups. Docs frontmatter, structured docs versions and recorded demo versions remain pinned to their sources.
+
+## Actions Pages deployment
+
+`.github/workflows/pages.yml` runs on pushes to `main`, pull requests, manual dispatch and hourly at minute **17 UTC** (`17 * * * *`). Pull requests only test, build and verify. Main runs are serialized through deployment to keep the live comparison meaningful. Actions first runs the offline tests, then the real registry-backed build, then artifact verification; only successful, eligible and changed artifacts reach `actions/upload-pages-artifact@v4` and `actions/deploy-pages@v4`. Checkout uses `actions/checkout@v6` with credential persistence disabled. No bot writes source commits.
+
+An independent gate uses **authenticated** `gh api repos/rig-c/rig-c.github.io/pages` to read the actual `build_type`. Its token has `contents: read` and `pages: read`; a public anonymous request is not a substitute. Only `build_type: workflow` allows publication. `legacy` leaves the build in verification-only mode; API/network/authentication errors and unknown modes fail closed. A 404 from the Pages API is an error. The build job has only `contents: read`. Only the deploy job receives `pages: write` and `id-token: write`, and it uses the existing `github-pages` environment. Its `main`-only branch policy is preserved. There is no `configure-pages` call, Pages auto-enable, setting mutation or PR deployment.
+
+### Cutover order
+
+1. Complete PR review and verification and sign off the exact PR head, including removal of tracked generated outputs and preservation of authored static inputs.
+2. **Immediately before merge**, HQ changes Pages from `legacy` to `workflow` and reads the setting back. The workflow is not on `main` yet, so the previous legacy deployment stays live. Do not merge a source-only tree while legacy publishing is enabled: no legacy build may run against it.
+3. The parent merges the approved head only after that readback. The `main` push can perform the first Actions deployment; a normal dispatch (`failure_fixture=none`) is available if another run is needed. The authenticated build-type gate remains a second guard.
+4. The parent checks the deployment, canonical live routes, CNAME, Markdown/LLM endpoints, all redirect stubs and eight package versions against fresh npm manifests. Observe a no-change run and the deliberate failed run described below. Settings, merge and live acceptance remain separate owner actions.
+
+### Deterministic artifact and no-change behavior
+
+`deployment-manifest.json` is public. Schema 1 contains a path-sorted `files` array, with each file's relative path, byte count and SHA-256; the top-level `sha256` hashes the compact JSON encoding of that array. Every deployable file, including all authored assets and `CNAME`, participates. The manifest excludes itself and contains no timestamps, source commits or workflow/run IDs. New files, removed files and asset-only edits therefore change the hash even when package versions do not. The verifier recomputes the complete artifact digest and separately compares authored static files with their source inputs.
+
+After verification, the workflow compares against **the currently served** `https://rig-c.org/deployment-manifest.json`. Each request uses explicit no-cache/no-store revalidation headers, a unique request-only cache-busting query and a 15-second timeout. The random query never enters the artifact or digest. The live manifest must pass schema, path ordering and file-list digest validation. Equal hashes skip **both upload and deploy**, also for scheduled and manual runs. A live manifest **404 only** permits the initial migration. Other HTTP statuses, redirects, network failures, invalid JSON or invalid manifests fail the run and prevent publication. There is no stale fallback or comparison to a repository copy of the manifest.
+
+### Real failure fixture
+
+After a good deployment, the parent can dispatch a deliberately red build:
+
+```bash
+gh workflow run pages.yml --repo rig-c/rig-c.github.io --ref main -f failure_fixture=invalid-version
+```
+
+The input injects a registry fetch returning an invalid version through the **same exported `buildSite` and `publishedVersions` resolver** as production. The real build must fail before writing an artifact; this dispatch is intentionally red, not an expected-failure test reported as a successful workflow. No production registry, credential, proxy or external state is changed. If the resolver ever regresses and accepts the fixture, a second CLI tripwire still fails, and independent upload/deploy conditions forbid fixture publication. Unknown fixture values also fail. The normal `none` path always fetches real npm latest manifests without retry or fallback.
+
+Keep the failed run and compare the live manifest SHA and deployment history before/after it; the parent owns that evidence and must show no upload/deploy. Offline tests cover resolver refusal, no writes on failure, nonzero fixture CLI exit, independent publication guards, deterministic complete file sets, changed/deleted assets, live no-change/404/error behavior and all route/static copies. HTML structure assertions establish separate adapter code items and breaks; they are not a rendered-browser visual acceptance claim.
 
 ## Videos
 

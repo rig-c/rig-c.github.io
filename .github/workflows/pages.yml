@@ -1,0 +1,98 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      failure_fixture:
+        description: 'Deliberate red build through the real npm resolver; never deploys'
+        type: choice
+        options: [none, invalid-version]
+        default: none
+        required: true
+
+permissions: {}
+
+# Serialize main runs through live comparison AND deployment. PRs use their own ref group.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pages-mode:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    outputs:
+      enabled: ${{ steps.mode.outputs.enabled || 'false' }}
+    steps:
+      - name: Default to verification only
+        run: echo 'Deployment requires the authenticated workflow-mode gate.'
+      - name: Check actual Pages mode (read only)
+        id: mode
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && inputs.failure_fixture != 'invalid-version'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SITE_REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mode="$(gh api "repos/$SITE_REPOSITORY/pages" --jq '.build_type')"
+          case "$mode" in
+            workflow) echo 'enabled=true' >> "$GITHUB_OUTPUT" ;;
+            legacy) echo 'enabled=false' >> "$GITHUB_OUTPUT"
+                    echo '::notice::Pages still uses legacy publishing; verified builds will not deploy.' ;;
+            *) echo "::error::Unexpected Pages build_type: $mode"; exit 1 ;;
+          esac
+
+  build:
+    needs: pages-mode
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.compare.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.4'
+      - name: Test resolver, layout, complete artifact and deployment decisions
+        run: bun run test
+      - name: Build isolated site (fixture errors must escape)
+        env:
+          SITE_FAILURE_FIXTURE: ${{ inputs.failure_fixture || 'none' }}
+        run: bun run build:ci
+      - name: Verify generated artifact
+        run: bun run verify
+      - name: Compare verified bytes to current live manifest
+        id: compare
+        if: needs.pages-mode.outputs.enabled == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && inputs.failure_fixture != 'invalid-version'
+        run: bun run compare:live
+      - name: Upload changed site only
+        if: success() && needs.pages-mode.outputs.enabled == 'true' && steps.compare.outputs.changed == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && inputs.failure_fixture != 'invalid-version'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: [pages-mode, build]
+    if: success() && needs.pages-mode.outputs.enabled == 'true' && needs.build.outputs.changed == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && inputs.failure_fixture != 'invalid-version'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy verified changed artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

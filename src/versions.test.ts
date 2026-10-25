@@ -20,7 +20,7 @@ describe('build-time npm versions', () => {
   test('labels independently versioned adapters instead of taking only the first', () => {
     const names = ['@rig-c/pixi', '@rig-c/phaser', '@rig-c/three'];
     expect(versionLabel(names, new Map(names.map((name, i) => [name, `0.${i}.1`]))))
-      .toBe('pixi 0.0.1 / phaser 0.1.1 / three 0.2.1');
+      .toBe('@rig-c/pixi 0.0.1\n@rig-c/phaser 0.1.1\n@rig-c/three 0.2.1');
     expect(() => versionLabel(['rig-c'], new Map())).toThrow('not resolved for rig-c');
   });
 
