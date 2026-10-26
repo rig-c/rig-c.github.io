@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "sha256": "46477ab4b95d2f6aa2f804d2114f3f9dbc90d280c85c9c7aa58546dc018a5a2d",
+  "sha256": "515c89f1307308e5e41dcfe5a0fc7c69e5751539863ef7cb7c14e1cf6ffa38e2",
   "files": [
     {
       "path": "README.md",
-      "bytes": 1832,
-      "sha256": "445bc45882d8b71c2826daeeccf7490377617107bd0b1aff591bfe6e90e057f3"
+      "bytes": 3979,
+      "sha256": "4b0cb0bc44ccbb56674d3cfd2b149b79b10722989fb964fc273345574d3b79d7"
     },
     {
       "path": "THIRD_PARTY_LICENSES.txt",
@@ -24,8 +24,8 @@
     },
     {
       "path": "depth.jpg",
-      "bytes": 242570,
-      "sha256": "72b50699ac18c9421d19142c2ddb7bfc8a59113f6ff45826153c16ef7c02cd09"
+      "bytes": 244996,
+      "sha256": "c814960c7e40dd1d5573a5e6d6e5d97eefeb309d015dea924359dc87f8e998a0"
     },
     {
       "path": "index.html",
@@ -44,13 +44,13 @@
     },
     {
       "path": "scene.bin.gz",
-      "bytes": 3409263,
-      "sha256": "af763aa40b3c80597c2cdf91d83713230efd1eef6625eafa1f0ba04222c3e168"
+      "bytes": 3405993,
+      "sha256": "4e52da5a46e86e200ca82a4ff5a1befbe1d5daa62ddd442f6aa3038e3a0b3e80"
     },
     {
       "path": "scene.json",
-      "bytes": 3731,
-      "sha256": "82422ef7184e9b9c4f3999c510e2fde68c6dbf6c0739376ce0b79e7f6f34b806"
+      "bytes": 3730,
+      "sha256": "51a5bfdf5c2687871b9290fd2dcec9004b892c165e1ab098f1d008aa78b89f2a"
     }
   ]
 }

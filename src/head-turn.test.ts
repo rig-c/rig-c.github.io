@@ -3,13 +3,50 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ROOT_DIR } from './output.ts';
+import { artifactManifest } from './deployment.ts';
 import { CURVATURE_PATH, HEAD_TURN_PATH, verifyCurvaturePage, verifyHeadTurnBundle } from './head-turn.ts';
 const read = (path: string) => readFileSync(join(ROOT_DIR, path), 'utf8');
 
-test('approved producer bundle is byte exact, including original entry and raw gzip', () => {
+test('approved depth revision bundle is byte exact, including original entry and raw gzip', () => {
   verifyHeadTurnBundle(ROOT_DIR);
   const gzip = readFileSync(join(ROOT_DIR, HEAD_TURN_PATH, 'bundle/scene.bin.gz'));
   expect([...gzip.subarray(0, 2)]).toEqual([31, 139]);
+});
+
+test('changed depth image or compiled depth payload fails the approved inventory', () => {
+  const copy = mkdtempSync(join(tmpdir(), 'head-turn-depth-'));
+  try {
+    const demo = join(copy, HEAD_TURN_PATH);
+    cpSync(join(ROOT_DIR, HEAD_TURN_PATH, 'bundle'), join(demo, 'bundle'), { recursive: true });
+    cpSync(join(ROOT_DIR, HEAD_TURN_PATH, 'bundle-manifest.json'), join(demo, 'bundle-manifest.json'));
+    for (const name of ['depth.jpg', 'scene.bin.gz']) {
+      const path = join(demo, 'bundle', name);
+      const original = readFileSync(path);
+      const changed = Buffer.from(original);
+      changed[changed.length - 1] ^= 1;
+      writeFileSync(path, changed);
+      expect(() => verifyHeadTurnBundle(copy)).toThrow('approved ten-file inventory');
+      writeFileSync(path, original);
+    }
+    verifyHeadTurnBundle(copy);
+  } finally {
+    rmSync(copy, { recursive: true, force: true });
+  }
+});
+
+test('a self-consistent replacement manifest cannot retarget the approved depth pin', () => {
+  const copy = mkdtempSync(join(tmpdir(), 'head-turn-pin-'));
+  try {
+    const demo = join(copy, HEAD_TURN_PATH);
+    cpSync(join(ROOT_DIR, HEAD_TURN_PATH, 'bundle'), join(demo, 'bundle'), { recursive: true });
+    writeFileSync(join(demo, 'bundle', 'depth.jpg'), 'unapproved replacement depth');
+    // This manifest correctly hashes its files; only the independent approval pin rejects it.
+    const replacement = artifactManifest(join(demo, 'bundle'));
+    writeFileSync(join(demo, 'bundle-manifest.json'), JSON.stringify(replacement));
+    expect(() => verifyHeadTurnBundle(copy)).toThrow('approved ten-file inventory');
+  } finally {
+    rmSync(copy, { recursive: true, force: true });
+  }
 });
 
 test('site entry changes only caption and integration UI; original resources still use bundle base', () => {
