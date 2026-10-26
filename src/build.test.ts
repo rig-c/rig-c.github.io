@@ -43,8 +43,8 @@ describe('isolated deployable site', () => {
     expect(manifest.files.some((file) => file.path === 'assets/demo.js')).toBe(true);
     expect(manifest.files.some((file) => file.path === 'demos/head-turn/bundle/scene.bin.gz')).toBe(true);
     expect(read('demos/head-turn/index.html')).toBe(readFileSync(join(ROOT_DIR, 'demos/head-turn/index.html'), 'utf8'));
-    expect(read('index.html').indexOf('class="head-turn-feature"')).toBeLessThan(read('index.html').indexOf('class="hero"'));
-    expect(read('index.html').split('Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress')).toHaveLength(2);
+    expect(read('index.html')).not.toContain('head-turn-feature');
+    expect(read('examples/index.html').split('Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress')).toHaveLength(2);
     expect(existsSync(join(out, 'src'))).toBe(false);
     expect(existsSync(join(out, '.nojekyll'))).toBe(false);
   });

@@ -69,6 +69,15 @@ pip install -r requirements.txt
 
 Licences for all of these: [Licensing](/docs/licensing/).
 
+## Preview: depth-driven head turn
+
+<figure class="head-turn-feature">
+  <a href="/demos/head-turn/" aria-label="Open the interactive head-turn demo"><img src="/assets/head-turn-yaw15.png" alt="The head-turn demo character rendered at a positive 15-degree yaw" width="1280" height="900" loading="lazy"></a>
+  <figcaption>Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress</figcaption>
+</figure>
+
+Move the pointer across the character and the head turns from a depth map: features, ears and hair shift by their depth rather than the drawing rotating flat. [Open the interactive demo](/demos/head-turn/) (WebGL required). It is a static preview; no published package ships it yet.
+
 <!-- SOURCES (not published)
 - family preview: examples family/README.md "움직이는 미리보기" (5 accepted models, breathing, blink, breeze 4, render-readme-preview.mjs)
 - 20 rigs / 396 part rows / outfits / config paths / repro commands: family/README.md §현재 승인된 입력과 재검증
@@ -76,4 +85,5 @@ Licences for all of these: [Licensing](/docs/licensing/).
 - blink from the viewer's adjust, not the model: family/viewer/index.html lines 545-568
 - family-preview.mp4: encoded by scripts/encode-video.sh from examples@c239b09 family/docs/family-preview.webp (67 frames, 3.333 s per family-preview.json) at 20.1 fps over the page --bg #070b18; loop seam 0.960 vs max step 1.324 (scripts/loop-seam.py)
 - standalone table: examples README Layout table; trailer: rig-c/trailer README
+- head-turn preview: demos/head-turn (approved bundle, tree 46477ab4), poster assets/head-turn-yaw15.png, rig-c.github.io#79
 -->

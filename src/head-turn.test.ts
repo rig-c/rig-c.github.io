@@ -22,7 +22,8 @@ test('site entry changes only caption and integration UI; original resources sti
   expect(restored).toBe(original);
   expect(entry).toContain('<div id="loading" role="status">Loading the depth demo…</div>');
   const caption = 'Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress';
-  const landing = read('content/index.md');
-  expect(landing.split(caption)).toHaveLength(2);
-  expect(landing.indexOf('/demos/head-turn/')).toBeLessThan(landing.indexOf('## From loose parts'));
+  const examples = read('content/examples.md');
+  expect(examples.split(caption)).toHaveLength(2);
+  expect(examples).toContain('](/demos/head-turn/)');
+  expect(read('content/index.md')).not.toContain('/demos/head-turn/');
 });

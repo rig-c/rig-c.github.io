@@ -14,12 +14,6 @@ summaryForLlms: Toolchain overview, package index (parts, pose, core, review, pl
 ---
 # rig-c — AI-Authored 2D Rigging and Animation, Verified Before It Is Written
 
-<figure class="head-turn-feature">
-  <a href="/demos/head-turn/" aria-label="Open the interactive head-turn demo"><img src="/assets/head-turn-yaw15.png" alt="The head-turn demo character rendered at a positive 15-degree yaw" width="1280" height="900" fetchpriority="high"></a>
-  <figcaption>Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress</figcaption>
-  <p><a class="btn btn-primary" href="/demos/head-turn/">Try the head-turn demo</a></p>
-</figure>
-
 One character painting goes in; a rigged, animated 2D character that plays in the browser or imports into the Spine 4.3 editor comes out. Every stage prints named, numeric findings and refuses by name what it cannot verify, so a file that fails a check never reaches the disk. A pass is a structural fact about the data, not a verdict on how the character looks.
 
 **rig-c makes no images.** The painting and its layer split ([See-through](https://github.com/shitagaki-lab/see-through)) come from image models you run yourself — on your own GPU, or a free web demo. rig-c starts from those files, ships no model weights, and runs every one of its own steps on the CPU.
