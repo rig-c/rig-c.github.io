@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { artifactManifest, verifyManifest } from './deployment.ts';
-import { verifyHeadTurnBundle } from './head-turn.ts';
+import { verifyCurvaturePage, verifyHeadTurnBundle } from './head-turn.ts';
 import { DEFAULT_OUTPUT, outputRoot, parseOutputArgs, ROOT_DIR as SOURCE_ROOT } from './output.ts';
 import { htmlRel, mdRoute, PAGES, REDIRECTS, SITE_ORIGIN } from './content.ts';
 
@@ -34,6 +34,11 @@ export function verifySite(outDir = DEFAULT_OUTPUT): void {
     'demos/head-turn/index.html',
     'demos/head-turn/site-ui.css',
     'demos/head-turn/site-ui.js',
+    'demos/head-turn/curvature/index.html',
+    'demos/head-turn/curvature/curvature.css',
+    'demos/head-turn/curvature/curvature.js',
+    'demos/head-turn/curvature/original.webp',
+    'demos/head-turn/curvature/depth.webp',
     'assets/head-turn-yaw15.png',
   ]) {
     if (!existsSync(join(ROOT_DIR, requiredFile))) {
@@ -161,6 +166,7 @@ export function verifySite(outDir = DEFAULT_OUTPUT): void {
       if (JSON.stringify(sourceFiles) !== JSON.stringify(outputFiles)) errors.push(`Authored ${directory} file set differs`);
     }
     verifyHeadTurnBundle(ROOT_DIR);
+    errors.push(...verifyCurvaturePage(ROOT_DIR));
     verifyManifest(ROOT_DIR);
   } catch (error) {
     errors.push(String(error));
