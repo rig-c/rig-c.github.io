@@ -4,6 +4,7 @@ import { htmlRel, mdRoute, PAGES, type Page, REDIRECTS, SITE_ORIGIN } from './co
 import { publishedVersions, versionLabel, type RegistryFetch } from './versions.ts';
 import { assertReplaceableOutput, DEFAULT_OUTPUT, outputRoot, parseOutputArgs, ROOT_DIR } from './output.ts';
 import { writeManifest } from './deployment.ts';
+import { verifyHeadTurnBundle } from './head-turn.ts';
 
 const TODAY = '2026-10-19';
 const DOCS = PAGES.filter((p) => p.section === 'docs');
@@ -385,8 +386,11 @@ function renderPage(page: Page): string {
   let main: string;
   if (page.section === 'home') {
     // The hero carries the page's one <h1>; the Markdown's own H1 stays in the .md mirror only.
-    const rest = body.replace(/<h1[^>]*>[\s\S]*?<\/h1>\s*/, '');
+    const withoutHeading = body.replace(/<h1[^>]*>[\s\S]*?<\/h1>\s*/, '');
+    const feature = withoutHeading.match(/<figure class="head-turn-feature">[\s\S]*?<\/figure>\s*/)?.[0] ?? '';
+    const rest = withoutHeading.replace(feature, '');
     main = `<main class="site-main home">
+      ${feature}
       ${hero(page)}
       <article class="home-body">
 ${rest}
@@ -579,6 +583,7 @@ export interface BuildOptions {
 export async function buildSite({ outDir = DEFAULT_OUTPUT, fetchRegistry }: BuildOptions = {}): Promise<void> {
   const destination = outputRoot(outDir);
   assertReplaceableOutput(destination);
+  verifyHeadTurnBundle(ROOT_DIR);
   // Resolve AND render before any disk writes, including creation of a staging directory.
   const names = DOCS.flatMap((page) => page.packageName?.split(',').map((name) => name.trim()) ?? []);
   const published = await publishedVersions(names, fetchRegistry);
@@ -590,7 +595,7 @@ export async function buildSite({ outDir = DEFAULT_OUTPUT, fetchRegistry }: Buil
   const staging = mkdtempSync(join(dirname(destination), `.${basename(destination)}-`));
   try {
     // These are authored inputs in this repository. Never read a sibling checkout.
-    for (const name of ['assets', 'styles.css', 'CNAME']) {
+    for (const name of ['assets', 'demos', 'styles.css', 'CNAME']) {
       cpSync(join(ROOT_DIR, name), join(staging, name), { recursive: true, dereference: false, errorOnExist: true });
     }
     for (const [relPath, content] of files) {

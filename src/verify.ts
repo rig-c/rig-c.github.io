@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { artifactManifest, verifyManifest } from './deployment.ts';
+import { verifyHeadTurnBundle } from './head-turn.ts';
 import { DEFAULT_OUTPUT, outputRoot, parseOutputArgs, ROOT_DIR as SOURCE_ROOT } from './output.ts';
 import { htmlRel, mdRoute, PAGES, REDIRECTS, SITE_ORIGIN } from './content.ts';
 
@@ -30,6 +31,10 @@ export function verifySite(outDir = DEFAULT_OUTPUT): void {
     'llms-full.txt',
     'sitemap.xml',
     'robots.txt',
+    'demos/head-turn/index.html',
+    'demos/head-turn/site-ui.css',
+    'demos/head-turn/site-ui.js',
+    'assets/head-turn-yaw15.png',
   ]) {
     if (!existsSync(join(ROOT_DIR, requiredFile))) {
       errors.push(`Missing root file: ${requiredFile}`);
@@ -150,9 +155,12 @@ export function verifySite(outDir = DEFAULT_OUTPUT): void {
     }
   }
   try {
-    const sourceAssets = artifactManifest(join(SOURCE_ROOT, 'assets')).files;
-    const outputAssets = artifactManifest(join(ROOT_DIR, 'assets')).files;
-    if (JSON.stringify(sourceAssets) !== JSON.stringify(outputAssets)) errors.push('Authored asset file set differs');
+    for (const directory of ['assets', 'demos']) {
+      const sourceFiles = artifactManifest(join(SOURCE_ROOT, directory)).files;
+      const outputFiles = artifactManifest(join(ROOT_DIR, directory)).files;
+      if (JSON.stringify(sourceFiles) !== JSON.stringify(outputFiles)) errors.push(`Authored ${directory} file set differs`);
+    }
+    verifyHeadTurnBundle(ROOT_DIR);
     verifyManifest(ROOT_DIR);
   } catch (error) {
     errors.push(String(error));

@@ -1,0 +1,10 @@
+/* Integration UI only; the producer canvas and depth runtime stay unchanged. */
+#controls-toggle { display: none; pointer-events: auto; }
+@media (max-width: 799px) {
+  header { top: 12px; left: 14px; right: 14px; }
+  .intro h1 { padding-right: 80px; font-size: 19px; }
+  .caption { max-width: 100%; }
+  #controls-toggle { display: block; position: absolute; top: 0; right: 0; padding: 7px 10px; font-size: 12px; }
+  .controls:not([data-open]) { display: none; }
+  .controls { max-height: calc(100dvh - 130px); overflow-y: auto; }
+}
