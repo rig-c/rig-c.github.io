@@ -386,11 +386,8 @@ function renderPage(page: Page): string {
   let main: string;
   if (page.section === 'home') {
     // The hero carries the page's one <h1>; the Markdown's own H1 stays in the .md mirror only.
-    const withoutHeading = body.replace(/<h1[^>]*>[\s\S]*?<\/h1>\s*/, '');
-    const feature = withoutHeading.match(/<figure class="head-turn-feature">[\s\S]*?<\/figure>\s*/)?.[0] ?? '';
-    const rest = withoutHeading.replace(feature, '');
+    const rest = body.replace(/<h1[^>]*>[\s\S]*?<\/h1>\s*/, '');
     main = `<main class="site-main home">
-      ${feature}
       ${hero(page)}
       <article class="home-body">
 ${rest}
