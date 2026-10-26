@@ -76,7 +76,16 @@ Licences for all of these: [Licensing](/docs/licensing/).
   <figcaption>Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress</figcaption>
 </figure>
 
-Move the pointer across the character and the head turns from a depth map: features, ears and hair shift by their depth rather than the drawing rotating flat. [Open the interactive demo](/demos/head-turn/) (WebGL required). It is a static preview; no published package ships it yet.
+[Open the interactive demo](/demos/head-turn/) (WebGL required) and move the pointer across the character. Nothing in the picture rotates flat. The head turns because every part shifts by its own depth.
+
+**How it is made.** It starts from two images: the painting the look example already rigs, and a depth map estimated from that same painting. No new art is drawn.
+
+- **Depth becomes motion.** Each part is covered by a dense mesh, about 224,000 triangles in all. When the view turns, every vertex moves by its depth times the sine of the view angle. Near points shift further than far ones, and that is the parallax your eye reads as volume.
+- **The head swings from the neck.** On top of the depth motion, the whole head moves as if on a lever 55 units long from the neck (the *Pivot depth* slider, 0–100). That is why the face follows the pointer instead of only shading in place.
+- **Small features move as one piece.** Eyes, nose and ears each take a single depth value, so they slide without warping. The eyes also look at the pointer, inside the eyelids' outline.
+- **Hair keeps its layers.** The fringe moves with the face, and the back hair shifts slightly the other way (10 % by default) so the head reads as having a back.
+
+These rules were settled over four rounds of judging the motion by eye. Next is the version inside [`@rig-c/parts`](/docs/parts/): give it a depth map with the layers, and the rig it builds carries these deformations as dials (a yaw and pitch you set, or drive from the pointer). Today the demo is a static preview, and no published package ships it yet.
 
 <!-- SOURCES (not published)
 - family preview: examples family/README.md "움직이는 미리보기" (5 accepted models, breathing, blink, breeze 4, render-readme-preview.mjs)
@@ -86,4 +95,5 @@ Move the pointer across the character and the head turns from a depth map: featu
 - family-preview.mp4: encoded by scripts/encode-video.sh from examples@c239b09 family/docs/family-preview.webp (67 frames, 3.333 s per family-preview.json) at 20.1 fps over the page --bg #070b18; loop seam 0.960 vs max step 1.324 (scripts/loop-seam.py)
 - standalone table: examples README Layout table; trailer: rig-c/trailer README
 - head-turn preview: demos/head-turn (approved bundle, tree 46477ab4), poster assets/head-turn-yaw15.png, rig-c.github.io#79
+- how it is made: rig-c/parts#763 accepted v4 behaviour + plan comment 6406395097 (delta = Z*sin(view), pivot 55 / 0..100, eye/nose/ear units, gaze in aperture, fringe on face, rear counter 10%); 224,144 triangles from the bundle README/handoff; depth map estimated from the look atlas; dials-not-pointer ruling #763 comment 6406405223
 -->
