@@ -1,5 +1,6 @@
 /* Integration UI only; the producer canvas and depth runtime stay unchanged. */
 #controls-toggle { display: none; pointer-events: auto; }
+#curvature-link { display: inline-block; margin-top: 8px; pointer-events: auto; }
 @media (max-width: 799px) {
   header { top: 12px; left: 14px; right: 14px; }
   .intro h1 { padding-right: 80px; font-size: 19px; }

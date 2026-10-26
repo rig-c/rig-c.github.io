@@ -1,8 +1,9 @@
 import { expect, test } from 'bun:test';
-import { readFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ROOT_DIR } from './output.ts';
-import { HEAD_TURN_PATH, verifyHeadTurnBundle } from './head-turn.ts';
+import { CURVATURE_PATH, HEAD_TURN_PATH, verifyCurvaturePage, verifyHeadTurnBundle } from './head-turn.ts';
 const read = (path: string) => readFileSync(join(ROOT_DIR, path), 'utf8');
 
 test('approved producer bundle is byte exact, including original entry and raw gzip', () => {
@@ -17,6 +18,7 @@ test('site entry changes only caption and integration UI; original resources sti
   const restored = entry
     .replace('<base href="./bundle/">', '')
     .replace('<link rel="stylesheet" href="../site-ui.css"><script src="../site-ui.js" defer></script><link rel="canonical" href="https://rig-c.org/demos/head-turn/">', '')
+    .replace('<a id="curvature-link" href="../curvature/">Curvature check</a>', '')
     .replace('A preview of an upcoming @rig-c/parts feature; the producer is in progress.', 'Depth-driven head turn: a preview of an upcoming @rig-c/parts feature (the producer is in progress)')
     .replace('<button id="controls-toggle" type="button" aria-controls="head-turn-controls" aria-expanded="false">Controls</button><section id="head-turn-controls" class="controls"', '<section class="controls"');
   expect(restored).toBe(original);
@@ -26,4 +28,28 @@ test('site entry changes only caption and integration UI; original resources sti
   expect(examples.split(caption)).toHaveLength(2);
   expect(examples).toContain('](/demos/head-turn/)');
   expect(read('content/index.md')).not.toContain('/demos/head-turn/');
+});
+
+test('curvature check is a self-contained page linked both ways from the head-turn preview', () => {
+  expect(verifyCurvaturePage(ROOT_DIR)).toEqual([]);
+  const entry = read(`${HEAD_TURN_PATH}/index.html`);
+  expect(entry.split('href="../curvature/"')).toHaveLength(2);
+  const page = read(`${CURVATURE_PATH}/index.html`);
+  expect(page).not.toMatch(/(?:src|href)="(?:https?:)?\/\/(?!rig-c\.org\/demos\/head-turn\/curvature\/")/);
+  expect(read(`${CURVATURE_PATH}/curvature.js`)).not.toMatch(/https?:\/\//);
+});
+
+test('curvature check verification names a missing file and a broken reference', () => {
+  const copy = mkdtempSync(join(tmpdir(), 'curvature-'));
+  try {
+    cpSync(join(ROOT_DIR, 'demos'), join(copy, 'demos'), { recursive: true });
+    rmSync(join(copy, CURVATURE_PATH, 'depth.webp'));
+    expect(verifyCurvaturePage(copy).join('\n')).toContain('Curvature check files differ');
+    writeFileSync(join(copy, CURVATURE_PATH, 'depth.webp'), '');
+    const html = join(copy, CURVATURE_PATH, 'index.html');
+    writeFileSync(html, readFileSync(html, 'utf8').replace('./curvature.css', './missing.css'));
+    expect(verifyCurvaturePage(copy)).toEqual(['Curvature check reference does not resolve: ./missing.css']);
+  } finally {
+    rmSync(copy, { recursive: true, force: true });
+  }
 });
