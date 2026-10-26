@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "sha256": "46477ab4b95d2f6aa2f804d2114f3f9dbc90d280c85c9c7aa58546dc018a5a2d",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 1832,
+      "sha256": "445bc45882d8b71c2826daeeccf7490377617107bd0b1aff591bfe6e90e057f3"
+    },
+    {
+      "path": "THIRD_PARTY_LICENSES.txt",
+      "bytes": 7641,
+      "sha256": "f421a8fa897ab51c0ca14380cf7f52db136d5e52af3ccf571389c3681b861071"
+    },
+    {
+      "path": "aperture.js",
+      "bytes": 1370,
+      "sha256": "b2c159cdd338649ad6833cfd04bb710da6e106d76655c71d3a9ab7c57cbd543c"
+    },
+    {
+      "path": "app.js",
+      "bytes": 5410,
+      "sha256": "e2c3b1dff5a4efa14ed66498f693638c62cbb996db8d3be00a5ba6c17504b2d6"
+    },
+    {
+      "path": "depth.jpg",
+      "bytes": 242570,
+      "sha256": "72b50699ac18c9421d19142c2ddb7bfc8a59113f6ff45826153c16ef7c02cd09"
+    },
+    {
+      "path": "index.html",
+      "bytes": 3391,
+      "sha256": "f267f6cc80531d66406c1d7c47fb1fefad705211ba804d09ad1d2c9ec9098a81"
+    },
+    {
+      "path": "look.png",
+      "bytes": 1790672,
+      "sha256": "d41b70387f1e1f6e988f319c466441f1b0e0dadc731212278113c747ac2cef4e"
+    },
+    {
+      "path": "runtime.js",
+      "bytes": 486531,
+      "sha256": "33551eef39683c12a0c3e340acba981f09a1fa4e0141c2d55dd02f9bbd269d54"
+    },
+    {
+      "path": "scene.bin.gz",
+      "bytes": 3409263,
+      "sha256": "af763aa40b3c80597c2cdf91d83713230efd1eef6625eafa1f0ba04222c3e168"
+    },
+    {
+      "path": "scene.json",
+      "bytes": 3731,
+      "sha256": "82422ef7184e9b9c4f3999c510e2fde68c6dbf6c0739376ce0b79e7f6f34b806"
+    }
+  ]
+}

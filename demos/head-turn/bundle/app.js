@@ -1,0 +1,27 @@
+import{PixiRenderer,WebGLRenderer,Container,Sprite,Texture,Rectangle,Matrix}from'./runtime.js';
+import{coreAnchorClamp}from'./aperture.js';
+const $=id=>document.getElementById(id),host=$('demo'),image=new Image();image.src=new URL('./look.png',import.meta.url);
+try{
+ const[scene,,payload]=await Promise.all([fetch(new URL('./scene.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Scene unavailable');return r.json()}),image.decode(),fetch(new URL('./scene.bin.gz',import.meta.url)).then(r=>{if(!r.ok)throw Error('Geometry unavailable');return r.arrayBuffer()})]);
+ const magic=new Uint8Array(payload);let buffer=payload;if(magic[0]===31&&magic[1]===139){if(typeof DecompressionStream!=='function')throw Error('This preview requires a current browser');buffer=await new Response(new Blob([payload]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer()}const signature=new Uint8Array(buffer,0,4);if(signature[0]!==68||signature[1]!==72||signature[2]!==68||signature[3]!==49)throw Error('Invalid geometry payload');
+ const read=(spec,T)=>Array.from(new T(buffer,spec[0],spec[1]));
+ const parts=scene.parts.map((p,i)=>({...p,base:read(p.base,Float64Array),z:p.depth.values?read(p.depth.values,Float64Array):p.depth.constant,slot:{slot:'m'+i,kind:'mesh',page:'look.png',pma:false,blend:'Normal',tint:[1,1,1,1],sequence:0,vertices:read(p.base,Float64Array),uvs:read(p.uv,Float64Array),triangles:read(p.tri,p.indexWidth===2?Uint16Array:Uint32Array)}}));
+ for(const e of scene.eyes)e.core=new Uint8Array(buffer,e.core[0],e.core[1]);
+ const renderer=new WebGLRenderer();await renderer.init({width:Math.round(innerWidth*1.5),height:Math.round(innerHeight*1.5),backgroundAlpha:0,antialias:true,resolution:1,preserveDrawingBuffer:true});renderer.canvas.setAttribute('aria-label','Interactive depth-driven head turn');document.body.appendChild(renderer.canvas);
+ const stage=new Container(),root=new Container(),masks=new Container();stage.addChild(root,masks);const painter=new PixiRenderer(root,{pageImages:new Map([['look.png',image]])});let width,height,scale,cameraX,cameraY;
+ function fit(){width=Math.max(1,Math.round(innerWidth*1.5));height=Math.max(1,Math.round(innerHeight*1.5));renderer.resize(width,height);const b=scene.bounds;scale=Math.min(width*.82/b.width,height*.88/b.height);cameraX=width/2-(b.x+b.width/2)*scale;cameraY=height/2+(b.y+b.height/2)*scale;for(const c of[root,masks]){c.scale.set(scale);c.position.set(cameraX,cameraY)}}fit();
+ let gain=1,pivot=55,gaze=.10,counter=.10,x=0,y=0,vx=0,vy=0,tx=0,ty=0;
+ const frame={order:parts.map(p=>p.slot)},maskSprites=[];
+ function draw(){const sx=Math.sin(x*15*Math.PI/180),sy=Math.sin(y*12*Math.PI/180),strength=scene.depthGain*gain,T=[pivot*sx,pivot*sy],b=scene.basis;
+  const eyeShift=scene.eyes.map(e=>coreAnchorClamp(e.core,e.size[0],e.size[1],e.anchor,[gaze*e.size[0]*x,-gaze*e.size[0]*y]).shift);
+  for(const p of parts){const a=p.slot.vertices=new Array(p.base.length),common=p.common===2?-counter:p.common===1?1:0,e=p.iris>=0?scene.eyes[p.iris]:null,shift=e?eyeShift[p.iris]:[0,0],gx=e?e.gazeBasis[0]*shift[0]+e.gazeBasis[1]*shift[1]:0,gy=e?e.gazeBasis[2]*shift[0]+e.gazeBasis[3]*shift[1]:0;
+   for(let i=0;i<p.base.length/2;i++){const z=(typeof p.z==='number'?p.z:p.z[i])*strength,dx=z*sx,dy=z*sy;a[2*i]=p.base[2*i]+b.a*dx+b.b*dy+common*T[0]+gx;a[2*i+1]=p.base[2*i+1]+b.c*dx+b.d*dy+common*T[1]+gy}}
+  root.removeChildren();painter.render(frame);
+  scene.eyes.forEach((e,i)=>{let sprite=maskSprites[i];if(!sprite){sprite=new Sprite(new Texture({source:painter.getPageSource('look.png'),frame:new Rectangle(...e.frame)}));masks.addChild(sprite);maskSprites[i]=sprite}const p=parts[e.unit],z=p.z*strength,dx=z*sx,dy=z*sy,m=e.base;sprite.setFromMatrix(new Matrix(m[0],m[1],m[2],m[3],m[4]+T[0]+b.a*dx+b.b*dy,m[5]-(T[1]+b.c*dx+b.d*dy)));root.children[e.iris].setMask({mask:sprite,channel:'alpha',inverse:false})});
+  renderer.render({container:stage});
+ }
+ const finite=(v,min,max)=>{if(!Number.isFinite(v))throw Error('Control must be finite');return Math.max(min,Math.min(max,v))};
+ for(const[id,min,max,set,format]of[['gain',0,3,v=>gain=v,v=>v.toFixed(2)+'×'],['pivot',0,100,v=>pivot=v,v=>v.toFixed(0)],['gaze',0,.25,v=>gaze=v,v=>(v*100).toFixed(0)+'%'],['counter',0,1,v=>counter=v,v=>(v*100).toFixed(0)+'%']])$(id).addEventListener('input',e=>{const v=finite(Number(e.target.value),min,max);set(v);$(id+'Value').value=format(v);draw()});
+ renderer.canvas.addEventListener('pointermove',e=>{const r=renderer.canvas.getBoundingClientRect();tx=Math.max(-1,Math.min(1,(e.clientX-r.left-r.width/2)/(r.width/2)));ty=Math.max(-1,Math.min(1,(r.top+r.height/2-e.clientY)/(r.height/2)))});renderer.canvas.addEventListener('pointerleave',()=>{tx=ty=0});
+ $('centre').addEventListener('click',()=>{x=y=vx=vy=tx=ty=0;draw()});addEventListener('resize',()=>{fit();draw()});draw();host.setAttribute('aria-busy','false');$('loading').remove();let last=performance.now();function tick(now){const dt=Math.min(.1,(now-last)/1000);last=now;const px=x,py=y,w=20,e=Math.exp(-w*dt),ex=x-tx,ey=y-ty,nx=tx+(ex*(1+w*dt)+vx*dt)*e,ny=ty+(ey*(1+w*dt)+vy*dt)*e;vx=(vx*(1-w*dt)-w*w*dt*ex)*e;vy=(vy*(1-w*dt)-w*w*dt*ey)*e;x=nx;y=ny;if(x!==px||y!==py)draw();requestAnimationFrame(tick)}requestAnimationFrame(tick);
+}catch(e){$('loading').textContent='The demo could not load. Please reload the page.';host.setAttribute('aria-busy','false');console.error(e)}
