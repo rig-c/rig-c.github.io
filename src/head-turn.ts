@@ -3,8 +3,8 @@ import { join } from 'node:path';
 import { artifactManifest, parseManifest } from './deployment.ts';
 
 export const HEAD_TURN_PATH = 'demos/head-turn';
-// Approved ten-file preview inventory, including the confirmed depth revision.
-export const HEAD_TURN_BUNDLE_SHA256 = '515c89f1307308e5e41dcfe5a0fc7c69e5751539863ef7cb7c14e1cf6ffa38e2';
+// Approved ten-file preview inventory, including the confirmed depth and GPU displacement revisions.
+export const HEAD_TURN_BUNDLE_SHA256 = '7c8cc28645f474c9f38cae75f36367eee5b266797039b5b6528005370e4c5bb5';
 export function verifyHeadTurnBundle(root: string): void {
   const demo = join(root, HEAD_TURN_PATH);
   const expected = parseManifest(readFileSync(join(demo, 'bundle-manifest.json'), 'utf8'));

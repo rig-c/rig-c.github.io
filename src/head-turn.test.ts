@@ -7,19 +7,19 @@ import { artifactManifest } from './deployment.ts';
 import { CURVATURE_PATH, HEAD_TURN_PATH, verifyCurvaturePage, verifyHeadTurnBundle } from './head-turn.ts';
 const read = (path: string) => readFileSync(join(ROOT_DIR, path), 'utf8');
 
-test('approved depth revision bundle is byte exact, including original entry and raw gzip', () => {
+test('approved GPU bundle is byte exact, including original entry and raw gzip', () => {
   verifyHeadTurnBundle(ROOT_DIR);
   const gzip = readFileSync(join(ROOT_DIR, HEAD_TURN_PATH, 'bundle/scene.bin.gz'));
   expect([...gzip.subarray(0, 2)]).toEqual([31, 139]);
 });
 
-test('changed depth image or compiled depth payload fails the approved inventory', () => {
+test('changed geometry, shader, runtime or controller fails the approved inventory', () => {
   const copy = mkdtempSync(join(tmpdir(), 'head-turn-depth-'));
   try {
     const demo = join(copy, HEAD_TURN_PATH);
     cpSync(join(ROOT_DIR, HEAD_TURN_PATH, 'bundle'), join(demo, 'bundle'), { recursive: true });
     cpSync(join(ROOT_DIR, HEAD_TURN_PATH, 'bundle-manifest.json'), join(demo, 'bundle-manifest.json'));
-    for (const name of ['depth.jpg', 'scene.bin.gz']) {
+    for (const name of ['depth.jpg', 'scene.bin.gz', 'app.js', 'runtime.js', 'aperture.js']) {
       const path = join(demo, 'bundle', name);
       const original = readFileSync(path);
       const changed = Buffer.from(original);

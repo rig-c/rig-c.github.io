@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "sha256": "515c89f1307308e5e41dcfe5a0fc7c69e5751539863ef7cb7c14e1cf6ffa38e2",
+  "sha256": "7c8cc28645f474c9f38cae75f36367eee5b266797039b5b6528005370e4c5bb5",
   "files": [
     {
       "path": "README.md",
-      "bytes": 3979,
-      "sha256": "4b0cb0bc44ccbb56674d3cfd2b149b79b10722989fb964fc273345574d3b79d7"
+      "bytes": 6887,
+      "sha256": "04e49c6a99cd8261a9ade82c84bd228c1f62ff73e15657094eddb77e1d3b3ab0"
     },
     {
       "path": "THIRD_PARTY_LICENSES.txt",
@@ -19,8 +19,8 @@
     },
     {
       "path": "app.js",
-      "bytes": 5410,
-      "sha256": "e2c3b1dff5a4efa14ed66498f693638c62cbb996db8d3be00a5ba6c17504b2d6"
+      "bytes": 7970,
+      "sha256": "89aec03bc57f3363a7a37942bd3309486341a11f533626b55958e9080311a59c"
     },
     {
       "path": "depth.jpg",
@@ -39,8 +39,8 @@
     },
     {
       "path": "runtime.js",
-      "bytes": 486531,
-      "sha256": "33551eef39683c12a0c3e340acba981f09a1fa4e0141c2d55dd02f9bbd269d54"
+      "bytes": 486648,
+      "sha256": "f55d9bda6ea33736753781895f2ab4c87a6b49e04ac4b40622c7ab10e3a0f0d4"
     },
     {
       "path": "scene.bin.gz",
