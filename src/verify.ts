@@ -1,23 +1,10 @@
+import { checkInternalLinks, siteDocuments } from './links.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { artifactManifest, verifyManifest } from './deployment.ts';
 import { verifyCurvaturePage, verifyHeadTurnBundle } from './head-turn.ts';
 import { DEFAULT_OUTPUT, outputRoot, parseOutputArgs, ROOT_DIR as SOURCE_ROOT } from './output.ts';
 import { htmlRel, mdRoute, PAGES, REDIRECTS, SITE_ORIGIN } from './content.ts';
-
-function resolveLocalHref(href: string, ROOT_DIR: string): string | null {
-  const clean = href.split('#')[0]?.split('?')[0] ?? '';
-  if (!clean.startsWith('/')) {
-    return null;
-  }
-  if (clean === '/') {
-    return join(ROOT_DIR, 'index.html');
-  }
-  if (clean.endsWith('/')) {
-    return join(ROOT_DIR, clean.slice(1), 'index.html');
-  }
-  return join(ROOT_DIR, clean.slice(1));
-}
 
 export function verifySite(outDir = DEFAULT_OUTPUT): void {
   const ROOT_DIR = outputRoot(outDir);
@@ -105,21 +92,6 @@ export function verifySite(outDir = DEFAULT_OUTPUT): void {
       }
     }
 
-    const hrefRegex = /href="([^"]+)"/g;
-    let match: RegExpExecArray | null = hrefRegex.exec(html);
-    while (match !== null) {
-      const href = match[1] ?? '';
-      const targetPath = resolveLocalHref(href, ROOT_DIR);
-      if (targetPath && !existsSync(targetPath)) {
-        errors.push(`[${route}] Broken internal link href="${href}" -> ${targetPath}`);
-      }
-      const bare = href.split('#')[0] ?? '';
-      if (bare in REDIRECTS) {
-        errors.push(`[${route}] Links to moved route ${bare}; link ${REDIRECTS[bare]} instead`);
-      }
-      match = hrefRegex.exec(html);
-    }
-
     const fullUrl = `${SITE_ORIGIN}${route}`;
     if (!sitemap.includes(`<loc>${fullUrl}</loc>`)) {
       errors.push(`[${route}] Missing ${fullUrl} in sitemap.xml`);
@@ -133,6 +105,12 @@ export function verifySite(outDir = DEFAULT_OUTPUT): void {
     if (md.includes('{{') || html.includes('{{')) {
       errors.push(`[${route}] Unexpanded template token`);
     }
+  }
+
+  try {
+    errors.push(...checkInternalLinks(ROOT_DIR, siteDocuments(ROOT_DIR)));
+  } catch (error) {
+    errors.push(String(error));
   }
 
   for (const [from, to] of Object.entries(REDIRECTS)) {
@@ -181,7 +159,7 @@ export function verifySite(outDir = DEFAULT_OUTPUT): void {
   }
 
   console.log(
-    `PASS: Verified ${PAGES.length} static HTML pages, ${PAGES.length} Markdown mirrors, ${Object.keys(REDIRECTS).length} redirect stubs, JSON-LD schemas, canonical tags, internal links, llms.txt, llms-full.txt, sitemap.xml, and robots.txt.`,
+    `PASS: Verified ${PAGES.length} static HTML pages, ${PAGES.length} Markdown mirrors, ${Object.keys(REDIRECTS).length} redirect stubs, JSON-LD schemas, canonical tags, internal paths and fragments in HTML/Markdown/LLM sections, llms.txt, llms-full.txt, sitemap.xml, and robots.txt.`,
   );
 }
 

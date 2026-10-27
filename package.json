@@ -11,6 +11,8 @@
     "build:ci": "bun scripts/build-site.ts",
     "compare:live": "bun scripts/compare-live.ts",
     "verify": "bun src/verify.ts",
+    "check:links": "bun src/links.ts",
+    "check:external": "bun src/external-links.ts",
     "serve": "bun src/serve.ts"
   }
 }
