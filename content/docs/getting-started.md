@@ -4,7 +4,7 @@ title: Getting Started with rig-c — One Painting to a Browser Rig, No GPU
 description: Step-by-step walkthrough to build a rigged, breathing, waving 2D character that says hello from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.
 keywords: rig-c tutorial, getting started, 2D character rigging tutorial, See-through layers, rig-parts build, rig-pose retarget
 repoUrl: https://github.com/rig-c/getting-started
-summaryForLlms: Tested no-GPU, no-Python walkthrough (steps 1-10 with 9b and 9c, under ten minutes of commands on a loaded Apple M4) from pre-decomposed character layers to a compiled rig with idle, wave and a keyed hello with hair and skirt physics playing in the browser, plus downstream export routes.
+summaryForLlms: Pinned CPU-only, no-Python recipe from prepared example layers and hand-placed joints through idle, wave and hello with hair/skirt physics to browser playback. Historical 2026-10-21 Apple M4 durations cover steps 1-10 including 9b/9c; a separate Linux reproduction and the upstream rolling-latest CI have their own records.
 ---
 # Getting Started with rig-c
 
@@ -20,34 +20,55 @@ Repository: <https://github.com/rig-c/getting-started>
 
 ## Try it first — no GPU, no Python
 
-This builds a published example character whose painting and See-through layers are already made, then plays it in your browser. The joints come from a hand-placed file that ships with the guide, so the only tools you need are [Bun](https://bun.sh) 1.2 or later, `git` and `curl`, on macOS or Linux (Windows is not tested).
+This builds a published example character whose painting and See-through layers are already made. Its joints are hand-placed, so this route needs **Bun 1.4.4** (the version tested below), `curl` and `tar`, with a macOS or Linux shell. The new reproduction below ran on Linux; Windows was not tested. Painting and layer generation happen before this recipe, on the [full guide's GPU or hosted routes](https://github.com/rig-c/getting-started#readme). A person still judges how the result looks.
 
-**How long it takes.** Every command below was run as written, in order, from an empty folder on 2026-10-21 — Apple M4, Bun 1.4.2, and whatever `bun add` resolved that day (`rig-c` 2.65.1, `@rig-c/parts` 1.54.0, `@rig-c/pose` 0.38.0, `@rig-c/play` 1.12.0). Other jobs kept the machine's load average between 20 and 95 throughout, so both figures are upper bounds:
+**Choose a versioned run.** The commands here pin four packages, their dependency overrides, the helper-script commit and the example input commit. They reproduce this page's historical package combination; they are not an install of the latest packages. For a rolling-latest walkthrough, use the [upstream guide](https://github.com/rig-c/getting-started#try-it-first) and its existing [scheduled CPU walkthrough CI](https://github.com/rig-c/getting-started/actions/workflows/adapters.yml). Its [tested-with record](https://github.com/rig-c/getting-started/blob/main/docs/REFERENCE.md#tested-with) has its own date and versions. That job polls npm daily and runs weekly regardless.
 
-| Run | Steps 1–10, with 9b and 9c |
+### What the time records include
+
+The **historical Apple M4 runs on 2026-10-21** covered steps **1–10, including 9b and 9c**: install, input download, assembly, the idle build, wave, hello, cloth rebuild and server checks. They used Bun 1.4.2, helper commit [`093204686165630a9d6912675fc0cf9df6ada398`](https://github.com/rig-c/getting-started/tree/093204686165630a9d6912675fc0cf9df6ada398), `@rig-c/parts` 1.54.0, `rig-c` 2.65.1, `@rig-c/pose` 0.38.0 and `@rig-c/play` 1.12.0. Other jobs kept the load average between 20 and 95.
+
+| Historical run | Observed duration, steps 1–10 with 9b and 9c |
 | --- | --- |
-| Empty Bun cache (includes downloading the packages and the 41 MB example) | 536 s |
-| A second run, caches warm, step 6 by the script (pose models already downloaded) | 571 s |
+| Empty Bun cache; includes package downloads and the 41 MB example; hand-placed joints | 536 s |
+| Warm caches; step 6 used the CPU detector, with pose models already downloaded | 571 s |
 
-The three builds (steps 8, 9b and 9c, 100–190 s each here) and step 5 (assemble) are most of it. A quiet machine takes less; the two runs above are the only measurements.
+These are two observed durations under that load. They establish neither an upper bound nor a quiet-machine estimate. Image generation, the two See-through runs and human review are outside them. Step 10 checked HTTP 200 for the page and both models, then stopped the server; these times do not include a person's browser review. The recipe below replaces the old default-branch clone and unversioned install with verified archives and explicit pins, so it has a separate reproduction record.
+
+**Pinned recipe reproduced 2026-10-27.** A new empty working directory on a **Linux x86_64 / WSL2 shared runner**, with Bun **1.4.4**, npm **11.19.1** and Node **24.22.1**, passed all **12 step groups** (1–10 plus 9b/9c). The direct versions are the four listed above; the dependency overrides are printed in step 1. The runner used an isolated HOME and a new dedicated Bun cache; this is not a claim about cold OS, network or CDN caches. Helper and input archives passed the printed SHA-256 checks. The quoted output figures below matched, including hello's 33.6 px / 16.05 → 12.92 degrees and cloth's 12/13 measured bars, one SKIP and five warnings. Chromium 153 also exercised both step-10 URLs: advancing poses, pause/resume and breeze, with no page errors. This is a Linux reproduction, not a new Apple timing or a human visual verdict.
+
+Start from an empty directory and run the numbered steps in order. Keep the shell open: step 1 sets a dedicated Bun cache for this run. An empty working directory alone does not mean every cache is cold.
 
 ### 1. Install the packages
 
 ```sh
 mkdir rig-c-start
 cd rig-c-start
-git clone https://github.com/rig-c/getting-started
+export BUN_INSTALL_CACHE_DIR="$PWD/.bun-cache"
+curl --fail --location --output helpers.tar.gz https://codeload.github.com/rig-c/getting-started/tar.gz/093204686165630a9d6912675fc0cf9df6ada398
+bun -e 'const b = await Bun.file("helpers.tar.gz").arrayBuffer(); if (new Bun.CryptoHasher("sha256").update(b).digest("hex") !== "df9731cbbd9a983fca2c7353a0fc8b78c49319ba7e29e34fda1a0f72536e848a") throw new Error("archive checksum mismatch")'
+mkdir getting-started
+tar -xzf helpers.tar.gz --strip-components=1 -C getting-started
+rm helpers.tar.gz
 mkdir my-rig
 cd my-rig
-bun add @rig-c/parts rig-c @rig-c/pose @rig-c/play
+cat > package.json <<'EOF'
+{
+  "private": true,
+  "type": "module",
+  "overrides": { "rig-c": "2.65.1", "ag-psd": "31.0.3", "base64-js": "1.5.1", "pako": "2.1.0" }
+}
+EOF
+bun add --exact --backend=copyfile @rig-c/parts@1.54.0 rig-c@2.65.1 @rig-c/pose@0.38.0 @rig-c/play@1.12.0
 ```
 
-Every command from here on runs in `my-rig`.
+Every command from here on runs in `my-rig`. The helpers come from the full commit above; the archive checksum is checked before extraction. `--exact` saves exact direct dependencies, and the explicit overrides hold `parts` and `pose` to the same compiler and explicitly set the three transitive dependency versions used in this run. `--backend=copyfile` keeps this install independent of cache hardlinks. Keep the generated `package.json` and `bun.lock` with your result for later reinstalls. `bun run rig-parts` and `bun run rig-pose` use this project's installed CLIs.
 
 ### 2. Get the example inputs
 
 ```sh
-curl -L -o exam.tar.gz https://codeload.github.com/rig-c/exam/tar.gz/01436ee3f02c189fe1a1e9656fe62068889837f5
+curl --fail --location --output exam.tar.gz https://codeload.github.com/rig-c/exam/tar.gz/01436ee3f02c189fe1a1e9656fe62068889837f5
+bun -e 'const b = await Bun.file("exam.tar.gz").arrayBuffer(); if (new Bun.CryptoHasher("sha256").update(b).digest("hex") !== "c2224a08620ec0929c8e139a7dfcf257b30eba562d306300e6455ed54c2ba977") throw new Error("archive checksum mismatch")'
 tar -xzf exam.tar.gz --strip-components=3 exam-01436ee3f02c189fe1a1e9656fe62068889837f5/tasks/01-build/inputs
 tar -xzf exam.tar.gz --strip-components=1 exam-01436ee3f02c189fe1a1e9656fe62068889837f5/LICENSE exam-01436ee3f02c189fe1a1e9656fe62068889837f5/NOTICE.md
 rm exam.tar.gz
@@ -65,7 +86,7 @@ cat > config.json <<'EOF'
   "assemble": { "rig_scale": 0.5 }
 }
 EOF
-bunx rig-parts inputs --source inputs/painting.png --config config.json --out work
+bun run rig-parts inputs --source inputs/painting.png --config config.json --out work
 ```
 
 You should see `st_input_full.png 2432x2432` and a note that there is no head box yet.
@@ -73,10 +94,10 @@ You should see `st_input_full.png 2432x2432` and a note that there is no head bo
 ### 4. Find the head box
 
 ```sh
-bunx rig-parts layers inputs/layers/full
-bunx rig-parts propose --head-box --full inputs/layers/full --canvas 1664x2432 | tail -n 1 > work/head_box.json
+bun run rig-parts layers inputs/layers/full
+bun run rig-parts propose --head-box --full inputs/layers/full --canvas 1664x2432 | tail -n 1 > work/head_box.json
 bun ../getting-started/scripts/take.ts work/head_box.json config.json seethrough.head_box=head_box
-bunx rig-parts inputs --source inputs/painting.png --config config.json --out work
+bun run rig-parts inputs --source inputs/painting.png --config config.json --out work
 ```
 
 You should see `29 layer(s): 29 with opaque pixels`, `0 WARN line(s)`, `work/head_box.json` holding `{"head_box":[616,32,1132,548]}`, then `st_input_head.png 516x516`.
@@ -84,9 +105,9 @@ You should see `29 layer(s): 29 with opaque pixels`, `0 WARN line(s)`, `work/hea
 ### 5. Assemble the parts
 
 ```sh
-bunx rig-parts assemble --propose-plan --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json > work/plan.json
+bun run rig-parts assemble --propose-plan --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json > work/plan.json
 bun ../getting-started/scripts/take.ts work/plan.json config.json assemble.plan=plan assemble.extend_below_crop=extend_below_crop
-bunx rig-parts assemble --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json --out work
+bun run rig-parts assemble --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --config config.json --out work
 ```
 
 You should see 22 parts, then `recomposite vs source: mean |d|=1.13, within 8: 97.8%`.
@@ -97,21 +118,15 @@ You should see 22 parts, then `recomposite vs source: mean |d|=1.13, within 8: 9
 sed -n '/^```json$/,/^```$/p' ../getting-started/docs/KEYPOINTS.md | sed '1d;$d' > keypoints.json
 ~~~
 
-This copies the hand-placed body-18 joints for this painting out of the guide's [`docs/KEYPOINTS.md`](https://github.com/rig-c/getting-started/blob/main/docs/KEYPOINTS.md), which also explains how to place them for a painting of your own.
+This copies the hand-placed body-18 joints for this painting out of the guide's [`docs/KEYPOINTS.md`](https://github.com/rig-c/getting-started/blob/093204686165630a9d6912675fc0cf9df6ada398/docs/KEYPOINTS.md), which also explains how to place them for a painting of your own.
 
-**Detecting the joints with a script instead** needs [uv](https://docs.astral.sh/uv/) and downloads about 300 MB of pose models on first run:
-
-```sh
-uv run --with rtmlib --with onnxruntime python ../getting-started/scripts/keypoints.py inputs/painting.png --out keypoints.json
-```
-
-You should see `18 observed, 0 occluded, 0 missing -> keypoints.json`. The hand-placed file was tuned to the script's joints, so every step prints what this page quotes either way, except step 9b's settle, which reads `33.2 px in` and `15.96 -> 12.87 deg` on the script's joints.
+The optional CPU detector needs Python/uv and downloads pose models. It is a separate route in the [upstream guide](https://github.com/rig-c/getting-started#readme); it was not run for this pinned no-Python recipe. The historical warm-cache timing above used that detector, which is why it is kept separate from the hand-placed route here.
 
 ### 7. Draft the bones
 
 ```sh
 bun -e 'const f = "keypoints.json", k = await Bun.file(f).json(); k.people[0].joints.l_ankle.at = [848, 2140]; await Bun.write(f, JSON.stringify(k, null, 1) + "\n")'
-bunx rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json
+bun run rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json
 bun ../getting-started/scripts/take.ts work/proposal.json config.json bones meshes regions motion limbs
 ```
 
@@ -122,7 +137,7 @@ You should see `0 LINT line(s) over 6 mesh(es) and the hip` and a coverage line 
 ### 8. Build the rig
 
 ```sh
-bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
+bun run rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
 ```
 
 You should see `limb cut: "shoes" opaque 13735 = "foot_r" 8071 + "foot_l" 5664`, then `check: PASS; 11 of 13 bar(s) measured, 2 skipped (FEET_STAY_LEVEL, STRESS_OFF_CHAIN)`, then `build: PASS`. `FEET_STAY_LEVEL` is skipped because the idle turns no leg; step 9b's hello does. Open `out/idle.gif`: the character breathes and blinks in a loop.
@@ -134,7 +149,7 @@ You should see `limb cut: "shoes" opaque 13735 = "foot_r" 8071 + "foot_l" 5664`,
       <img src="/assets/docs/getting-started-idle-poster.png" alt="Animation: the example character standing, breathing and blinking once in her idle loop" width="317" height="640">
     </picture>
   </div>
-  <figcaption><span class="media-kind">Animation</span> The step-8 build this walkthrough wrote (<code>out/check/build</code>), playing its <code>idle</code>: 40 frames at 12 fps, looping, drawn by <code>@rig-c/play</code> 1.12.0 over the page rather than by <code>rigc render</code>, whose frames are opaque by design. Made by the commands above, run as written on 2026-10-20 with <code>@rig-c/parts</code> 1.42.0 and <code>rig-c</code> 2.64.1. With reduced motion on, the first frame stands still.</figcaption>
+  <figcaption><span class="media-kind">Historical animation</span> The step-8 build from the 2026-10-20 walkthrough (<code>out/check/build</code>), playing its <code>idle</code>: 40 frames at 12 fps, looping, drawn by <code>@rig-c/play</code> 1.12.0 over the page rather than by <code>rigc render</code>, whose frames are opaque by design. Captured from the then-current walkthrough, run on 2026-10-20 with <code>@rig-c/parts</code> 1.42.0 and <code>rig-c</code> 2.64.1. With reduced motion on, the first frame stands still.</figcaption>
 </figure>
 
 A skipped bar is named with its reason; any `FAIL` line means nothing was written, and the line says what to change. A green build means the checks passed — whether it looks right is yours to judge (`out/idle.gif`, or [Review](/docs/review/)).
@@ -143,7 +158,7 @@ A skipped bar is named with its reason; any `FAIL` line means nothing was writte
 
 ```sh
 bun ../getting-started/scripts/wave.ts keypoints.json wave.pose.json
-bunx rig-pose clean --pose wave.pose.json --out wave.pose.clean.json
+bun run rig-pose clean --pose wave.pose.json --out wave.pose.clean.json
 cat > map.json <<'EOF'
 {
   "spec": "rig-pose-map/1",
@@ -155,7 +170,7 @@ cat > map.json <<'EOF'
   "translate": { "bone": "hip", "joint": "mid_hip", "scale": { "pose": ["mid_hip", "neck"], "rig": ["hip", "neck"] } }
 }
 EOF
-bunx rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json --out wave.motion.json --name wave --profile spine-html --build wave-build
+bun run rig-pose retarget --rig out/rig --map map.json --pose wave.pose.clean.json --out wave.motion.json --name wave --profile spine-html --build wave-build
 ```
 
 You should see `73 frame(s), 3 s at 24 fps`, a `GATE … green` line, and `wrote wave.motion.json — animations: idle, wave`. `wave-build/` holds the rig with both animations.
@@ -168,7 +183,7 @@ A motion can also be written as keys on the bones and handed to the build, which
 bun ../getting-started/scripts/hello.ts out/rig/rig.json
 echo '{"animations_from": "hello.anim.json"}' > work/hello-from.json
 bun ../getting-started/scripts/take.ts work/hello-from.json config.json motion.animations_from=animations_from
-bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
+bun run rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop
 ```
 
 You should see `hello.ts: 4 beats (hm?, heh, wave, settle), 4.75 s at 24 fps, 16 tracks of 115 keys; sleeve_r0 at most 4.0 deg` and a settle of `33.6 px in` and `16.05 -> 12.92 deg` on the hand-placed joints, then from the build `FEET_STAY_LEVEL: PASS`, `check: PASS; 12 of 13 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN); 1 warning(s)` and `build: PASS`. The warning is `SEAM_OVER_MOTION`, never a bar: a sliver of the forearm shows past the sleeve's cuff where it turns at the elbow. The wave is the forearm's, because on this painting swinging the whole arm out, as step 9 does, opens a gap at the armhole. As the arm comes down she re-plants her weight, her right foot sliding in toward the other and back, on the two feet step 7's correction made.
@@ -190,13 +205,13 @@ cat > work/cloth.json <<'EOF'
 }
 EOF
 bun ../getting-started/scripts/take.ts work/cloth.json config.json cloth
-bunx rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json --cloth config.json --write-config config.cloth.json
+bun run rig-parts propose --parts work/rig --source inputs/painting.png --out work --keypoints keypoints.json --cloth config.json --write-config config.cloth.json
 mv config.cloth.json config.json
 bun -e 'const f = "config.json", c = await Bun.file(f).json(); c.motion.tracks.find((t) => t.bone === "bun").amp = 1; await Bun.write(f, JSON.stringify(c, null, 2) + "\n")'
-bunx rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop --lead-in 1
+bun run rig-parts build --config config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --out out --loop --lead-in 1
 ```
 
-The first line writes the hello again without its skirt keys (`14 tracks of 115 keys`): from here physics follows her hip. `propose --cloth` writes the config with the new chains and `every other byte as read`, and `mv` makes it yours. Two lines correct the draft: `strength` makes the side locks stiff enough not to pull off her cheek when her head turns, and the `bun -e` line raises the bun's swing, without which the build stops at `CHECK_CHAIN_LAG`.
+The first line writes the hello again without its skirt keys (`14 tracks of 115 keys`): from here physics follows her hip. `propose --cloth` writes the config with the new chains and `every other byte as read`, and `mv` makes it yours. The proposal prints one LINT line about the chain amplitude before the correction below. Two lines correct the draft: `strength` makes the side locks stiff enough not to pull off her cheek when her head turns, and the `bun -e` line raises the bun's swing, without which the build stops at `CHECK_CHAIN_LAG`.
 
 You should see `check: PASS; 12 of 13 bar(s) measured, 1 skipped (STRESS_OFF_CHAIN); 5 warning(s) (SEAM_OVER_MOTION, CLOTH_SETTLES, not a bar)`, a `lead-in:` line ending `max |d| 0, 0 px over 40 — the jump at the wrap`, and `build: PASS`. `CLOTH_SETTLES` is a warning, not a failure: the skirt hangs into place within 2 seconds and then rests, because the idle never moves her hip. `--lead-in 1` plays the idle once before `out/idle.gif` is cut from it, so the loop starts after the skirt has settled.
 
@@ -206,7 +221,7 @@ You should see `check: PASS; 12 of 13 bar(s) measured, 1 skipped (STRESS_OFF_CHA
 bun ../getting-started/scripts/serve.ts
 ```
 
-Open <http://localhost:3000/?model=out/check/build/skeleton.model.json&anim=hello&under=idle>: she notices you, smiles with two little shrugs, waves with her forearm beside her shoulder and re-plants her weight, while the locks beside her face and the skirt trail after her. `&under=idle` keeps the idle playing beneath, so she breathes through it. The page also blows a light breeze through `@rig-c/play`'s `player.environment()`; untick **breeze**, or add `&wind=0`, for the runtime's own steady wind. Step 9's wave is at <http://localhost:3000/?model=wave-build/skeleton.model.json&anim=wave>; the menu switches animations. Ctrl+C stops the server.
+[Open hello over idle](http://localhost:3000/?model=out/check/build/skeleton.model.json&anim=hello&under=idle): she notices you, smiles with two little shrugs, waves with her forearm beside her shoulder and re-plants her weight, while the locks beside her face and the skirt trail after her. `&under=idle` keeps the idle playing beneath, so she breathes through it. The page also blows a light breeze through `@rig-c/play`'s `player.environment()`; untick **breeze**, or add `&wind=0`, for the runtime's own steady wind. [Open step 9's wave](http://localhost:3000/?model=wave-build/skeleton.model.json&anim=wave); the menu switches animations. Ctrl+C stops the server.
 
 <figure>
   <div class="media">
@@ -215,7 +230,7 @@ Open <http://localhost:3000/?model=out/check/build/skeleton.model.json&anim=hell
       <img src="/assets/docs/getting-started-hello-poster.png" alt="Animation: the example character notices the viewer and straightens her head, smiles with two small shrugs, waves with her forearm beside her shoulder, then shifts her weight, one foot sliding in toward the other and back" width="356" height="640">
     </picture>
   </div>
-  <figcaption><span class="media-kind">Animation</span> The <code>hello</code> in this walkthrough's <code>out/check/build</code> after the guide's steps 9b and 9c, unedited: 4.75 s, 57 frames at 12 fps, looping, in the page's breeze, after one pass of settling so the hair and skirt are already moving. Step 10's page plays the hello over the <code>idle</code>, so she also breathes through it; this clip is the hello alone, because the two loops (4.75 s and 3.33 s) never line up into one that repeats. Its wave is an elbow-down wave, the upper arm kept within 4 degrees of rest, and every seam the guide's build reads stays inside its tear bars (gap ≤ 25 px, ghost ≤ 50 px) at every phase of the breeze. Drawn by <code>@rig-c/play</code> 1.12.0 over the page rather than by <code>rigc render</code>, whose frames are opaque by design. Run as written on 2026-10-21 with <code>@rig-c/parts</code> 1.53.0, <code>rig-c</code> 2.65.1, <code>@rig-c/pose</code> 0.37.0. With reduced motion on, the first frame stands still.</figcaption>
+  <figcaption><span class="media-kind">Historical animation</span> The <code>hello</code> from the 2026-10-21 walkthrough's <code>out/check/build</code> after the guide's steps 9b and 9c, unedited: 4.75 s, 57 frames at 12 fps, looping, in the page's breeze, after one pass of settling so the hair and skirt are already moving. Step 10's page plays the hello over the <code>idle</code>, so she also breathes through it; this clip is the hello alone, because the two loops (4.75 s and 3.33 s) never line up into one that repeats. Its wave is an elbow-down wave, the upper arm kept within 4 degrees of rest, and every seam the guide's build reads stays inside its tear bars (gap ≤ 25 px, ghost ≤ 50 px) at every phase of the breeze. Drawn by <code>@rig-c/play</code> 1.12.0 over the page rather than by <code>rigc render</code>, whose frames are opaque by design. That walkthrough was run on 2026-10-21 with <code>@rig-c/parts</code> 1.53.0, <code>rig-c</code> 2.65.1, <code>@rig-c/pose</code> 0.37.0. With reduced motion on, the first frame stands still.</figcaption>
 </figure>
 
 The full guide — making your own character, the GPU routes, troubleshooting and every measured figure — is the [rig-c/getting-started README](https://github.com/rig-c/getting-started#readme) and its [docs/REFERENCE.md](https://github.com/rig-c/getting-started/blob/main/docs/REFERENCE.md).
