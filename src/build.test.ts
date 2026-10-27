@@ -44,7 +44,7 @@ describe('isolated deployable site', () => {
     expect(manifest.files.some((file) => file.path === 'demos/head-turn/bundle/scene.bin.gz')).toBe(true);
     expect(read('demos/head-turn/index.html')).toBe(readFileSync(join(ROOT_DIR, 'demos/head-turn/index.html'), 'utf8'));
     expect(read('index.html')).not.toContain('head-turn-feature');
-    expect(read('examples/index.html').split('Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress')).toHaveLength(2);
+    expect(read('examples/index.html').split('Standalone depth-driven head-turn demo; the Parts producer shipped separately in 1.68.0')).toHaveLength(2);
     expect(existsSync(join(out, 'src'))).toBe(false);
     expect(existsSync(join(out, '.nojekyll'))).toBe(false);
   });
@@ -72,11 +72,11 @@ describe('isolated deployable site', () => {
     expect(row.split('|')).toHaveLength(6);
   });
 
-  test('docs and demo metadata remain pinned while listing is fresh', () => {
-    expect(read('docs/play/index.html')).toContain('"version": "1.12.0"');
+  test('current docs metadata is resolved while the live player stays pinned', () => {
+    expect(read('docs/play/index.html')).toContain('"version": "100.0.4"');
     expect(read('docs/play/index.html')).toContain('@rig-c/play 1.12.0 running in your browser');
     expect(read('docs/play/index.html')).toContain('c239b09328ca7364361b9761fac817502c09ede0');
-    expect(read('llms.txt')).toContain('`@rig-c/play@1.12.0`');
+    expect(read('llms.txt')).toContain('`@rig-c/play@100.0.4`');
     expect(read('index.md')).toContain('`@rig-c/play`: `100.0.4`');
   });
 

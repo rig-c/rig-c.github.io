@@ -15,7 +15,6 @@ export interface Page {
   description: string;
   keywords: string[];
   packageName?: string;
-  packageVersion?: string;
   repoUrl: string;
   npmUrl?: string;
   summaryForLlms: string;
@@ -84,7 +83,6 @@ function load(): Page[] {
       description: required(file, meta, 'description'),
       keywords: (meta.keywords ?? '').split(',').map((k) => k.trim()).filter(Boolean),
       packageName: meta.packageName,
-      packageVersion: meta.packageVersion,
       repoUrl: required(file, meta, 'repoUrl'),
       npmUrl: meta.npmUrl,
       summaryForLlms: required(file, meta, 'summaryForLlms'),

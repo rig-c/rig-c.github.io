@@ -73,10 +73,10 @@ Licences for all of these: [Licensing](/docs/licensing/).
 
 <figure class="head-turn-feature">
   <a href="/demos/head-turn/" aria-label="Open the interactive head-turn demo"><img src="/assets/head-turn-yaw15.png" alt="The head-turn demo character rendered at a positive 15-degree yaw" width="1280" height="900" loading="lazy"></a>
-  <figcaption>Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress</figcaption>
+  <figcaption>Standalone depth-driven head-turn demo; the Parts producer shipped separately in 1.68.0</figcaption>
 </figure>
 
-[Open the interactive demo](/demos/head-turn/) (WebGL required) and move the pointer across the character. Nothing in the picture rotates flat. The head turns because every part shifts by its own depth.
+[Open the standalone interactive demo](/demos/head-turn/) (WebGL required) and move the pointer across the character. Its mesh vertices shift in the picture plane from precompiled depth samples; this is depth-driven parallax, not a rigid 3D head rotating to reveal unseen sides.
 
 **How it is made.** It starts from two images: the painting the look example already rigs, and a depth map estimated from that same painting. No new art is drawn.
 
@@ -85,7 +85,9 @@ Licences for all of these: [Licensing](/docs/licensing/).
 - **Small features move as one piece.** Eyes, nose and ears each take a single depth value, so they slide without warping. The eyes also look at the pointer, inside the eyelids' outline.
 - **Hair keeps its layers.** The fringe moves with the face, and the back hair shifts slightly the other way (10 % by default) so the head reads as having a back.
 
-These rules were settled over four rounds of judging the motion by eye. Next is the version inside [`@rig-c/parts`](/docs/parts/): give it a depth map with the layers, and the rig it builds carries these deformations as dials (a yaw and pitch you set, or drive from the pointer). Today the demo is a static preview, and no published package ships it yet.
+**The released producer.** [`@rig-c/parts` 1.68.0](https://github.com/rig-c/parts/releases/tag/v1.68.0) ships per-layer depth input and a 2.5D head-turn producer. Enable `config.depth` with explicit depth polarity and world-unit scale, then declare `config.turn.roles`: `surface` for depth-sampled grid surfaces, `unit` for features that move together, and `rear` for the back layer. The rig stage writes `turn` and `tilt` animations driven by `yaw_dial` and `pitch_dial`; Core projects the depth samples. See [Parts: depth-driven head turns](/docs/parts/#depth-driven-head-turns) and the [1.68.0 authoring contract](https://github.com/rig-c/parts/blob/89a7671229d155976fc8b5e87ffd6459301ff7b9/docs/AUTHORING.md#3-configjson-field-by-field).
+
+The demo above is a separate, precompiled implementation with its own pointer and gaze controller. It has not been rebuilt here with the released producer, and the producer's grid and controller behavior are not claimed to match it. The demo's original preview caption belongs to that earlier snapshot; the release status here describes the package.
 
 <!-- SOURCES (not published)
 - family preview: examples family/README.md "움직이는 미리보기" (5 accepted models, breathing, blink, breeze 4, render-readme-preview.mjs)
@@ -94,6 +96,8 @@ These rules were settled over four rounds of judging the motion by eye. Next is 
 - blink from the viewer's adjust, not the model: family/viewer/index.html lines 545-568
 - family-preview.mp4: encoded by scripts/encode-video.sh from examples@c239b09 family/docs/family-preview.webp (67 frames, 3.333 s per family-preview.json) at 20.1 fps over the page --bg #070b18; loop seam 0.960 vs max step 1.324 (scripts/loop-seam.py)
 - standalone table: examples README Layout table; trailer: rig-c/trailer README
+- release reconciliation: npm @rig-c/parts@1.68.0 tarball README and src/turn.ts buildDepth25DTurn; AUTHORING.md turn row and CHANGELOG at npm gitHead 89a7671229d155976fc8b5e87ffd6459301ff7b9. README still has pre-consumer wording; turn contract, shipped code and release changelog establish the released path.
+- demo mechanics read directly from bundle/app.js draw(): sx=sin(x*15deg), sy=sin(y*12deg); base + basis*depth shift + common pivot + gaze, no rigid xyz rotation or cosine narrowing. Original snapshot unchanged.
 - head-turn preview: demos/head-turn (approved bundle, tree 46477ab4), poster assets/head-turn-yaw15.png, rig-c.github.io#79
 - how it is made: rig-c/parts#763 accepted v4 behaviour + plan comment 6406395097 (delta = Z*sin(view), pivot 55 / 0..100, eye/nose/ear units, gaze in aperture, fringe on face, rear counter 10%); 224,144 triangles from the bundle README/handoff; depth map estimated from the look atlas; dials-not-pointer ruling #763 comment 6406405223
 -->

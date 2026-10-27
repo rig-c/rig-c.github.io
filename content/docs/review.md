@@ -4,7 +4,6 @@ title: "@rig-c/review: local rig inspection and feedback"
 description: A local workspace where a person inspects an agent's rig output, tries setup edits that the installed producer rebuilds, and exports issue-ready feedback.
 summaryForLlms: "@rig-c/review is a local, loopback-only CLI and browser workspace for a person to inspect a compiled rig, compare it with reference video, try setup edits that the installed producer rebuilds in scratch, and save structured, source-bound feedback for the producing agent."
 packageName: "@rig-c/review"
-packageVersion: "0.7.1"
 repoUrl: https://github.com/rig-c/review
 npmUrl: https://www.npmjs.com/package/@rig-c/review
 ---
@@ -134,7 +133,7 @@ Runs under Bun 1.3.0 or later, which must be on `PATH`; `open` prints a loopback
 - **`check` validates the delivery contract and model envelope**, not the upstream compiler gate or visual quality; a raw `skeleton.json` can be inspected but not played (README §"Existing output handoff").
 - **No frame rate is inferred**: without a declared clock the page shows `rate unknown`, and strip PNGs need the report's exact `frameTimes` (README §"Existing output handoff", §"Frame strip export").
 - **Never publishes an issue automatically**; saving or exporting feedback modifies no model (README §"Feedback ownership").
-- **Maturity**: "the CLI is the supported surface, and no importable API is promised yet" (README §"Start"; the README still says 0.1.x while npm is at 0.7.1).
+- **Maturity**: "the CLI is the supported surface, and no importable API is promised yet" (published 0.12.0 README §"Start").
 
 ## Go deeper
 - [Place in the toolchain](https://github.com/rig-c/review#place-in-the-toolchain)

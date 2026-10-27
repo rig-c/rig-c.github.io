@@ -4,7 +4,6 @@ title: "@rig-c/play: play rigc models as DOM or one canvas"
 description: A browser player for the skeleton.model.json that rigc build writes. Draws rigs as plain DOM elements or into one canvas per player.
 summaryForLlms: "@rig-c/play is the browser runtime that loads rigc's compiled skeleton.model.json and plays it as plain DOM elements (CSS matrix per rigid slot, small canvases per mesh) or as one canvas per player."
 packageName: "@rig-c/play"
-packageVersion: "1.12.0"
 repoUrl: https://github.com/rig-c/play
 npmUrl: https://www.npmjs.com/package/@rig-c/play
 ---

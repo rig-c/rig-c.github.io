@@ -60,7 +60,7 @@ test('site entry changes only caption and integration UI; original resources sti
     .replace('<button id="controls-toggle" type="button" aria-controls="head-turn-controls" aria-expanded="false">Controls</button><section id="head-turn-controls" class="controls"', '<section class="controls"');
   expect(restored).toBe(original);
   expect(entry).toContain('<div id="loading" role="status">Loading the depth demo…</div>');
-  const caption = 'Depth-driven head turn: a preview of an upcoming @rig-c/parts feature; the producer is in progress';
+  const caption = 'Standalone depth-driven head-turn demo; the Parts producer shipped separately in 1.68.0';
   const examples = read('content/examples.md');
   expect(examples.split(caption)).toHaveLength(2);
   expect(examples).toContain('](/demos/head-turn/)');
