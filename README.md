@@ -59,6 +59,36 @@ The builder copies **only this repository's** `assets/`, `demos/`, `styles.css` 
 
 The landing HTML gives each adapter version its own escaped `<code>` item separated by `<br>`. Its Markdown table remains one physical line per row, followed by a plain per-package list of all eight independently resolved packages; the same list appears in `llms.txt` and `llms-full.txt`. `@rig-c/core` and `@rig-c/adapters` are labels/aliases, not additional latest lookups. Docs badges and structured docs versions use the same build-time registry map. Recorded demo versions remain pinned to their sources.
 
+## Link checks
+
+`bun run verify` checks links in the twelve generated pages, their Markdown mirrors, `llms.txt` and each page section of `llms-full.txt`. The same check runs alone with `bun run check:links`. It reads the actual element IDs from generated HTML, including IDs on non-heading elements; it does not guess heading slugs. Markdown is rendered by Bun to extract inline, reference, autolinks and raw HTML links. Code examples and HTML comments are not links.
+
+Same-page, relative, cross-page and absolute same-origin links are resolved in the source page's URL context. A link to a known `index.md#fragment` uses that page's generated HTML IDs. Each `llms-full.txt` section keeps its original page context, so another page's heading cannot satisfy its same-page fragment. Attributes decode semicolon-terminated named and numeric HTML entities once; URL paths and fragments decode percent escapes once, including Unicode. Empty `#` and `#top` navigate to the top. Missing files, missing IDs, invalid URL escapes and fragments on unsupported non-HTML files fail with the source and original href.
+
+The link crawl covers generated pages and mirrors. It does not recursively inspect copied demo/bundle links, apply their `<base>` elements, execute scripts, or check dynamic links. Existing specialized demo and asset checks still run. A `<base>` in a generated source page is refused rather than resolved against the wrong context.
+
+Use an external scratch directory for build output and test temporary files:
+
+```bash
+CHECK_ROOT="$HOME/.cache/rig-c-site-checks"
+mkdir -p "$CHECK_ROOT"
+export TMPDIR="$CHECK_ROOT"
+bun run build --out "$CHECK_ROOT/output"
+bun run check:links --out "$CHECK_ROOT/output"
+bun run verify --out "$CHECK_ROOT/output"
+bun test src/links.test.ts src/external-links.test.ts
+```
+
+The tests plant a missing anchor in an existing private fixture file, run the real check CLI and assert exit 1 with the source and href, then repair the fixture and assert exit 0. They also cover HTML entities, Unicode, queries, Markdown-only and LLM-only failures, and page context. No authored page is mutated by these controls. Tests and verification remain offline; only the existing build's npm lookups require network access.
+
+### Bounded repository documentation report
+
+`bun run check:external --out "$CHECK_ROOT/output" > "$CHECK_ROOT/external-links.json"` is an optional live report, separate from test, build, verify and CI. It collects only public `https://github.com/rig-c/<repo>` README pages and `/blob/...` documents ending in `.md`, `.mdx`, `.rst`, `.txt`, or named `LICENSE`, `LICENCE`, `COPYING`, `NOTICE`. Other organizations, raw hosts, directory trees, issues and arbitrary domains are outside its scope. It follows no discovered links.
+
+Bounds are fixed: 40 HTTP requests total (redirects included), at most two redirect hops per page, 1 MiB per response body, five seconds per request including body reads, and 45 seconds for the request budget. Requests are sequential, deduplicated by URL without fragment, unauthenticated, and use manual redirects with the same scope checks at every hop. No cookies or authorization headers are sent or forwarded. There are no retries. Unvisited targets are reported as `budget`; oversized responses and refused redirects remain uncertain.
+
+Only HTTP 404/410 are `missing` and produce exit 1. Auth failures, rate limits, server errors, timeouts and network errors have distinct report statuses and never become missing targets. Exit 0 means the bounded report completed with no observed 404/410; it does not establish that every target is valid. Results retain source pages, requested and final URLs, HTTP status and, for completed bodies, length and SHA-256. GitHub can supply headings dynamically: an observed ID proves `anchor: present`, but an unobserved fragment stays `anchor: unknown`, even on HTTP 200. This report does not claim external anchor absence. Offline fixtures cover all these dispositions without live requests.
+
 ## Actions Pages deployment
 
 `.github/workflows/pages.yml` runs on pushes to `main`, pull requests, manual dispatch and hourly at minute **17 UTC** (`17 * * * *`). Pull requests only test, build and verify. Main runs are serialized through deployment to keep the live comparison meaningful. Actions first runs the offline tests, then the real registry-backed build, then artifact verification; only successful, eligible and changed artifacts reach `actions/upload-pages-artifact@v4` and `actions/deploy-pages@v4`. Checkout uses `actions/checkout@v6` with credential persistence disabled. No bot writes source commits.

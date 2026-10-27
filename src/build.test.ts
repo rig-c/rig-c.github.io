@@ -158,6 +158,25 @@ describe('isolated deployable site', () => {
     verifySite(out);
   });
 
+  test('verification rejects missing HTML and mirror anchors despite a refreshed valid manifest', () => {
+    for (const path of ['docs/core/index.html', 'docs/core/index.md']) {
+      const absolute = join(out, path);
+      const original = readFileSync(absolute);
+      const manifest = readFileSync(join(out, 'deployment-manifest.json'));
+      try {
+        const planted = path.endsWith('.html')
+          ? '<a href="#private-missing-anchor">Missing</a>'
+          : '\n[Missing](#private-missing-anchor)';
+        writeFileSync(absolute, original.toString() + planted);
+        writeManifest(out);
+        expect(() => verifySite(out)).toThrow('Verification failed');
+      } finally {
+        writeFileSync(absolute, original);
+        writeFileSync(join(out, 'deployment-manifest.json'), manifest);
+      }
+    }
+  });
+
   test('output argument cannot target authored paths or root', () => {
     for (const path of [ROOT_DIR, '..', 'assets', 'content', 'src', 'docs']) expect(() => outputRoot(path)).toThrow();
   });
