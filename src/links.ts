@@ -34,16 +34,27 @@ export function markdownDocument(source: string, route: string, markdown: string
 }
 
 export function siteDocuments(root: string): LinkDocument[] {
+  if (!statSync(root, { throwIfNoEntry: false })?.isDirectory()) {
+    throw new Error(`Missing output directory: ${root}. Run build first.`);
+  }
+  const expected = [
+    ...PAGES.flatMap((page) => [htmlRel(page.route), mdRoute(page.route).slice(1)]),
+    'llms.txt', 'llms-full.txt',
+  ];
+  const missing = expected.filter((path) => !statSync(join(root, path), { throwIfNoEntry: false })?.isFile());
+  if (missing.length) {
+    throw new Error(`Missing expected source document(s) (regular files required): ${missing.join(', ')}. Run build first.`);
+  }
   const documents: LinkDocument[] = [];
   const read = (path: string) => readFileSync(join(root, path), 'utf8');
   for (const page of PAGES) {
     const html = htmlRel(page.route);
     const md = mdRoute(page.route).slice(1);
-    if (existsSync(join(root, html))) documents.push({ source: html, route: page.route, html: read(html) });
-    if (existsSync(join(root, md))) documents.push(markdownDocument(md, `/${md}`, read(md)));
+    documents.push({ source: html, route: page.route, html: read(html) });
+    documents.push(markdownDocument(md, `/${md}`, read(md)));
   }
-  if (existsSync(join(root, 'llms.txt'))) documents.push(markdownDocument('llms.txt', '/llms.txt', read('llms.txt')));
-  if (existsSync(join(root, 'llms-full.txt'))) {
+  documents.push(markdownDocument('llms.txt', '/llms.txt', read('llms.txt')));
+  {
     const full = read('llms-full.txt');
     const marker = /^={80}\nURL: (https:\/\/rig-c\.org\/[^\n]*)\nMarkdown: [^\n]+(?:\nLatest published packages \(npm at build time\): [^\n]+)?\nRepository: [^\n]+\n={80}\n/gm;
     const sections = [...full.matchAll(marker)];
@@ -110,8 +121,13 @@ export function checkInternalLinks(root: string, documents: readonly LinkDocumen
 
 if (import.meta.main) {
   const root = parseOutputArgs();
-  const errors = checkInternalLinks(root, siteDocuments(root));
-  for (const error of errors) console.error(error);
-  console.log(`Internal links: ${errors.length} error(s)`);
-  if (errors.length) process.exitCode = 1;
+  try {
+    const errors = checkInternalLinks(root, siteDocuments(root));
+    for (const error of errors) console.error(error);
+    console.log(`Internal links: ${errors.length} error(s)`);
+    if (errors.length) process.exitCode = 1;
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  }
 }

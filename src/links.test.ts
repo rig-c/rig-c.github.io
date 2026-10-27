@@ -15,6 +15,7 @@ function fixture() {
     writeFileSync(html, Bun.markdown.html(`# Page ${index}\n\n## Section ${index}`, { headings: { ids: true } }));
     writeFileSync(join(root, mdRoute(page.route)), `# Page ${index}\n\n[Section](#section-${index})`);
   }
+  llms(root);
   return root;
 }
 afterEach(() => { for (const root of temporary.splice(0)) rmSync(root, { recursive: true, force: true }); });
@@ -123,3 +124,46 @@ test('actual CLI process is RED for planted missing anchor, then GREEN after pri
   console.log(`REPAIRED GREEN exit=${green.code}: ${green.stdout.trim()}`);
   expect(green.code).toBe(0);
 });
+
+// These are process controls: absent inputs must never become a zero-link PASS.
+test('standalone CLI refuses missing output and every expected source, and restored output stays green', async () => {
+  const root = fixture();
+  async function run(output = root) {
+    const child = Bun.spawn([process.execPath, join(import.meta.dir, 'links.ts'), '--out', output], { stdout: 'pipe', stderr: 'pipe' });
+    const [code, stdout, stderr] = await Promise.all([child.exited, new Response(child.stdout).text(), new Response(child.stderr).text()]);
+    return { code, stdout, stderr };
+  }
+  const good = await run();
+  expect(good.code).toBe(0);
+  expect(good.stdout).toBe('Internal links: 0 error(s)\n');
+  const absent = join(root, 'not-built');
+  const noOutput = await run(absent);
+  expect(noOutput.code).toBe(1);
+  expect(noOutput.stderr).toContain(`Missing output directory: ${absent}`);
+  expect(noOutput.stdout).toBe('');
+  console.log(`INPUT REFUSAL nonexistent exit=${noOutput.code}: ${noOutput.stderr.trim()}`);
+  const expected = [...PAGES.flatMap((page) => [htmlRel(page.route), mdRoute(page.route).slice(1)]), 'llms.txt', 'llms-full.txt'];
+  for (const path of expected) {
+    const absolute = join(root, path);
+    const original = readFileSync(absolute);
+    try {
+      rmSync(absolute);
+      const refusal = await run();
+      expect(refusal.code).toBe(1);
+      expect(refusal.stderr).toContain(`Missing expected source document(s) (regular files required): ${path}.`);
+      expect(refusal.stdout).toBe('');
+      console.log(`INPUT REFUSAL deleted=${path} exit=${refusal.code}: ${refusal.stderr.trim()}`);
+      if (path === 'docs/core/index.md') {
+        mkdirSync(absolute);
+        const directory = await run();
+        expect(directory.code).toBe(1);
+        expect(directory.stderr).toContain(path);
+        console.log(`INPUT REFUSAL directory=${path} exit=${directory.code}: ${directory.stderr.trim()}`);
+        rmSync(absolute, { recursive: true });
+      }
+    } finally { writeFileSync(absolute, original); }
+  }
+  const restored = await run();
+  expect(restored).toEqual(good);
+  console.log(`INPUT RESTORED GREEN exit=${restored.code}: ${restored.stdout.trim()}`);
+}, 30_000);
