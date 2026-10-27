@@ -85,6 +85,8 @@ Licences for all of these: [Licensing](/docs/licensing/).
 - **Small features move as one piece.** Eyes, nose and ears each take a single depth value, so they slide without warping. The eyes also look at the pointer, inside the eyelids' outline.
 - **Hair keeps its layers.** The fringe moves with the face, and the back hair shifts slightly the other way (10 % by default) so the head reads as having a back.
 
+For the available routes, controls and playback evidence, compare [2D, depth-driven 2.5D and full 3D](/docs/capabilities/).
+
 **The released producer.** [`@rig-c/parts` 1.68.0](https://github.com/rig-c/parts/releases/tag/v1.68.0) ships per-layer depth input and a 2.5D head-turn producer. Enable `config.depth` with explicit depth polarity and world-unit scale, then declare `config.turn.roles`: `surface` for depth-sampled grid surfaces, `unit` for features that move together, and `rear` for the back layer. The rig stage writes `turn` and `tilt` animations driven by `yaw_dial` and `pitch_dial`; Core projects the depth samples. See [Parts: depth-driven head turns](/docs/parts/#depth-driven-head-turns) and the [1.68.0 authoring contract](https://github.com/rig-c/parts/blob/89a7671229d155976fc8b5e87ffd6459301ff7b9/docs/AUTHORING.md#3-configjson-field-by-field).
 
 The demo above is a separate, precompiled implementation with its own pointer and gaze controller. It has not been rebuilt here with the released producer, and the producer's grid and controller behavior are not claimed to match it. The demo's original preview caption belongs to that earlier snapshot; the release status here describes the package.
