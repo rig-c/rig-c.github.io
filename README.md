@@ -15,6 +15,7 @@ Every documentation page is one Markdown file under `content/` (frontmatter + bo
 | `/docs/capabilities/` | `content/docs/capabilities.md` | Input, producer, controls, output and playback matrix for 2D, depth-driven 2.5D and full 3D |
 | `/docs/getting-started/` | `content/docs/getting-started.md` | The three-step pipeline and the 10-step no-GPU walkthrough from [`rig-c/getting-started`](https://github.com/rig-c/getting-started) |
 | `/docs/parts/` … `/docs/adapters/` | `content/docs/<slug>.md` | One concept page per package: what it is, when to use it, what it solves, what you get, how it works, key concepts, and links into the repo for detail |
+| `/docs/performance/` | `content/docs/performance.md` | Historical runtime costs, CPU/GPU boundaries, unresolved results and source-pinned methodology |
 | `/examples/` | `content/examples.md` | Reproducible examples (`rig-c/examples`, `rig-c/trailer`) |
 | `/demos/head-turn/` | `demos/head-turn/index.html` | Standalone depth-driven head-turn demo (separate from the released Parts producer) (JavaScript/WebGL required) |
 | `/demos/head-turn/curvature/` | `demos/head-turn/curvature/index.html` | Curvature check: the original painting displaced by its depth map in one fragment shader, no rig (WebGL required) |

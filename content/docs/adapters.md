@@ -71,6 +71,7 @@ Swap in `@rig-c/phaser phaser` or `@rig-c/three three` for the other hosts.
 
 ## Go deeper
 
+- [Measured runtime costs and unresolved results](/docs/performance/) — historical Play comparisons through the legacy Pixi adapter, with workload and device limits.
 - [README: Why this exists](https://github.com/rig-c/adapters#why-this-exists)
 - [README: What an adapter promises](https://github.com/rig-c/adapters#what-an-adapter-promises)
 - [packages/pixi README](https://github.com/rig-c/adapters/tree/main/packages/pixi#readme)
