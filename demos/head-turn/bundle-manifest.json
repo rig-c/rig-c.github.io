@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "sha256": "7c8cc28645f474c9f38cae75f36367eee5b266797039b5b6528005370e4c5bb5",
+  "sha256": "fb7bc15b188ed8f29a931067df44a4c3cdb61ba3f114c706722eee73c8a6c2fc",
   "files": [
     {
       "path": "README.md",
-      "bytes": 6887,
-      "sha256": "04e49c6a99cd8261a9ade82c84bd228c1f62ff73e15657094eddb77e1d3b3ab0"
+      "bytes": 8823,
+      "sha256": "6b30d00f969e6201ba2b45db73123fd3c419d710b797ca1b58f699cc47aaa626"
     },
     {
       "path": "THIRD_PARTY_LICENSES.txt",
@@ -19,8 +19,8 @@
     },
     {
       "path": "app.js",
-      "bytes": 7970,
-      "sha256": "89aec03bc57f3363a7a37942bd3309486341a11f533626b55958e9080311a59c"
+      "bytes": 7940,
+      "sha256": "4e2536d43f8ad7ef002ecaa65350c1cec92d24d3f809f2fd6299f21e6fb0e2ca"
     },
     {
       "path": "depth.jpg",

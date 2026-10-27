@@ -14,7 +14,7 @@ try{
  // Pixi 8.22.0: retain the meshes and their buffers; a custom shader disables batching.
  const frame={order:parts.map(p=>p.slot)},maskSprites=[];
  painter.render(frame);
- const vertex=`#version 300 es
+ const vertex=`
  in vec2 aPosition;
  in vec2 aUV;
  in float aDepth;
@@ -37,7 +37,7 @@ try{
   gl_Position=vec4((mvp*vec3(position,1.0)).xy,0.0,1.0);
   vUV=aUV;
  }`;
- const fragment=`#version 300 es
+ const fragment=`
  in vec2 vUV;
  uniform sampler2D uTexture;
  uniform vec4 uColor;

@@ -90,3 +90,14 @@ test('curvature check verification names a missing file and a broken reference',
     rmSync(copy, { recursive: true, force: true });
   }
 });
+
+// The real WebGL1/2 compilation and pixel comparison run in the browser gate.
+// This source contract rejects the explicit ES300 header that bypassed Pixi's compatibility path.
+test('head-turn shader leaves GLSL compatibility preprocessing to the bundled Pixi', () => {
+  const app = read(`${HEAD_TURN_PATH}/bundle/app.js`);
+  const shaders = [...app.matchAll(/const (vertex|fragment)=`([\s\S]*?)`;/g)];
+  expect(shaders.map((match) => match[1])).toEqual(['vertex', 'fragment']);
+  for (const shader of shaders) expect(shader[2]).not.toMatch(/#\s*version/);
+  // addProgramDefines consumes this exact output declaration and maps finalColor.
+  expect(shaders[1]![2]).toContain('out vec4 finalColor;');
+});

@@ -53,8 +53,21 @@ Additional SHA-256 provenance (the scene, atlases and aperture controller retain
 | --- | --- |
 | CPU `app.js` input | `e2c3b1dff5a4efa14ed66498f693638c62cbb996db8d3be00a5ba6c17504b2d6` |
 | Bundled Pixi runtime input | `33551eef39683c12a0c3e340acba981f09a1fa4e0141c2d55dd02f9bbd269d54` |
-| GPU `app.js` | `89aec03bc57f3363a7a37942bd3309486341a11f533626b55958e9080311a59c` |
+| Initial ES300 GPU `app.js` (pre-repair) | `89aec03bc57f3363a7a37942bd3309486341a11f533626b55958e9080311a59c` |
 | Runtime with shader exports | `f55d9bda6ea33736753781895f2ab4c87a6b49e04ac4b40622c7ab10e3a0f0d4` |
 | Unchanged aperture controller | `b2c159cdd338649ad6833cfd04bb710da6e106d76655c71d3a9ab7c57cbd543c` |
 
 Visual parity and callback timing require a browser run against the frozen CPU reference. Bundle integrity tests alone do not establish either result. GPU arithmetic uses Float32, so the visual comparison must state its pixel error bounds rather than assume bit-exact CPU Float64 arithmetic.
+
+## WebGL1 compatibility repair (2026-10-28)
+
+The initial GPU shaders explicitly requested GLSL ES300 and therefore failed on the original renderer's WebGL1 fallback. This repair removes the two `#version 300 es` lines; the displacement, uniforms, mask/controller code and bundled runtime are unchanged.
+
+The exact bundled mechanism is `id`/`Gt` (`GlProgram`), which tests `fragment.indexOf("#version 300 es") !== -1` and passes that boolean to `addProgramDefines` and `insertVersion`. With no header, `Yu` (`addProgramDefines`) maps vertex `in`/`out` to `attribute`/`varying`, maps fragment `in` to `varying`, removes the exact `out vec4 finalColor;` declaration and maps `finalColor`/`texture` to `gl_FragColor`/`texture2D`. `Zu` (`insertVersion`) returns the source without adding an ES300 header. Precision handling remains in `qu` (`ensurePrecision`); highp is requested as before. This uses the shared GLSL100 compatibility path on WebGL1 and WebGL2. See the version-pinned [GlProgram constructor](https://github.com/pixijs/pixijs/blob/v8.22.0/src/rendering/renderers/gl/shader/GlProgram.ts#L134-L164), [addProgramDefines](https://github.com/pixijs/pixijs/blob/v8.22.0/src/rendering/renderers/gl/shader/program/preprocessors/addProgramDefines.ts#L6-L32), and [insertVersion](https://github.com/pixijs/pixijs/blob/v8.22.0/src/rendering/renderers/gl/shader/program/preprocessors/insertVersion.ts). The same control flow and replacements are present in the minified runtime.
+
+| Repair input or output | SHA-256 |
+| --- | --- |
+| Pre-repair GPU app | `89aec03bc57f3363a7a37942bd3309486341a11f533626b55958e9080311a59c` |
+| Original CPU reference | `e2c3b1dff5a4efa14ed66498f693638c62cbb996db8d3be00a5ba6c17504b2d6` |
+| Compatible GPU app | `4e2536d43f8ad7ef002ecaa65350c1cec92d24d3f809f2fd6299f21e6fb0e2ca` |
+| Unchanged bundled runtime | `f55d9bda6ea33736753781895f2ab4c87a6b49e04ac4b40622c7ab10e3a0f0d4` |
