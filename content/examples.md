@@ -69,6 +69,10 @@ pip install -r requirements.txt
 
 Licences for all of these: [Licensing](/docs/licensing/).
 
+## Pointer-follow slider example
+
+[Run the pinned upstream look example](/docs/adapters/#run-a-pointer-follow-example) with complete download and start commands, declared dial bindings and cleanup steps. It uses the public Parts 1.34.0 slider fixture in PixiJS; it is separate from the depth-driven preview below.
+
 ## Preview: depth-driven head turn
 
 <figure class="head-turn-feature">
