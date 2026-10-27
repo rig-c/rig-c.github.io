@@ -12,6 +12,8 @@ rig-c is a set of small packages that hand files to each other: a painting split
 
 ## Start here
 
+Comparing 2D rigging, depth-driven turns and 3D scene placement? Start with the [capability matrix](/docs/capabilities/): inputs, released producers, controls, outputs and playback evidence in one place.
+
 {{docs-map}}
 
 ## How the pieces fit

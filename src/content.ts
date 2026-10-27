@@ -28,6 +28,7 @@ export interface Page {
 const SOURCES: readonly { file: string; route: string; section: Section }[] = [
   { file: 'index.md', route: '/', section: 'home' },
   { file: 'docs/index.md', route: '/docs/', section: 'docs' },
+  { file: 'docs/capabilities.md', route: '/docs/capabilities/', section: 'docs' },
   { file: 'docs/getting-started.md', route: '/docs/getting-started/', section: 'docs' },
   { file: 'docs/parts.md', route: '/docs/parts/', section: 'docs' },
   { file: 'docs/pose.md', route: '/docs/pose/', section: 'docs' },

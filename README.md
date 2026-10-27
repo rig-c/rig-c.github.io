@@ -12,6 +12,7 @@ Every documentation page is one Markdown file under `content/` (frontmatter + bo
 | --- | --- | --- |
 | `/` | `content/index.md` | Toolchain overview, package table, licensing boundaries |
 | `/docs/` | `content/docs/index.md` | Docs hub: the packages in pipeline order (the list is generated from each page's frontmatter) |
+| `/docs/capabilities/` | `content/docs/capabilities.md` | Input, producer, controls, output and playback matrix for 2D, depth-driven 2.5D and full 3D |
 | `/docs/getting-started/` | `content/docs/getting-started.md` | The three-step pipeline and the 10-step no-GPU walkthrough from [`rig-c/getting-started`](https://github.com/rig-c/getting-started) |
 | `/docs/parts/` … `/docs/adapters/` | `content/docs/<slug>.md` | One concept page per package: what it is, when to use it, what it solves, what you get, how it works, key concepts, and links into the repo for detail |
 | `/examples/` | `content/examples.md` | Reproducible examples (`rig-c/examples`, `rig-c/trailer`) |
@@ -61,7 +62,7 @@ The landing HTML gives each adapter version its own escaped `<code>` item separa
 
 ## Link checks
 
-`bun run verify` checks links in the twelve generated pages, their Markdown mirrors, `llms.txt` and each page section of `llms-full.txt`. The same check runs alone with `bun run check:links`. Build the output first: standalone checks refuse a nonexistent output directory or any missing expected page HTML, Markdown mirror, `llms.txt` or `llms-full.txt`, naming the missing input and exiting 1. Expected documents must be regular files. It reads the actual element IDs from generated HTML, including IDs on non-heading elements; it does not guess heading slugs. Markdown is rendered by Bun to extract inline, reference, autolinks and raw HTML links. Code examples and HTML comments are not links.
+`bun run verify` checks links in all registered generated pages, their Markdown mirrors, `llms.txt` and each page section of `llms-full.txt`. The same check runs alone with `bun run check:links`. Build the output first: standalone checks refuse a nonexistent output directory or any missing expected page HTML, Markdown mirror, `llms.txt` or `llms-full.txt`, naming the missing input and exiting 1. Expected documents must be regular files. It reads the actual element IDs from generated HTML, including IDs on non-heading elements; it does not guess heading slugs. Markdown is rendered by Bun to extract inline, reference, autolinks and raw HTML links. Code examples and HTML comments are not links.
 
 Same-page, relative, cross-page and absolute same-origin links are resolved in the source page's URL context. A link to a known `index.md#fragment` uses that page's generated HTML IDs. Each `llms-full.txt` section keeps its original page context, so another page's heading cannot satisfy its same-page fragment. Attributes decode semicolon-terminated named and numeric HTML entities once; URL paths and fragments decode percent escapes once, including Unicode. Empty `#` and `#top` navigate to the top. Missing files, missing IDs, invalid URL escapes and fragments on unsupported non-HTML files fail with the source and original href.
 

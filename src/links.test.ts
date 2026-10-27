@@ -6,14 +6,16 @@ import { htmlRel, mdRoute, PAGES, SITE_ORIGIN } from './content.ts';
 import { checkInternalLinks, decodeAttribute, inspectHtml, markdownDocument, siteDocuments } from './links.ts';
 
 const temporary: string[] = [];
+// Core's links exercise cross-page anchors, independent of docs navigation order.
+const sectionId = (route: string, index: number) => route === '/docs/core/' ? 'section-core' : `section-${index}`;
 function fixture() {
   const root = mkdtempSync(join(realpathSync(tmpdir()), 'site-links-'));
   temporary.push(root);
   for (const [index, page] of PAGES.entries()) {
     const html = join(root, htmlRel(page.route));
     mkdirSync(join(html, '..'), { recursive: true });
-    writeFileSync(html, Bun.markdown.html(`# Page ${index}\n\n## Section ${index}`, { headings: { ids: true } }));
-    writeFileSync(join(root, mdRoute(page.route)), `# Page ${index}\n\n[Section](#section-${index})`);
+    writeFileSync(html, Bun.markdown.html(`# Page ${index}\n\n## ${sectionId(page.route, index)}`, { headings: { ids: true } }));
+    writeFileSync(join(root, mdRoute(page.route)), `# Page ${index}\n\n[Section](#${sectionId(page.route, index)})`);
   }
   llms(root);
   return root;
@@ -68,15 +70,15 @@ test('missing file, malformed percent, moved routes and non-HTML fragment target
 
 test('Markdown links use rendered inline, reference, autolink and raw HTML; code/comments are not links', () => {
   const root = fixture();
-  const md = `[inline](/docs/core/#section-5) [reference][target]\n\n[target]: /docs/core/index.md#section-5\n\n<${SITE_ORIGIN}/docs/core/#section-5>\n\n<a href="/docs/core/#section-5">raw</a>\n\n\`[code](/absent/)\`\n\n\`\`\`html\n<a href="/absent/">code</a>\n\`\`\`\n\n<!-- <a href="/absent/">comment</a> -->`;
+  const md = `[inline](/docs/core/#section-core) [reference][target]\n\n[target]: /docs/core/index.md#section-core\n\n<${SITE_ORIGIN}/docs/core/#section-core>\n\n<a href="/docs/core/#section-core">raw</a>\n\n\`[code](/absent/)\`\n\n\`\`\`html\n<a href="/absent/">code</a>\n\`\`\`\n\n<!-- <a href="/absent/">comment</a> -->`;
   expect(checkInternalLinks(root, [markdownDocument('mirror.md', '/docs/core/index.md', md)])).toEqual([]);
   expect(checkInternalLinks(root, [markdownDocument('mirror.md', '/docs/core/index.md', '[bad](#missing)')])[0]).toContain('[mirror.md]');
 });
 
 function llms(root: string) {
-  const full = PAGES.map((page, i) => `================================================================================\nURL: ${SITE_ORIGIN}${page.route}\nMarkdown: ${SITE_ORIGIN}${mdRoute(page.route)}\nRepository: https://github.com/rig-c/core\n================================================================================\n\n# Page ${i}\n\n[Own section](#section-${i})\n`).join('\n');
+  const full = PAGES.map((page, i) => `================================================================================\nURL: ${SITE_ORIGIN}${page.route}\nMarkdown: ${SITE_ORIGIN}${mdRoute(page.route)}\nRepository: https://github.com/rig-c/core\n================================================================================\n\n# Page ${i}\n\n[Own section](#${sectionId(page.route, i)})\n`).join('\n');
   writeFileSync(join(root, 'llms-full.txt'), full);
-  writeFileSync(join(root, 'llms.txt'), `[Core](${SITE_ORIGIN}/docs/core/index.md#section-5)`);
+  writeFileSync(join(root, 'llms.txt'), `[Core](${SITE_ORIGIN}/docs/core/index.md#section-core)`);
 }
 
 test('llms-full resolves every same-page fragment in original page context; LLM-only defect fails', () => {
@@ -84,7 +86,7 @@ test('llms-full resolves every same-page fragment in original page context; LLM-
   llms(root);
   expect(checkInternalLinks(root, siteDocuments(root))).toEqual([]);
   const fullPath = join(root, 'llms-full.txt');
-  writeFileSync(fullPath, readFileSync(fullPath, 'utf8').replace('[Own section](#section-5)', '[Own section](#section-0)'));
+  writeFileSync(fullPath, readFileSync(fullPath, 'utf8').replace('[Own section](#section-core)', '[Own section](#section-0)'));
   const errors = checkInternalLinks(root, siteDocuments(root));
   expect(errors).toHaveLength(1);
   expect(errors[0]).toContain('[llms-full.txt (/docs/core/)]');
