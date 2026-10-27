@@ -10,7 +10,7 @@ const TODAY = '2026-10-19';
 const DOCS = PAGES.filter((p) => p.section === 'docs');
 const AUTHOR = { '@type': 'Person', name: 'firejune', url: 'https://github.com/firejune', sameAs: ['https://github.com/firejune'] };
 
-function renderSite(latestVersions: ReadonlyMap<string, string>): Map<string, string> {
+export function renderSite(latestVersions: ReadonlyMap<string, string>): Map<string, string> {
 function escapeHtml(value: string): string {
   return value
     .replaceAll('&', '&amp;')
@@ -30,7 +30,17 @@ function docsMap(): string {
     .join('\n');
 }
 
-// Latest-version tokens use npm, while page metadata and recorded demo versions stay pinned.
+// Every current-package surface reads this build's resolved registry map.
+// Recording, fixture and reproduction versions remain authored in the page body.
+function packageEntries(page: Page): { name: string; version: string }[] {
+  return (page.packageName?.split(',').map((name) => name.trim()) ?? []).map((name) => ({
+    name, version: versionLabel([name], latestVersions),
+  }));
+}
+
+function packageMetadata(page: Page): string {
+  return packageEntries(page).map(({ name, version }) => `${name}@${version}`).join('; ');
+}
 function version(slug: string, target?: 'html' | 'md'): string {
   const doc = DOCS.find((p) => p.route === `/docs/${slug}/`);
   if (!doc?.packageName) throw new Error(`{{version:${slug}}}: no docs page with a packageName`);
@@ -128,7 +138,10 @@ function playDemo(target: 'html' | 'md'): string {
 }
 
 function expand(page: Page, target: 'html' | 'md' = 'md'): string {
-  return page.markdown
+  const markdown = target === 'md' && page.packageName
+    ? page.markdown.replace(/^(# [^\n]+)(\n|$)/, `$1\n\nLatest published (npm at build time): ${packageEntries(page).map(({ name, version }) => `\`${name}@${version}\``).join('; ')}.$2`)
+    : page.markdown;
+  return markdown
     .replace('{{play-demo}}', playDemo(target))
     .replace(/\{\{thread:([a-z-]+)\}\}/g, (_, slug: string) => thread(slug, target))
     .replace('{{live-demo}}', liveDemo(target))
@@ -238,15 +251,17 @@ function buildJsonLd(page: Page): string {
       },
     );
     if (page.packageName) {
-      graph.push({
-        '@type': 'SoftwareSourceCode',
-        name: page.packageName,
-        version: page.packageVersion,
-        codeRepository: page.repoUrl,
-        url,
-        programmingLanguage: 'TypeScript',
-        description: page.description,
-      });
+      for (const { name, version } of packageEntries(page)) {
+        graph.push({
+          '@type': 'SoftwareSourceCode',
+          name,
+          version,
+          codeRepository: page.repoUrl,
+          url,
+          programmingLanguage: 'TypeScript',
+          description: page.description,
+        });
+      }
     }
   }
 
@@ -343,8 +358,11 @@ function breadcrumb(page: Page): string {
 
 function packageBar(page: Page): string {
   const items: string[] = [];
-  if (page.packageName && page.packageVersion) {
-    items.push(`<span class="pkg"><code>${escapeHtml(page.packageName)}</code> <span class="ver">${escapeHtml(page.packageVersion)}</span></span>`);
+  if (page.packageName) {
+    items.push('<span class="pkg-label">Latest published (npm at build time)</span>');
+    for (const { name, version } of packageEntries(page)) {
+      items.push(`<span class="pkg"><code>${escapeHtml(name)}</code> <span class="ver">${escapeHtml(version)}</span></span>`);
+    }
   }
   items.push(`<a href="${escapeHtml(page.repoUrl)}">${escapeHtml(page.repoUrl.replace('https://github.com/', 'github.com/'))}</a>`);
   if (page.npmUrl) items.push(`<a href="${escapeHtml(page.npmUrl)}">npm</a>`);
@@ -468,8 +486,7 @@ function buildLlmsTxt(): string {
     '',
   ];
   for (const page of PAGES) {
-    const packageVersion = page.route === '/' ? version('core') : page.packageVersion;
-    const badge = page.packageName && packageVersion ? ` (\`${page.packageName}@${packageVersion}\`)` : '';
+    const badge = page.packageName ? ` (latest published: \`${packageMetadata(page)}\`)` : '';
     lines.push(
       `- [${page.navLabel}](${SITE_ORIGIN}${page.route}) ([Markdown](${SITE_ORIGIN}${mdRoute(page.route)}))${badge}: ${page.summaryForLlms}`,
     );
@@ -516,8 +533,7 @@ function buildLlmsFullTxt(): string {
     '',
   ].join('\n');
   const sections = PAGES.map((page) => {
-    const packageVersion = page.route === '/' ? version('core') : page.packageVersion;
-    const pkg = page.packageName && packageVersion ? `\nPackage: ${page.packageName}@${packageVersion}` : '';
+    const pkg = page.packageName ? `\nLatest published packages (npm at build time): ${packageMetadata(page)}` : '';
     return [
       '================================================================================',
       `URL: ${SITE_ORIGIN}${page.route}`,

@@ -4,7 +4,6 @@ title: rig-c core — a 2D rig compiler with a named-assertion gate
 description: rigc compiles a rig spec and a motion spec into Spine 4.3 skeleton data, and writes nothing unless every named assertion passes.
 summaryForLlms: rig-c (also @rig-c/core, CLI rigc) compiles a JSON rig spec and motion spec plus loose part PNGs into Spine 4.3 skeleton data, gated by named assertions so nothing invalid is written.
 packageName: rig-c
-packageVersion: 2.61.0
 repoUrl: https://github.com/rig-c/core
 npmUrl: https://www.npmjs.com/package/rig-c
 ---
@@ -134,7 +133,7 @@ bun add -d rig-c
 bun rigc build --rig rig.json --motion motion.json --out build/
 ```
 
-rigc runs on Bun 1.2.0 or later. The npm package is `rig-c`; `@rig-c/core` is the same package under the scope, and the command is `rigc`. Licensing by playback path: [Licensing](/docs/licensing/).
+The published 2.74.0 package declares Bun 1.4.0 or later. The npm package is `rig-c`; `@rig-c/core` is the same package under the scope, and the command is `rigc`. Licensing by playback path: [Licensing](/docs/licensing/).
 
 ## Inputs and outputs
 
@@ -165,6 +164,7 @@ rigc runs on Bun 1.2.0 or later. The npm package is `rig-c`; `@rig-c/core` is th
 - Start here: [/docs/getting-started/](/docs/getting-started/)
 
 <!-- SOURCES (not published)
+- declared runtime refreshed from npm rig-c@2.74.0 tarball package.json engines.bun (>=1.4.0); recorded cases below retain their original pins.
 - key-pose film: rig-c/core@539572d (539572d34bb034b9e905e30dc2d45bcd2650b34f, the commit that last changed it; identical at v2.64.1 51dba78) assets/rigc-keypose.gif — 234 frames, 600x405, 5 cs each = 11.70 s, opaque; encoded by scripts/encode-video.sh row core-keypose (20 fps, cropped to 600x404); caption from films/two-keypose/README.md (summary, shot table, honesty stance; shot 2 = spine-rigc@0.9.0 output); "spine-rigc" is drawn in the caption band of every frame
 - three cases: rig-c 2.61.0 on rig-c/examples@c239b09 family/roa/out/rig — verbatim fail.log / pass.log / guide.txt of each case (case run 2026-10-19)
 - render contact: "idle 41 frame(s), 3.333s + contact.png"; inspect command and image from the same run

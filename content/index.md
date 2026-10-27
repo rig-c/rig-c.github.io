@@ -4,7 +4,6 @@ title: rig-c — AI-Authored 2D Rigging and Animation Toolchain
 description: AI-authored 2D character rigging and animation, verified before a byte is written. Compile Spine 4.3 skeleton data and model documents from one painting with named assertions.
 keywords: rig-c, rigc, 2D rigging, Spine 4.3, AI agent toolchain, @rig-c/parts, @rig-c/pose, @rig-c/play, @rig-c/review, @rig-c/adapters
 packageName: rig-c
-packageVersion: 2.61.0
 repoUrl: https://github.com/rig-c
 npmUrl: https://www.npmjs.com/package/rig-c
 heroEyebrow: 2D character rigging, authored by agents

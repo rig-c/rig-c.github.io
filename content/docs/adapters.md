@@ -4,7 +4,6 @@ title: "rig-c engine adapters: PixiJS, Phaser and Three.js"
 description: Play a rig that rigc built inside PixiJS 8, Phaser 4.2+ or Three.js, posed by @rig-c/play and drawn by the host's own renderer. No Spine runtime.
 summaryForLlms: "@rig-c/pixi, @rig-c/phaser and @rig-c/three play rigc's skeleton.model.json inside PixiJS, Phaser or Three.js scenes, posed through @rig-c/play and drawn with each host's native objects, without a Spine runtime."
 packageName: "@rig-c/pixi, @rig-c/phaser, @rig-c/three"
-packageVersion: "0.1.1, 0.1.1, 0.1.1"
 repoUrl: https://github.com/rig-c/adapters
 npmUrl: https://www.npmjs.com/package/@rig-c/pixi
 ---
@@ -14,7 +13,7 @@ The adapters put a rigc-built rig inside the engine or renderer your game alread
 
 ## What it is
 
-Three packages, each versioned on its own, all at 0.1.1 with 0.x APIs:
+Three packages, each versioned on its own, with 0.x APIs. The badge above lists each current npm release; the recording below keeps its original versions:
 
 - `@rig-c/pixi`: a PixiJS 8 adapter.
 - `@rig-c/phaser`: a Phaser 4.2+ adapter for WebGL scenes.

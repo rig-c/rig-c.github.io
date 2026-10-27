@@ -4,7 +4,6 @@ title: "@rig-c/pose: put pose motion onto a rig-c rig"
 description: "Turns a body-18 pose sequence into bone keys in rig-c's motion format, checked through rig-c's gate before anything is written."
 summaryForLlms: "@rig-c/pose is a Bun CLI that cleans a body-18 joint-position sequence and retargets it onto a rig-c rig as gated, verified bone keys."
 packageName: "@rig-c/pose"
-packageVersion: 0.35.0
 repoUrl: https://github.com/rig-c/pose
 npmUrl: https://www.npmjs.com/package/@rig-c/pose
 ---
@@ -46,6 +45,8 @@ This example shows larger arm and leg movements alongside the source skeleton. T
 ## How the swing reached Character 1
 
 ### A motion that fits the rig
+
+This recorded swing and its measurements use `@rig-c/pose` 0.35.0 and `rig-c` 2.61.0. They are a pinned reproduction, separate from the current package version above.
 
 The first try was a full arm-over-the-head wave. It passed every check — the gate, the landing tolerance, the fold test — and the render still showed the sleeve torn open at the shoulder once the arm went overhead. A pass is structural, so the motion has to suit the character and the rig: here, the coffee cup she is already holding, swung loosely like a pendulum from the elbow, written as two swings in three seconds: the forearm follows a sine with a 1.5 s period, eased at both ends, and the sequence was cleaned with <code>--loop</code>, so the motion returns to its first frame at 3 s and the hero clip above is all of it.
 
@@ -115,7 +116,7 @@ npm i -D @rig-c/pose
 bunx rig-pose retarget --rig out/rig --map map.json --pose swing.pose.clean.json --out swing.motion.json --name swing --build swing-build
 ```
 
-Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
+The published 1.2.1 package declares [Bun](https://bun.sh) 1.4.0 or later on `PATH`; rig-c comes as a dependency.
 
 ## Inputs and outputs
 | In | Out |
@@ -125,13 +126,24 @@ Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
 | A map, `rig-pose-map/1` — which bones carry which joints | A JSON report, `rig-pose-report/1` (`--report`), and a gated build (`--build`) |
 | For `compare`: a reference and a render sequence on one time base | `compare.json` and a `compare.png` sheet, differences per body unit, worst first |
 
+## Depth, projection and feet
+
+The [1.2.1 reference](https://github.com/rig-c/pose/blob/35d4d140fa45410051117251c9e55a9fb36f4920/docs/REFERENCE.md) documents these opt-in paths. The recorded swing above did not use them.
+
+- **Derived depth:** `rig-pose clean --depth walk|run` adds each limb segment's foreshortening ratio and a gait-derived sign. It estimates depth from 2D joint lengths and body orientation; it does not read which limb the picture draws in front at a crossing. A side-on frame can leave the sign undecided.
+- **Draw order:** `rig-pose retarget --draw-order depth` keys the legs' order from that depth, using the ankle for a walk and knee for a run. Ordering a forearm against the trunk also requires the rig's `layout.json` and an explicit map binding. The flag refuses a sequence without depth; it does not invent a target layer from a part's name.
+- **Foreshortening:** `--leg-scale <min,max>` scales mapped leg segments along their bones, and the trunk when its projected length changes, within declared bounds. This matches projected lengths; it does not rotate a 3D body.
+- **Feet:** `--plant-feet` adjusts the hip to hold support on one floor; `--stance <leg lengths>` can bring a nearby free foot onto it. Bounds can leave a residual that the report names. Separately, `--depth-scale <min,max>` scales foot bones uniformly about their ankles from derived depth; its walk sign assumes a camera above the feet and uses picture-y ankle lead. It cannot recover absolute camera distance or guarantee the correct scale order at every crossing.
+
+See [derived depth](https://github.com/rig-c/pose/blob/35d4d140fa45410051117251c9e55a9fb36f4920/docs/REFERENCE.md#derived-depth-clean---depth), [depth-based draw order](https://github.com/rig-c/pose/blob/35d4d140fa45410051117251c9e55a9fb36f4920/docs/REFERENCE.md#draw-order-from-depth---draw-order-depth) and [foreshortening and planted feet](https://github.com/rig-c/pose/blob/35d4d140fa45410051117251c9e55a9fb36f4920/docs/REFERENCE.md#the-legs-foreshortening-and-planted-feet) for the contracts and refusal codes.
+
 ## Limits
-- **"0.x is the prototype."** The format, the command and the output can change in any release until 1.0 (README, intro).
-- **Does not extract poses from video**: the input is joint positions, from a pose model, a dataset or by hand (README §"What it does not do").
-- **2D only — does not turn the body**: a segment pointing at the camera foreshortens and "the rig cannot"; the direction is matched, not the length (README §"What it does not do").
-- **No front/behind order per segment, no blinks or mouth shapes**, and cloth physics is not fitted to the reference (README §"What it does not do").
-- **No hands or fingers** — there are no bones for them yet (README §"What it does not do").
-- No importable API: the supported surface is the `rig-pose` command (README §"Requirements").
+
+- **1.x has a CLI contract**, not the old 0.x prototype status. The supported surface is `rig-pose`; the package exports no importable API.
+- **The input is joint positions**, not video. Pose extraction and camera fitting from pixels happen outside the shipped CLI; without a declared camera, the picture is read as a fixed camera.
+- **It remains a 2D retarget.** Depth signs and draw-order keys are constrained inferences. Large turns and intense motion on a designed character can need replacement drawings declared in the map; a green structural gate does not supply missing art.
+- **No eyelid, mouth or finger keys.** Body-18 has no hand points; head yaw/pitch inference does not provide expressions or lip-sync.
+- **Gait quality still has open work** (checked 2026-10-27): [#444](https://github.com/rig-c/pose/issues/444) tracks contralateral arm depth from step phase; [#445](https://github.com/rig-c/pose/issues/445) tracks keeping shoe soles level across the cycle; [#446](https://github.com/rig-c/pose/issues/446) tracks continuous depth-derived receding-limb shading. The released depth, plant and scale options do not establish those fixes.
 
 ## Go deeper
 - [Try it](https://github.com/rig-c/pose#try-it) — a self-contained wave example in the repository
@@ -143,6 +155,8 @@ Needs [Bun](https://bun.sh) 1.2 or later on `PATH`; rig-c comes as a dependency.
 - [What it does not do](https://github.com/rig-c/pose#what-it-does-not-do)
 - [npm](https://www.npmjs.com/package/@rig-c/pose) · [CHANGELOG](https://github.com/rig-c/pose/blob/main/CHANGELOG.md)
 <!-- SOURCES (not published)
+- current capability/limits: npm @rig-c/pose@1.2.1 README and package.json; docs/REFERENCE.md read at npm gitHead 35d4d140fa45410051117251c9e55a9fb36f4920 (not shipped in npm tarball): Derived depth, Draw order incl forearm layout, The legs incl depth-scale, What it does not do. The reference still carries old blanket wording about front/back; scoped flag contracts establish the available paths.
+- live issue checks: gh issue view 444/445/446 --repo rig-c/pose --comments; all OPEN with no comments, 2026-10-27. Public page describes the general issues only.
 - reproducible swing inputs (#49): assets/rigs/character-1-swing/keypoints.json (sha256 76b3152592362524921dc44843b04b525bc98ef6d873a579fca7d5a83318e3fd) and map.json (sha256 cf27eef4c4fa173249807f68e3531e670eaf4a6f0caeb663c0eda039d1e1cbfb) are the original hand-placed inputs; scripts/pendulum.py with no arguments runs the shipped preset, clean, retarget and a byte-identical model comparison in a new isolated workspace, never overwriting model/art. It fetches only rig.json/motion.json from https://github.com/rig-c/examples/tree/c239b09328ca7364361b9761fac817502c09ede0/family/roa/out/rig; uses the committed unchanged PNGs; pins Bun 1.4.2, @rig-c/pose 0.35.0, rig-c 2.61.0 and @esotericsoftware/spine-core 4.3.13 with an embedded frozen lock and fresh cache. It preserves the recorded out/rig and swing-build sibling layout: --copy-images emits skeleton.images as ../swing-build/, and spine.sha256 hashes the exact serialized skeleton.json bytes, including that output-relative metadata. Positional keypoints/out generation retains its old defaults.
 - pendulum swing (2026-10-20, issue #42; owner: the arm movement read as awkward): scripts/pendulum.py keypoints.json swing.pose.json --fore 4 --centre 2.5 --upper 0 --lag 0.15 (period 1.5 s, 2 periods, 73 frames 0..3 s inclusive, frame 72 = frame 0; rest alignment -1.19 / +0.37 / 2.553 as before) -> rig-pose clean --loop --hold off --rest 1 (@rig-c/pose 0.35.0; loop true, no holds; --rest 1 because the input is an exact sine and the default window, wrapped over the repeated last frame, moved frame 72 3.3 px off frame 0) -> rig-pose retarget --rig out/rig --map map.json --pose … --name swing --profile spine-html --build … (rig-c 2.61.0; GATE green, 4 LAND, no folds, 26 IDLE-DROPPED); model differs from the previous one only in the swing animation and the skeleton digest; part PNGs md5-identical. Tracks: sleeve_r1 -1.489..6.491 deg (key 0 = key 72 = 4.852), sleeve_r0 0.001, chest -0.001. Thresholds stated before measuring, from this page: holes <= 1500 px worst frame, covered <= idle + 400 = 1326 px; measured on the fixed viewport (rigc render --max 1400 --viewport -440.24,-65.03,875.10,2295.92; scripts holes.py / core_hidden.py of the earlier cases, which first reproduced idle 926, previous 1242/1124, ±6° 5173 exactly): this swing holes 1476, covered 1295. Symmetric sweep about the rest (lag 0.15 s), holes/covered: ±1.5 1482/866, ±2 2019/914, ±3 3117/964, ±4 4184/1055, ±5 5045/1136, ±6 5632/1243, ±8 6430/1392, ±10 6642/1451; with the upper arm at a third of the forearm, all fail holes (±3: 4601/1317); lagged chains (upper 1-3 deg, forearm 1-3 deg, lag 0.25-0.35 s) fail both (holes 3655-5769, covered 1390-2736). ±3.5 centred 2.5: 1122/1240. The idle alone: holes 1138. Most counted hole px are the arm-leg gap widening; the tear is the notch below the cuff (pose-swing-tear.jpg: rest f0, symmetric ±4 frame 13, this swing frame 13; crops of those renders at 2x, rig-c 2.64.1). The hand bone past the wrist (sleeve_r2) is not mapped: body-18 has no joint beyond the wrist
 - hero clip (2026-10-20, issue #42): scripts/pose-swing.py --window 0:72 (the default): motion frames 0..71 (72 frames, 3.000 s; frame 72 repeats frame 0), rotated to start at frame 18 (sleeve_r1 0.149 deg, the rest pose; the poster); rigc render rig-c 2.61.0; 806x792, 213979 bytes. Seam on the encoded file (MAD 0-255): rig panel 0.880 vs max step 1.127, whole frame 0.936 vs 1.171, both PASS. Starting at the swing's centre (frame 4, 2.222 deg) failed encoded (rig panel 1.021 vs 0.972, whole frame 1.111 vs 0.925; lossless 0.804 vs 0.864). pose-swing-ends.jpg: scripts compose.py of the earlier cases over rigc render --max 720 --poser core of the build, frames 13 and 31 (outermost -1.489, innermost 6.491); its rig panels match the hero's frames (MAD 0.083, the inset corners)

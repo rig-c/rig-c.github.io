@@ -4,7 +4,6 @@ title: "@rig-c/parts: a 2D character rig from one painting"
 description: A CLI for agents that turns one anime painting and its See-through layers into measured parts and a gated, packed Spine-format rig.
 summaryForLlms: "@rig-c/parts is a Bun CLI that turns one character painting and its See-through layer decomposition into measured parts, a rig-c rig spec and an idle, gated and packed by rig-c into Spine 4.3 skeleton data."
 packageName: "@rig-c/parts"
-packageVersion: 1.41.0
 repoUrl: https://github.com/rig-c/parts
 npmUrl: https://www.npmjs.com/package/@rig-c/parts
 ---
@@ -83,6 +82,16 @@ The idle then goes on: [Pose](/docs/pose/) gives the same rig a recorded motion,
 
 **Key terms.** *See-through layers* — the painting's decomposition, one run on the full figure and one on the head. *Parts* — the merged, measured pieces in rig space (`parts.json`). *Proposal* — the drafted bones, meshes, regions and motion, to be corrected. *Config* — `config.json`, the character's part plan, head box, bones and idle; unknown or missing fields are refused by name. *FAIL line* — a refusal that names a rule and ends with `(see rig-parts guide <RULE>)`.
 
+## Depth-driven head turns
+
+[Parts 1.68.0](https://github.com/rig-c/parts/releases/tag/v1.68.0) adds a depth-sheet path alongside the legacy ordering-depth turn. A layer's ordering median still decides its place in the stack; the per-pixel sheet supplies the surface's depth samples.
+
+1. Enable `config.depth` and declare the sheets' polarity (`near`) and positive world-unit scale (`zScale`). See-through's sheets use `near: "black"`; a fallback sheet declares its own polarity and scale. A filename hint alone does not enable depth input, and a missing declared sheet is an error.
+2. Assemble the layers with their registered sheets. The rig stage writes padded sheets and `depth_sheets.json` beside the rig inputs.
+3. Declare `config.turn.roles`: at least one `surface` becomes a depth-sampled Core grid; `unit` features move together at sampled or declared depths; `rear` parts follow the rear carrier. The producer writes `turn` and `tilt` animations and the `yaw_dial` / `pitch_dial` controls.
+
+The [1.68.0 config contract](https://github.com/rig-c/parts/blob/89a7671229d155976fc8b5e87ffd6459301ff7b9/docs/AUTHORING.md#3-configjson-field-by-field) documents the grid, pivot, rear counter-motion and refusals. All turn-bound sheets must share a polarity and scale. Surface grids default to 13 × 16 cells and are limited to 2,400 triangles per slot and 4,000 across surfaces. These are producer limits; the much denser [standalone head-turn demo](/examples/#preview-depth-driven-head-turn) is a separate implementation.
+
 ## Install
 
 ```sh
@@ -90,7 +99,7 @@ npm i -D @rig-c/parts
 rig-parts --help
 ```
 
-Requires [Bun](https://bun.sh) 1.2 or later; rig-c comes with it as a dependency. Which Spine terms apply depends on what plays the output: see [Licensing](/docs/licensing/).
+Declares [Bun](https://bun.sh) 1.4.0 or later in the published 1.68.0 package; rig-c comes with it as a dependency. Which Spine terms apply depends on what plays the output: see [Licensing](/docs/licensing/).
 
 ## Inputs and outputs
 
@@ -103,9 +112,10 @@ Requires [Bun](https://bun.sh) 1.2 or later; rig-c comes with it as a dependency
 
 ## Limits
 
-From the README's own *What it does not do*:
+From the [1.68.0 README](https://github.com/rig-c/parts/blob/89a7671229d155976fc8b5e87ffd6459301ff7b9/README.md#what-it-does-not-do) and [authoring contract](https://github.com/rig-c/parts/blob/89a7671229d155976fc8b5e87ffd6459301ff7b9/docs/AUTHORING.md):
 
-- **One depth value per layer.** A layer that is in front of another in one place and behind it in another is right in the still and wrong once it moves.
+- **Legacy turns use one ordering depth per layer.** A layer that crosses another can look right in the still and wrong in motion. The opt-in depth-sheet producer samples a surface per pixel instead; it does not turn the layer stack into unrestricted 3D geometry or supply unseen artwork. Existing authored weighted meshes do not automatically become depth-sampled surfaces.
+- **A single drawing has a turn range.** The default rated band is ±15° yaw and ±12° pitch. Going beyond it requires a declared alternate face drawing; depth samples alone do not draw the hidden side.
 - **No expression or lip-sync, and no jiggle.** The mouth is one layer; nothing here proposes, keys or judges a soft region.
 - **Occluded pixels are See-through's synthesis**, not the artist's.
 - **No success rate is claimed** — ten characters measured stage by stage is an existence proof, not a rate.
@@ -126,7 +136,7 @@ From the README's own *What it does not do*:
 - hero clip parts-explode.mp4 + poster: scripts/parts-explode.py (reads rig-c/examples@c239b09 family/roa/out/parts/*.png + parts.json via git show; assembled frames = parts.json x/y in list order, placement vs out/recomposite_rig.png mean abs diff 0.0134; grid layout and dissolves are illustration)
 - Character 1 assets: rig-c/examples@c239b09 family/roa — docs/roa_layers_sheet.png, out/parts/*.png, out/parts.json (17 parts, recomposite: mean_abs 0.873, within_share 0.9831, uncovered_error_px 6041, holes[0] 834 px bordering bottomwear), out/recomposite_rig.png, out/recomposite_error_rig.png, docs/idle.gif (41 frames, 80 ms), out/check/contact.png
 - red = uncovered error, blue = covered error (>40 off): rig-c/parts docs/AUTHORING.md lines 2200, 2633
-- Limits: rig-c/parts README "What it does not do" (origin/main lines 325-362)
+- depth/turn reconciliation: npm @rig-c/parts@1.68.0 README (legacy depth, per-layer input), package.json (Bun >=1.4.0); src/turn.ts buildDepth25DTurn (shipped producer, narrowing:false), AUTHORING.md at npm gitHead 89a7671229d155976fc8b5e87ffd6459301ff7b9 turn row, depth-sheet section, RIG_TURN_GRID_BUDGET and CONFIG_FACE_BAND_EXCEEDED; CHANGELOG 1.68.0 #774/#777. README final depth paragraph still describes #763 as future; do not copy that obsolete release claim. Other limits below retain their original README evidence.
 - 12 fps idle: 41 frames at 80 ms = 12.5 fps per GIF timing; check renders at 12 fps (rig-parts AUTHORING check row)
 - parts-idle.webp + parts-idle-poster.png: scripts/play-capture-webp.ts --root <dir> --model build/skeleton.model.json --anim idle --fps 12 --frames 40 --settle 1 --out assets/docs/parts-idle, where <dir> holds node_modules/@rig-c/play 1.12.0 and build/ = examples@c239b09 family/roa/out/check/build/skeleton.atlas, .json, .model.json, .png (git show); player rig-c/getting-started@2928714 scripts/play.html + serve.ts; Bun 1.4.2, Playwright 1.63.0 / Chromium 153, libwebp 1.6.0; run 2026-10-20. idle duration from loadModel's assets.animations: 3.3333 s = 40 frames at 12 fps. build --loop's docs/idle.png and check's idle_frames hold 41 (0..3.333 s, both ends); the 41st is where the loop wraps, so a looping clip shows 40. The rig has physics (check.json loop_physics: 23 constraints) and play's seek starts it from rest, so the first pass does not close (captured seam 0.753 vs max step 0.649 over #070b18); --settle 1 draws the second pass, frame i = seek(3.3333 + i/12), which does (0.508 vs 0.649; a second settle loop gives the same seams). Framing as rigc render --max 640: union of player.bounds() at 60 fps + 4% pad -> 244x640, scale 0.27876, viewport x -440.24 y -65.03 w 875.10 h 2295.92 = check's idle_frames/idle/geometry.json viewport (docs/idle.png is 246x640). Two runs gave identical frames (40 PNGs concatenated md5 0e864e728428a22cb8d527fadb11c620) and identical WebPs. WebP lossy q85 -m 6 -exact, alpha lossless (max error 0), durations 27 x 83 ms + 13 x 84 ms = 3333 ms per loop, background 0,0,0,0: 700112 bytes (md5 4b914c51df8301b952c3c4f32a6620f2); q75 562916. Poster = captured frame 0, 103721 bytes, md5 c953414dc9eef098af89618c7a7cbe69. Alpha: corners 0, interior 255, 5252 edge px on frame 0; border alpha 0 on every frame. Fringe: over 232, whole-frame mean luminance vs check's frames +0.035, edge px (0<alpha<255) -1.48 (darker, not a grey halo); semi-transparent px average 2.3 darker than their brightest opaque neighbour. Loop seam (scripts/loop-seam.py over #070b18): WebP 0.963 vs max step 1.164 PASS (over #e8e8e8 0.954 vs 1.135 PASS). Against rigc (check's idle_frames f0000-f0039, same viewport), capture over 232: MAD frame 0 2.445, mean 2.165, max 2.445 - resampling (browser at scale 0.279) plus the physics phase (play's second pass vs rigc's first); against docs/idle.png (246 wide, best at a 1 px shift) mean 2.479.
 - Replaced parts-idle.mp4 + poster (encode-video.sh from docs/idle.png, 41 frames, 246x640, opaque; loop seam 0.872 vs max step 0.937), deleted.
