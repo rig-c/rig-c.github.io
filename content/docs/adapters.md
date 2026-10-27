@@ -61,6 +61,75 @@ npm install @rig-c/pixi pixi.js @rig-c/play
 
 Swap in `@rig-c/phaser phaser` or `@rig-c/three three` for the other hosts.
 
+## Run a pointer-follow example
+
+The [upstream look example](https://github.com/rig-c/adapters/tree/cccc84136c0342312c4d353b46bae9d8c130627f/examples/look) is a runnable page: move the pointer to turn the face, with eyes following immediately and the head and body following on a spring. Start with **PixiJS** below. This route runs locally from a fixed source archive; it needs Bun, curl, tar and a browser with WebGL.
+
+In a new directory:
+
+```sh
+mkdir rig-c-look
+cd rig-c-look
+curl -fL https://codeload.github.com/rig-c/adapters/tar.gz/cccc84136c0342312c4d353b46bae9d8c130627f -o source.tar.gz
+tar -xzf source.tar.gz --strip-components=1
+bun install --frozen-lockfile
+cat > look.vite.config.ts <<'EOF'
+import { defineConfig, mergeConfig } from 'vite';
+import upstream from './vite.config.ts';
+export default defineConfig((env) => {
+  if (typeof upstream !== 'function') throw new Error('Expected the pinned Vite config');
+  return mergeConfig(upstream(env), {
+    optimizeDeps: { entries: ['examples/look/index.html'] },
+  });
+});
+EOF
+BROWSER=none bun run example:look --config look.vite.config.ts --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Open the [local PixiJS page](http://127.0.0.1:5173/examples/look/index.html?host=pixi). Wait for the loading message to become dial values, then move across the canvas; leaving it returns the target to neutral. Stop the server with Ctrl-C when finished. The committed model and image are already in the archive: no fixture fetch or rebuild is needed. The small Vite config keeps the upstream aliases and helper intact, while limiting dependency scanning to this example; the default config also scans unrelated test/oracle pages whose packages are not installed by this recipe.
+
+### What this run uses
+
+The source pin is [cccc841](https://github.com/rig-c/adapters/commit/cccc84136c0342312c4d353b46bae9d8c130627f); its [frozen lockfile](https://github.com/rig-c/adapters/blob/cccc84136c0342312c4d353b46bae9d8c130627f/bun.lock) selects **Play 1.12.0**, **PixiJS 8.22.0**, **rig-c 2.64.1** (the public `rig-c/core` reader) and **Vite 6.4.4**. The page imports `@rig-c/pixi` from this checkout's **0.1.2 workspace source**, through the upstream Vite development alias. It does not install that adapter from npm. Keep the archive and lock together; the current-release badges above describe a different, build-time lookup.
+
+The [fixture directory](https://github.com/rig-c/adapters/tree/cccc84136c0342312c4d353b46bae9d8c130627f/examples/look/rig) contains a compiled model and one atlas image used at runtime:
+
+| File | Bytes | SHA-256 |
+| --- | --- | --- |
+| `skeleton.model.json` | 2,182,604 | `1c2786199210007021fa82874e375a7d29f91e422285ccdf9416caa976585c50` |
+| `skeleton.png` | 1,790,672 | `d41b70387f1e1f6e988f319c466441f1b0e0dadc731212278113c747ac2cef4e` |
+
+[The fixture's introduction](https://github.com/rig-c/adapters/issues/37) records a Parts **1.34.0** build on Core **2.59.0**, from the project owner's painting, with cylinder-based face turn and slider dials. The committed example and fixture are distributed under the repository's [MIT licence](https://github.com/rig-c/adapters/blob/cccc84136c0342312c4d353b46bae9d8c130627f/LICENSE); retain that notice when copying them. These are the public bytes this recipe plays, not a new build from the released [depth producer](/docs/parts/#depth-driven-head-turns). Upstream still marks a refresh to a released public depth rig as pending. Slider motion here does not establish depth-producer acceptance, full 3D rotation or parity between hosts. The separate [head-turn preview](/demos/head-turn/) has its own implementation.
+
+### Connect it to your own page
+
+Read the pinned [helper](https://github.com/rig-c/adapters/blob/cccc84136c0342312c4d353b46bae9d8c130627f/examples/look/pointer-dials.ts), [page](https://github.com/rig-c/adapters/blob/cccc84136c0342312c4d353b46bae9d8c130627f/examples/look/main.ts) and [host setup](https://github.com/rig-c/adapters/blob/cccc84136c0342312c4d353b46bae9d8c130627f/examples/look/hosts.ts) together. `pointer-dials.ts` is example-side TypeScript: import it from the checkout, or copy it with its MIT notice into a bundler-based application. It is not a package export. The upstream page is the complete executable reference; the lifecycle below explains where each piece belongs.
+
+1. **Load the same model bytes into both readers.** Fetch the model URL and check `response.ok`. Pass its text to `readModel(text, modelUrl)` from `rig-c/core`. Pass the same text back to `loadModel({ modelUrl, regions: 'none', fetch })` from `@rig-c/play` through the public fetch callback, delegating image requests to the browser's `fetch`. Keep the model and its image pages together. There is no need to unwrap the opaque `ModelAssets.document`.
+2. **Create the host rig.** The PixiJS host creates a `WebGLRenderer`, a stage `Container` and `new PixiRig(assets, { ticker: null, autoUpdate: false })`, fits the rig's bounds and adds it to the stage. With manual stepping there is only one clock. The example's `LookController` selects the declared `idle`, sets the environment and adds its existing calibrated global hair impulse.
+3. **Bind declared slider names.** For the reusable helper, call `readPointerDialBindings(doc, { yaw: 'yaw_dial', pitch: 'pitch_dial' })`, then `new PointerDials(bindings)` and assign `rig.player.adjust = follow.adjust`. Yaw and pitch are required. Add `roll`, `body`, `gazeX` or `gazeY` only when your model declares their dial bones and usable sliders. The upstream `LookController` requests all six for this fixture, and derives yaw/pitch direction signs from its animation curves; preserve that probe when reusing its fixture. A different rig supplies its own names and directions.
+4. **Feed input, then pose and draw.** On `pointermove`, call `pointerToNormalized(event.clientX, event.clientY, canvas.getBoundingClientRect())` and pass its `fx, fy` to `follow.setPointer`. CSS coordinates map right/up to positive X/Y and clamp to `[-1, 1]`; an empty rectangle or nonfinite input maps to zero. On `pointerleave`, call `follow.clearPointer()`. In each frame, with elapsed seconds `dt`, call `follow.step(dt)` **before** `rig.advance(dt)`, then `renderer.render({ container: stage })`. The full upstream page uses `controller.step(dt)` to perform that sequence plus its hair input; do not advance the rig a second time. For a touch-controlled application, bind pointer down/move/up/cancel, set the canvas touch policy and clear on release; the pinned example itself only listens to move/leave.
+5. **Release in ownership order.** Stop your animation frame loop and remove your input listeners. Remove the rig from its stage and call `rig.destroy()` before `assets.dispose()`; shared assets stay alive until the last rig releases them. Destroy a renderer only if your page owns it. The upstream page exposes `window.__lookDemo.dispose()`: it cancels its clock, destroys the rig, disposes assets, destroys its host and removes the canvas. It also calls this on non-persisted `pagehide`; this is the example's inspection API, not a package API.
+
+Each requested dial must have exactly one **local, non-looping** slider, with finite `from`/`to`, nonzero finite `scale` and a positive animation duration. The helper inverts `time = to + (value - from) * scale` at time zero and at the duration, then sorts the two endpoints. It preserves asymmetric bands; the raw model's `max` is not the parsed range. A missing or unsupported slider throws `PointerDialRefusal` with the axis and bone. Do not replace that refusal with guessed angles or direct head-bone writes.
+
+For these fixture bytes, the derived bands are:
+
+| Axis | Dial bone | Local channel | Band |
+| --- | --- | --- | --- |
+| yaw | `yaw_dial` | rotation | `[-15, 15]` |
+| pitch | `pitch_dial` | rotation | `[-12, 12]` |
+| roll | `roll_dial` | rotation | `[-8, 8]` |
+| body | `body_dial` | rotation | `[-6, 6]` |
+| gazeX | `gaze_x_dial` | rotation | `[-1, 1]` |
+| gazeY | `gaze_y_dial` | rotation | `[-1, 1]` |
+
+### Failures and checks
+
+A missing requested dial produces a console warning and a static rig with the missing axis in the HUD. A failed model fetch sets `document.body.dataset.lookReady` to `error` and records `window.__lookDemoError`; the pinned page leaves its loading text in place. Inspect the console/network and that error value, or add a visible error message and release partially created resources in your application's catch path. Do not treat a loading message as success.
+
+From the extracted repository, `bun run test:look` exercises the actual helper's reader, refusal, normalization, asymmetric clamp and spring controls without a browser. `?manual=1` disables the page clock for controlled stepping via its inspection API. The reproducible route here is scoped to PixiJS; the upstream host links are available, but no new three-host equivalence or physical touch-device result is claimed.
+
 ## Key concepts
 
 - **Host**: the engine or renderer an adapter targets. Each host lives in `packages/<host>`.
@@ -82,6 +151,7 @@ Swap in `@rig-c/phaser phaser` or `@rig-c/three three` for the other hosts.
 - npm: [@rig-c/pixi](https://www.npmjs.com/package/@rig-c/pixi), [@rig-c/phaser](https://www.npmjs.com/package/@rig-c/phaser), [@rig-c/three](https://www.npmjs.com/package/@rig-c/three)
 
 <!-- SOURCES (not published)
+- pointer recipe: adapters@cccc84136c0342312c4d353b46bae9d8c130627f examples/look/{README.md,pointer-dials.ts,look.ts,main.ts,hosts.ts,index.html}, root package.json/bun.lock/vite.config.ts; workspace pixi 0.1.2 source alias. Fixture hashes from immutable Git blob bytes, introduction adapters#37/#38 (Parts 1.34.0/Core 2.59.0); repository LICENSE. No fixture rebuild.
 - versions 0.1.1 each — `npm view @rig-c/pixi version`, `npm view @rig-c/phaser version`, `npm view @rig-c/three version`; .release-please-manifest.json
 - 0.x APIs; PixiJS 8, Phaser 4.2+, Three.js 0.186.1 renderer and live Group — README.md:6-12
 - each host independently versioned in packages/<host> — README.md:15
