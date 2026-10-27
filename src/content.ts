@@ -36,6 +36,7 @@ const SOURCES: readonly { file: string; route: string; section: Section }[] = [
   { file: 'docs/review.md', route: '/docs/review/', section: 'docs' },
   { file: 'docs/play.md', route: '/docs/play/', section: 'docs' },
   { file: 'docs/adapters.md', route: '/docs/adapters/', section: 'docs' },
+  { file: 'docs/performance.md', route: '/docs/performance/', section: 'docs' },
   { file: 'docs/licensing.md', route: '/docs/licensing/', section: 'docs' },
   { file: 'examples.md', route: '/examples/', section: 'examples' },
   { file: 'exam.md', route: '/exam/', section: 'exam' },

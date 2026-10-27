@@ -88,6 +88,7 @@ From the README's *Status* and *No counterpart in 1.0.0* (it has no limits secti
 - **No per-slot changes from code** (attachment, colour) and no `scale` on load; scaling the root element is the caller's (README §"No counterpart in 1.0.0").
 
 ## Go deeper
+- [Measured runtime costs and unresolved results](/docs/performance/) — historical package comparisons, with CPU, GPU and presentation boundaries.
 - [Install](https://github.com/rig-c/play#install) · [A minimal page](https://github.com/rig-c/play#a-minimal-page)
 - [Status](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#status)
 - [Attachment sets (`sets.json`)](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#attachment-sets-setsjson)
