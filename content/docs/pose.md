@@ -113,8 +113,10 @@ The joints were placed by hand on the painting (the way the getting-started guid
 
 ```sh
 npm i -D @rig-c/pose
-bunx rig-pose retarget --rig out/rig --map map.json --pose swing.pose.clean.json --out swing.motion.json --name swing --build swing-build
+bun run rig-pose retarget --rig out/rig --map map.json --pose swing.pose.clean.json --out swing.motion.json --name swing --build swing-build
 ```
+
+Installing `@rig-c/pose` provides the `rig-pose` executable used above. The proposed unscoped npm package `rig-pose` is not published (checked 2026-10-28); use the scoped install and its local command. See [package names and aliases](/#package-names-and-aliases).
 
 The published 1.2.1 package declares [Bun](https://bun.sh) 1.4.0 or later on `PATH`; rig-c comes as a dependency.
 

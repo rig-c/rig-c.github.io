@@ -65,7 +65,7 @@ The player does not run its own clock: the page calls `frame(dt)`, so pausing, s
 
 ```sh
 npm i @rig-c/play
-npm i -D rig-c    # rigc build writes the model the player loads
+npm i -D @rig-c/core    # rigc build writes the model the player loads
 ```
 
 Runs in the browser as an ES module; rig-c's posing core is bundled, so there is nothing else to install. The package is MIT and links nothing from Esoteric Software — see [Licensing](/docs/licensing/).

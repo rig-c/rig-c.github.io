@@ -2,10 +2,10 @@
 navLabel: Overview
 title: rig-c — AI-Authored 2D Rigging and Animation Toolchain
 description: AI-authored 2D character rigging and animation, verified before a byte is written. Compile Spine 4.3 skeleton data and model documents from one painting with named assertions.
-keywords: rig-c, rigc, 2D rigging, Spine 4.3, AI agent toolchain, @rig-c/parts, @rig-c/pose, @rig-c/play, @rig-c/review, @rig-c/adapters
-packageName: rig-c
+keywords: rig-c, rigc, 2D rigging, Spine 4.3, AI agent toolchain, @rig-c/parts, @rig-c/pose, @rig-c/play, @rig-c/review, @rig-c/core, @rig-c/pixi, @rig-c/phaser, @rig-c/three
+packageName: "@rig-c/core"
 repoUrl: https://github.com/rig-c
-npmUrl: https://www.npmjs.com/package/rig-c
+npmUrl: https://www.npmjs.com/package/@rig-c/core
 heroEyebrow: 2D character rigging, authored by agents
 heroTitle: One painting in. A verified rig out.
 heroLede: rig-c turns a character painting, split into layers, into a rigged and animated character — Spine 4.3 skeleton data and a model a web page can play — and writes nothing until its named structural checks pass. How the result looks is still a person's call.
@@ -43,10 +43,10 @@ Try the CPU-only, no-Python path from prepared example layers: **[Getting starte
 | --- | --- | --- | --- |
 | [**@rig-c/parts**](/docs/parts/) | `{{version:parts}}` | `npm i -D @rig-c/parts` | Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them. |
 | [**@rig-c/pose**](/docs/pose/) | `{{version:pose}}` | `npm i -D @rig-c/pose` | Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written. |
-| [**rig-c / @rig-c/core**](/docs/core/) | `{{version:core}}` | `npm i -D rig-c` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and `skeleton.model.json` out — gated by named assertions before a byte is written (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`). |
+| [**@rig-c/core**](/docs/core/) | `{{version:core}}` | `npm i -D @rig-c/core` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and `skeleton.model.json` out — gated by named assertions before a byte is written (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`). |
 | [**@rig-c/review**](/docs/review/) | `{{version:review}}` | `npm i -D @rig-c/review` | Local human inspection workspace: compare setup geometry, compiled-model playback, source video/sheets, and export frame/bone/slot-bound feedback ready to become an issue. |
 | [**@rig-c/play**](/docs/play/) | `{{version:play}}` | `npm i @rig-c/play` | Plays `skeleton.model.json` in the browser with no Spine runtime — as plain DOM elements (`<img>` with CSS `matrix()`) or one `<canvas>` per player. |
-| [**@rig-c/adapters**](/docs/adapters/) | `{{version:adapters}}` | `npm i @rig-c/pixi`<br>`npm i @rig-c/phaser`<br>`npm i @rig-c/three` | Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through `@rig-c/play`'s posing core, with no Spine runtime. |
+| [**@rig-c/pixi**, **@rig-c/phaser**, **@rig-c/three**](/docs/adapters/) | `{{version:adapters}}` | `npm i @rig-c/pixi`<br>`npm i @rig-c/phaser`<br>`npm i @rig-c/three` | Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through `@rig-c/play`'s posing core, with no Spine runtime. |
 
 {{published-versions}}
 
@@ -72,10 +72,10 @@ rig-c replaces that silence with five rules:
 
 ```sh
 # Run the compiler CLI directly with Bun
-bunx rig-c --help
+bunx @rig-c/core --help
 
 # Install the authoring & compilation toolchain in a project
-bun add -d @rig-c/parts rig-c @rig-c/pose @rig-c/review
+bun add -d @rig-c/parts @rig-c/core @rig-c/pose @rig-c/review
 
 # Install the zero-Spine-runtime browser player
 bun add @rig-c/play
@@ -83,11 +83,11 @@ bun add @rig-c/play
 
 ### Install Agent Skills
 
-`rig-c` and `@rig-c/parts` ship [Agent Skills](https://agentskills.io) (`skills/<name>/SKILL.md`, inside each npm package) that route coding agents directly to the authoritative authoring rules:
+`@rig-c/core` and `@rig-c/parts` ship [Agent Skills](https://agentskills.io) (`skills/<name>/SKILL.md`, inside each npm package) that route coding agents directly to the authoritative authoring rules:
 
 ```sh
 # Codex, Gemini CLI, or Antigravity: link rig-c's skills into .agents/skills/
-bun add -d rig-c
+bun add -d @rig-c/core
 bun rigc skills install
 
 # Claude Code: the rig-c/core repository is a plugin marketplace
@@ -97,9 +97,31 @@ bun rigc skills install
 
 ## Package names and aliases
 
-- `rig-c`, `@rig-c/core`, and `spine-rigc` are the same compiler package on npm and install the `rigc` command.
-- `@rig-c/parts`, `rig-parts`, and `spine-parts` are the same part-assembly package and install the `rig-parts` command.
-- `@rig-c/play`, `rig-play`, and `spine-html` are the same browser player package.
+`rig-c` is the project and toolchain brand. The scoped names above are the canonical npm package identities; the engine adapters are three separately published packages.
+
+### Convenience install names and commands
+
+These short npm names are alternative entry points for the same products. Prefer scoped names for new installs; existing installations keep working.
+
+| Canonical package | Convenience install name | Executable |
+| --- | --- | --- |
+| `@rig-c/core` | `rig-c` | `rigc` |
+| `@rig-c/parts` | `rig-parts` | `rig-parts` |
+| `@rig-c/pose` | Pending: `rig-pose` is not published (checked 2026-10-28) | `rig-pose` |
+| `@rig-c/play` | `rig-play` | None; import the browser library |
+| `@rig-c/review` | — | `rig-review` |
+
+Installing `@rig-c/pose` provides the `rig-pose` command. The proposed unscoped npm convenience package is a separate publication dependency; use `npm i -D @rig-c/pose` and the installed command until that package is published and verified. An executable name alone is not an npm package recommendation.
+
+### Legacy names and compatibility
+
+| Legacy npm name | Canonical package |
+| --- | --- |
+| `spine-rigc` | `@rig-c/core` |
+| `spine-parts` | `@rig-c/parts` |
+| `spine-html` | `@rig-c/play` |
+
+These published legacy entry points remain available for compatibility. Existing links, CLI names, Spine-format support and licensing guidance remain valid. Historical recordings and pinned reproductions keep the package names and versions that produced them.
 
 ## Licensing, stated plainly
 

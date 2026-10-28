@@ -172,7 +172,7 @@ function hero(page: Page): string {
             <a class="btn btn-primary" href="/docs/getting-started/">Get started</a>
             <a class="btn" href="/docs/">Read the docs</a>
           </div>
-          <pre class="install"><code>bunx rig-c --help</code></pre>
+          <pre class="install"><code>bunx @rig-c/core --help</code></pre>
         </div>
         <figure class="hero-media">
           <div class="media">
@@ -204,7 +204,6 @@ function buildJsonLd(page: Page): string {
         '@id': `${SITE_ORIGIN}/#website`,
         url: `${SITE_ORIGIN}/`,
         name: 'rig-c',
-        alternateName: ['rigc', '@rig-c/core'],
         description: page.description,
         inLanguage: 'en',
         publisher: { '@type': 'Organization', name: 'rig-c', url: 'https://github.com/rig-c' },
@@ -213,12 +212,13 @@ function buildJsonLd(page: Page): string {
       {
         '@type': 'SoftwareApplication',
         '@id': `${SITE_ORIGIN}/#toolchain`,
-        name: 'rig-c',
+        name: '@rig-c/core',
+        alternateName: ['rig-c', 'spine-rigc'],
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'macOS, Linux, Windows, Web Browser',
         softwareVersion: version('core'),
         url: `${SITE_ORIGIN}/`,
-        downloadUrl: 'https://www.npmjs.com/package/rig-c',
+        downloadUrl: 'https://www.npmjs.com/package/@rig-c/core',
         codeRepository: 'https://github.com/rig-c/core',
         author: AUTHOR,
         description: page.description,
@@ -337,7 +337,7 @@ function siteFooter(page: Page): string {
           <a href="/llms-full.txt">llms-full.txt</a>
           <a href="/sitemap.xml">sitemap.xml</a>
           <a href="https://github.com/rig-c">GitHub</a>
-          <a href="https://www.npmjs.com/package/rig-c">npm</a>
+          <a href="https://www.npmjs.com/package/@rig-c/core">npm</a>
         </nav>
       </div>
     </footer>`;
@@ -497,17 +497,23 @@ function buildLlmsTxt(): string {
     '',
     publishedList(),
     '',
+    '## Package names and compatibility',
+    '',
+    'rig-c is the toolchain brand. Scoped names are canonical. Convenience npm names: @rig-c/core → rig-c (CLI rigc); @rig-c/parts → rig-parts (CLI rig-parts); @rig-c/play → rig-play (browser library, no CLI). @rig-c/pose installs CLI rig-pose; the proposed unscoped rig-pose package is not published (checked 2026-10-28). @rig-c/review installs CLI rig-review.',
+    '',
+    'Legacy compatibility names: spine-rigc → @rig-c/core; spine-parts → @rig-c/parts; spine-html → @rig-c/play. Existing entry points remain available. Historical recordings and pinned reproductions keep their original names and versions. Engine adapter packages are @rig-c/pixi, @rig-c/phaser and @rig-c/three.',
+    '',
     '## Install',
     '',
     '```bash',
     '# Authoring toolchain',
-    'npm i -D rig-c @rig-c/parts @rig-c/pose @rig-c/review',
+    'npm i -D @rig-c/core @rig-c/parts @rig-c/pose @rig-c/review',
     '',
     '# Browser and engine runtimes (no Spine runtime required)',
     'npm i @rig-c/play @rig-c/pixi @rig-c/phaser @rig-c/three',
     '',
     '# AI Agent Skills: rig-c ships skills/ (Codex, Gemini CLI, Antigravity read .agents/skills/)',
-    'bun add -d rig-c',
+    'bun add -d @rig-c/core',
     'bun rigc skills install',
     '',
     '# Claude Code: the rig-c/core repository is a plugin marketplace',
