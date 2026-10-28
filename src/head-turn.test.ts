@@ -86,9 +86,9 @@ describe('verifyHeadTurnDemo & verifyHeadTurnBundle', () => {
       fs.readFileSync(path.join(ROOT_DIR, HEAD_TURN_PACKAGE_MANIFEST_REL), 'utf-8'),
     ) as { packages: Array<{ name: string; version: string; integrity: string }> };
     const byName = new Map(pkgManifest.packages.map((p) => [p.name, p]));
-    expect(byName.get('@rig-c/parts')?.version).toBe('1.71.0');
+    expect(byName.get('@rig-c/parts')?.version).toBe('1.71.1');
     expect(byName.get('@rig-c/pose')?.version).toBe('1.4.0');
-    expect(byName.get('@rig-c/play')?.version).toBe('1.20.0');
+    expect(byName.get('@rig-c/play')?.version).toBe('1.21.0');
     expect(byName.get('@rig-c/pixi')?.version).toBe('0.1.5');
     expect(byName.get('rig-c')?.version).toBe('2.79.0');
     expect(byName.get('pixi.js')?.version).toBe('8.22.0');

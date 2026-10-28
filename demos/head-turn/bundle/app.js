@@ -320,6 +320,8 @@ async function main() {
 
   const stage = new Container();
   const rig = new PixiRig(assets, { ticker: null, autoUpdate: false });
+  // This page owns its physics environment; authored response strengths stay in the rig.
+  rig.environment({ wind: [0, 0], gravity: [0, 1] });
   stage.addChild(rig);
 
   // Measure neutral bounds at setup/idle to frame the bust cleanly in the viewport.

@@ -12,10 +12,10 @@ Every build and runtime dependency is installed from the public npm registry (`h
 
 | Package | Version | Role |
 | --- | --- | --- |
-| `@rig-c/parts` | `1.71.0` | Slices per-part depth sheets from `depth.jpg`, promotes `face` (`head`) and `topwear` (`chest`) to `13×16` depth-sampled surface grids (`360` triangles each), and emits the 2.5D `turn`, `tilt`, and `body_turn` animations and `yaw` / `pitch` / `body_yaw_dial` sliders |
+| `@rig-c/parts` | `1.71.1` | Slices per-part depth sheets from `depth.jpg`, promotes `face` (`head`) and `topwear` (`chest`) to `13×16` depth-sampled surface grids (`360` triangles each), and emits the 2.5D `turn`, `tilt`, and `body_turn` animations and `yaw` / `pitch` / `body_yaw_dial` sliders |
 | `@rig-c/pose` | `1.4.0` | Cleans and retargets the 4-way sign-test pose sequence (`pose#455`, 25 frames at 24 fps) onto the rig's `yaw`, `pitch`, and `body_yaw_dial` sliders as the `"clip"` animation |
 | `rig-c` | `2.79.0` | Gates (`--profile rig-play`) and compiles `rig.json` + `motion.json` into `skeleton.model.json`, `skeleton.json`, `skeleton.atlas`, and polygon-packed `skeleton.png`, and provides `readModel` in the browser |
-| `@rig-c/play` | `1.20.0` | Loads `skeleton.model.json` + `skeleton.png` (`loadModel`) and steps the runtime pose and animation mixer (`RigPlayer`) |
+| `@rig-c/play` | `1.21.0` | Loads `skeleton.model.json` + `skeleton.png` (`loadModel`) and steps the runtime pose and animation mixer (`RigPlayer`) |
 | `@rig-c/pixi` | `0.1.5` | Renders the posed `RigPlayer` frame onto a PixiJS v8 `Container` (`PixiRig`) |
 | `pixi.js` | `8.22.0` | Hardware-accelerated `WebGLRenderer` host |
 
@@ -26,7 +26,7 @@ Every build and runtime dependency is installed from the public npm registry (`h
 1. **Source art and confirmed depth atlas**
    - Painting: [`bundle/look.png`](./bundle/look.png)
    - Confirmed depth atlas: [`bundle/depth.jpg`](./bundle/depth.jpg) (`1284×1289`, SHA-256 `c814960c7e40dd1d5573a5e6d6e5d97eefeb309d015dea924359dc87f8e998a0`, white = near, `zScale = 109.86819166092819`)
-2. **2.5D head and body turn configuration (`@rig-c/parts@1.71.0`)**
+2. **2.5D head and body turn configuration (`@rig-c/parts@1.71.1`)**
    - `config.turn`:
      - `pivot: 55`, `counter: 0.1`, `grid: [13, 16]`
      - Head roles: `face: "surface"` (`face_surface` under `faceshift`), `hair_back: "rear"`, `hairpin: "rear"` (`rear_shift`), and facial/hair features (`ear_r`, `ear_l`, `nose`, `mouth`, `eyewhite_r`, `eyewhite_l`, `iris_r`, `iris_l`, `lash_r`, `lash_l`, `brow_l`, `brow_r`, `hair_front`) as `"unit"`
@@ -64,15 +64,17 @@ Every build and runtime dependency is installed from the public npm registry (`h
    ```bash
    mkdir -p build-env && cd build-env
    npm init -y
-   npm install --no-save \
-     @rig-c/parts@1.71.0 \
+   PLAYWRIGHT_SKIP_BROWSER_GC=1 npm install --no-save \
+     @rig-c/parts@1.71.1 \
      @rig-c/pose@1.4.0 \
-     @rig-c/play@1.20.0 \
+     @rig-c/play@1.21.0 \
      @rig-c/pixi@0.1.5 \
      rig-c@2.79.0 \
      pixi.js@8.22.0
    ```
-2. **Run `@rig-c/parts` (`rigStage`) on the cut parts + depth sheets cropped from `depth.jpg`**:
+2. **Reassemble the approved source layers using `@rig-c/parts@1.71.1` with the turn roles in the assemble config**:
+   - Do not reuse PNGs assembled by an older version: moving head parts must keep their own fringe and seam colours.
+   - Then run `@rig-c/parts` (`rigStage`) on the cut parts + depth sheets cropped from `depth.jpg`:
    - Configure `config.turn` (head) and `config.turn.body` (torso `topwear` + `collar_back`) with `pivot: 55`, `counter: 0.1`, `grid: [13, 16]`, and `zScale: 109.86819166092819`.
    - Emit `rig-out/rig.json`, `rig-out/motion.json`, `rig-out/images/`, `rig-out/depth_sheets.json`, and `rig-out/mesh_report.json`.
 3. **Clean and retarget the 4-way sign-test pose clip with `@rig-c/pose`**:
@@ -111,3 +113,13 @@ Every build and runtime dependency is installed from the public npm registry (`h
    bun run build
    bun run verify
    ```
+
+## Page physics environment
+
+Immediately after creating its `PixiRig`, the page calls:
+
+```js
+rig.environment({ wind: [0, 0], gravity: [0, 1] });
+```
+
+This environment belongs to that player and persists across pointer/clip changes and seeks. Wind is zero; gravity uses the runtime axes (x right, y down). Authored physics response strengths remain in the rig. No global runtime default is changed.

@@ -4,11 +4,11 @@
   "packages": [
     {
       "name": "@rig-c/parts",
-      "version": "1.71.0",
-      "spec": "@rig-c/parts@1.71.0",
-      "integrity": "sha512-gfESYw23/cjZYnUYd+yOgLE5UnyV1+S99qYA/dzx0XtkB1s7siHlJSBu9tP6D7qAktxKtamaUMLk7yuWoWAeBw==",
-      "shasum": "984920094211475fb1f656a2912745d45491fbf8",
-      "tarball": "https://registry.npmjs.org/@rig-c/parts/-/parts-1.71.0.tgz"
+      "version": "1.71.1",
+      "spec": "@rig-c/parts@1.71.1",
+      "integrity": "sha512-cFRsUkOv12Nsndqa4+IKHM2zHWotyYiSHx3n3IHlS7tWlZl1OvPKXDAw4+EhVGQDd2jlthpalt5q61kjrULN5g==",
+      "shasum": "457eda46ef12b43fd1a69c58aba7ac7f912f1a4d",
+      "tarball": "https://registry.npmjs.org/@rig-c/parts/-/parts-1.71.1.tgz"
     },
     {
       "name": "@rig-c/pose",
@@ -20,11 +20,11 @@
     },
     {
       "name": "@rig-c/play",
-      "version": "1.20.0",
-      "spec": "@rig-c/play@1.20.0",
-      "integrity": "sha512-2U1ze8Jy3SZPi0k5Ool6zIhfwp5c5GCabwJfw0FPeDDwfNSgnUapXhhnsPncFwWNOGlwose70JruxQ4MpYXB6Q==",
-      "shasum": "951df49ed3bffaedf1beccce524aea81dfde3ee1",
-      "tarball": "https://registry.npmjs.org/@rig-c/play/-/play-1.20.0.tgz"
+      "version": "1.21.0",
+      "spec": "@rig-c/play@1.21.0",
+      "integrity": "sha512-yLtnRiXbb+fWvKaTHZLpND3H4G6EA50VhN8lHMM3hVU82+hv3PwQy5TPXxJRQFjWvl7SyT+VXrcVipoU7uKP4g==",
+      "shasum": "b033b506ed017df8bedca986517b796dd8ecff66",
+      "tarball": "https://registry.npmjs.org/@rig-c/play/-/play-1.21.0.tgz"
     },
     {
       "name": "@rig-c/pixi",
