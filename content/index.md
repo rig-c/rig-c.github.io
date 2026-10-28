@@ -46,7 +46,7 @@ Try the CPU-only, no-Python path from prepared example layers: **[Getting starte
 | [**@rig-c/core**](/docs/core/) | `{{version:core}}` | `npm i -D @rig-c/core` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and `skeleton.model.json` out — gated by named assertions before a byte is written (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`). |
 | [**@rig-c/review**](/docs/review/) | `{{version:review}}` | `npm i -D @rig-c/review` | Local human inspection workspace: compare setup geometry, compiled-model playback, source video/sheets, and export frame/bone/slot-bound feedback ready to become an issue. |
 | [**@rig-c/play**](/docs/play/) | `{{version:play}}` | `npm i @rig-c/play` | Plays `skeleton.model.json` in the browser with no Spine runtime — as plain DOM elements (`<img>` with CSS `matrix()`) or one `<canvas>` per player. |
-| [**@rig-c/pixi**, **@rig-c/phaser**, **@rig-c/three**](/docs/adapters/) | `{{version:adapters}}` | `npm i @rig-c/pixi`<br>`npm i @rig-c/phaser`<br>`npm i @rig-c/three` | Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through `@rig-c/play`'s posing core, with no Spine runtime. |
+| [**@rig-c/pixi**](/docs/adapters/)<br>[**@rig-c/phaser**](/docs/adapters/)<br>[**@rig-c/three**](/docs/adapters/) | `{{version:adapters}}` | `npm i @rig-c/pixi`<br>`npm i @rig-c/phaser`<br>`npm i @rig-c/three` | Plays a rig-c compiled model inside PixiJS 8, Phaser 4.2+, or Three.js 0.186+ through `@rig-c/play`'s posing core, with no Spine runtime. |
 
 {{published-versions}}
 

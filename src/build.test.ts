@@ -58,6 +58,8 @@ describe('isolated deployable site', () => {
     const cell = row!.slice(row!.indexOf('href="/docs/adapters/"')).match(/<\/td>\s*<td>([\s\S]*?)<\/td>/)?.[1];
     expect(cell).toBe('<code>@rig-c/pixi 100.0.5</code><br><code>@rig-c/phaser 100.0.6</code><br><code>@rig-c/three 100.0.7</code>');
     expect(cell).not.toContain('&lt;br');
+    // One adapter package per line in the package cell too, as in the version and install cells.
+    expect(row!.match(/<td>([\s\S]*?)<\/td>/)?.[1]).toBe('<a href="/docs/adapters/"><strong>@rig-c/pixi</strong></a><br><a href="/docs/adapters/"><strong>@rig-c/phaser</strong></a><br><a href="/docs/adapters/"><strong>@rig-c/three</strong></a>');
     expect(html).toContain('"softwareVersion": "100.0.0"');
   });
 
@@ -67,7 +69,7 @@ describe('isolated deployable site', () => {
       for (const name of NAMES) expect(text.split('\n')).toContain(`- \`${name}\`: \`${versions.get(name)}\``);
       expect(text).not.toContain('{{version:');
     }
-    const row = read('index.md').split('\n').find((line) => line.startsWith('| [**@rig-c/pixi**, **@rig-c/phaser**, **@rig-c/three**]'))!;
+    const row = read('index.md').split('\n').find((line) => line.startsWith('| [**@rig-c/pixi**](/docs/adapters/)<br>[**@rig-c/phaser**](/docs/adapters/)<br>[**@rig-c/three**](/docs/adapters/) |'))!;
     expect(row).toContain('`@rig-c/pixi 100.0.5`; `@rig-c/phaser 100.0.6`; `@rig-c/three 100.0.7`');
     expect(row.endsWith('|')).toBe(true);
     expect(row.split('|')).toHaveLength(6);
