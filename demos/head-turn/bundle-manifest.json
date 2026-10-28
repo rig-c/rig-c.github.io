@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "sha256": "fb7bc15b188ed8f29a931067df44a4c3cdb61ba3f114c706722eee73c8a6c2fc",
+  "sha256": "6c9f3e6fba334c10362f51585e6f02a2c642772505b4a4b64c63b337216ec1d8",
   "files": [
     {
       "path": "README.md",
-      "bytes": 8823,
-      "sha256": "6b30d00f969e6201ba2b45db73123fd3c419d710b797ca1b58f699cc47aaa626"
+      "bytes": 1365,
+      "sha256": "47b488ebb86e81c1641648d75b7c4a8f78fa5a07b2ee38d88a335ca46bc26d69"
     },
     {
       "path": "THIRD_PARTY_LICENSES.txt",
@@ -13,14 +13,9 @@
       "sha256": "f421a8fa897ab51c0ca14380cf7f52db136d5e52af3ccf571389c3681b861071"
     },
     {
-      "path": "aperture.js",
-      "bytes": 1370,
-      "sha256": "b2c159cdd338649ad6833cfd04bb710da6e106d76655c71d3a9ab7c57cbd543c"
-    },
-    {
       "path": "app.js",
-      "bytes": 7940,
-      "sha256": "4e2536d43f8ad7ef002ecaa65350c1cec92d24d3f809f2fd6299f21e6fb0e2ca"
+      "bytes": 21243,
+      "sha256": "ca7920c05519a456309e4d6b9d32b460922c8b785ab4e0a2275c9f1924c03604"
     },
     {
       "path": "depth.jpg",
@@ -29,8 +24,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 3391,
-      "sha256": "f267f6cc80531d66406c1d7c47fb1fefad705211ba804d09ad1d2c9ec9098a81"
+      "bytes": 4565,
+      "sha256": "7e53df2fdf421b427aeb2f22a1b8c03c2ac28e05e4832592e309bf834538426c"
     },
     {
       "path": "look.png",
@@ -39,18 +34,28 @@
     },
     {
       "path": "runtime.js",
-      "bytes": 486648,
-      "sha256": "f55d9bda6ea33736753781895f2ab4c87a6b49e04ac4b40622c7ab10e3a0f0d4"
+      "bytes": 861880,
+      "sha256": "ed316db7c4cbac929f2ae901b7bd5694dc8a4b889c647d3b6f55e4f80733f1e1"
     },
     {
-      "path": "scene.bin.gz",
-      "bytes": 3405993,
-      "sha256": "4e52da5a46e86e200ca82a4ff5a1befbe1d5daa62ddd442f6aa3038e3a0b3e80"
+      "path": "skeleton.atlas",
+      "bytes": 1325,
+      "sha256": "9242be40bbecfcb61698249001f8d291fb94fe9eefe2a8a8354ba7b992f723d1"
     },
     {
-      "path": "scene.json",
-      "bytes": 3730,
-      "sha256": "51a5bfdf5c2687871b9290fd2dcec9004b892c165e1ab098f1d008aa78b89f2a"
+      "path": "skeleton.json",
+      "bytes": 688778,
+      "sha256": "d03cbfbf7ee004e2eb2bd6715eb9d6a96b6a6084b766dec311b25692b37b50f2"
+    },
+    {
+      "path": "skeleton.model.json",
+      "bytes": 1177764,
+      "sha256": "eca8add48a7353ac23e5a4d12556635ff14b74555882ffe58f18276e309723b5"
+    },
+    {
+      "path": "skeleton.png",
+      "bytes": 1792596,
+      "sha256": "53f36ff9e0b7a3a21dc8032d810a15de9c97720a1176159a12b46578c4e1d419"
     }
   ]
 }

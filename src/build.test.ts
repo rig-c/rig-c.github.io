@@ -41,7 +41,8 @@ describe('isolated deployable site', () => {
     expect(manifest.files.some((file) => file.path === 'assets/banner.svg')).toBe(true);
     expect(manifest.files.some((file) => file.path === 'assets/logo.svg')).toBe(true);
     expect(manifest.files.some((file) => file.path === 'assets/demo.js')).toBe(true);
-    expect(manifest.files.some((file) => file.path === 'demos/head-turn/bundle/scene.bin.gz')).toBe(true);
+    expect(manifest.files.some((file) => file.path === 'demos/head-turn/bundle/skeleton.model.json')).toBe(true);
+    expect(manifest.files.some((file) => file.path === 'demos/head-turn/prototype/scene.bin.gz')).toBe(true);
     expect(read('demos/head-turn/index.html')).toBe(readFileSync(join(ROOT_DIR, 'demos/head-turn/index.html'), 'utf8'));
     expect(read('index.html')).not.toContain('head-turn-feature');
     expect(read('examples/index.html').split('Standalone depth-driven head-turn demo; the Parts producer shipped separately in 1.68.0')).toHaveLength(2);
@@ -142,7 +143,7 @@ describe('isolated deployable site', () => {
   });
 
   test('verification rejects missing redirects, CNAME or assets even with an updated valid digest', () => {
-    for (const path of ['parts/index.html', 'CNAME', 'assets/logo.svg', 'demos/head-turn/bundle/scene.bin.gz', 'demos/head-turn/site-ui.js']) {
+    for (const path of ['parts/index.html', 'CNAME', 'assets/logo.svg', 'demos/head-turn/bundle/skeleton.model.json', 'demos/head-turn/prototype/scene.bin.gz', 'demos/head-turn/site-ui.js']) {
       const absolute = join(out, path);
       const original = readFileSync(absolute);
       const manifest = readFileSync(join(out, 'deployment-manifest.json'));
