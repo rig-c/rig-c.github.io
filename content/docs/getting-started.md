@@ -1,7 +1,7 @@
 ---
 navLabel: Getting Started
 title: Getting Started with rig-c — One Painting to a Browser Rig, No GPU
-description: Step-by-step walkthrough to build a rigged, breathing, waving 2D character that says hello from one painting using @rig-c/parts, rig-c, @rig-c/pose, and @rig-c/play with no GPU required.
+description: Step-by-step walkthrough to build a rigged, breathing, waving 2D character that says hello from one painting using @rig-c/parts, @rig-c/core, @rig-c/pose, and @rig-c/play with no GPU required.
 keywords: rig-c tutorial, getting started, 2D character rigging tutorial, See-through layers, rig-parts build, rig-pose retarget
 repoUrl: https://github.com/rig-c/getting-started
 summaryForLlms: Pinned CPU-only, no-Python recipe from prepared example layers and hand-placed joints through idle, wave and hello with hair/skirt physics to browser playback. Historical 2026-10-21 Apple M4 durations cover steps 1-10 including 9b/9c; a separate Linux reproduction and the upstream rolling-latest CI have their own records.
@@ -16,7 +16,7 @@ Repository: <https://github.com/rig-c/getting-started>
 
 1. **Paint one character.** Any image model or illustration workflow produces a front-facing, full-body character PNG on a plain white background with arms clear of the body.
 2. **Split it into layers, and mark the joints.** [See-through](https://github.com/shitagaki-lab/see-through) cuts the painting into layered parts (twice: full figure + head crop). Body-18 joints come from a lightweight CPU script (`rtmlib`) or hand placement.
-3. **Run the rig-c packages on the CPU.** `@rig-c/parts`, `rig-c`, `@rig-c/pose`, and `@rig-c/play` assemble the parts, author meshes and bones, gate the build, retarget motion, and play it in the browser. **No GPU is used in step 3.**
+3. **Run the rig-c packages on the CPU.** `@rig-c/parts`, `@rig-c/core`, `@rig-c/pose`, and `@rig-c/play` assemble the parts, author meshes and bones, gate the build, retarget motion, and play it in the browser. **No GPU is used in step 3.**
 
 ## Try it first — no GPU, no Python
 
@@ -237,7 +237,7 @@ The full guide — making your own character, the GPU routes, troubleshooting an
 
 ## Three ways to use the output
 
-1. **On the web with [`@rig-c/play`](/docs/play/) or [`@rig-c/adapters`](/docs/adapters/)**: Load `skeleton.model.json` and part PNGs directly. The packages are MIT and integrate no Spine Runtime.
+1. **On the web with [`@rig-c/play`](/docs/play/) or [an engine adapter](/docs/adapters/)**: Load `skeleton.model.json` and part PNGs directly. The packages are MIT and integrate no Spine Runtime.
 2. **In the Spine 4.3 Editor**: Import `out/check/build/skeleton.json` via `Import Data` and point `Images` to `out/rig/images/` to refine timelines by hand (requires rig-c 2.51.1+; the editor is under the Spine Editor License Agreement).
 3. **In a game engine via official Spine Runtimes**: Load `skeleton.json` and `skeleton.atlas` in Unity, Godot, Unreal, or C++ runtimes under the Spine Runtimes License.
 

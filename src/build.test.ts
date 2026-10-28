@@ -9,7 +9,7 @@ import { outputRoot, ROOT_DIR } from './output.ts';
 import { verifySite } from './verify.ts';
 import { buildForActions } from '../scripts/build-site.ts';
 
-const NAMES = ['rig-c', '@rig-c/parts', '@rig-c/pose', '@rig-c/review', '@rig-c/play', '@rig-c/pixi', '@rig-c/phaser', '@rig-c/three'];
+const NAMES = ['@rig-c/core', '@rig-c/parts', '@rig-c/pose', '@rig-c/review', '@rig-c/play', '@rig-c/pixi', '@rig-c/phaser', '@rig-c/three'];
 const versions = new Map(NAMES.map((name, i) => [name, `100.0.${i}`]));
 const temp = mkdtempSync(join(realpathSync(tmpdir()), 'site-build-'));
 const out = join(temp, 'output');
@@ -67,7 +67,7 @@ describe('isolated deployable site', () => {
       for (const name of NAMES) expect(text.split('\n')).toContain(`- \`${name}\`: \`${versions.get(name)}\``);
       expect(text).not.toContain('{{version:');
     }
-    const row = read('index.md').split('\n').find((line) => line.startsWith('| [**@rig-c/adapters**]'))!;
+    const row = read('index.md').split('\n').find((line) => line.startsWith('| [**@rig-c/pixi**, **@rig-c/phaser**, **@rig-c/three**]'))!;
     expect(row).toContain('`@rig-c/pixi 100.0.5`; `@rig-c/phaser 100.0.6`; `@rig-c/three 100.0.7`');
     expect(row.endsWith('|')).toBe(true);
     expect(row.split('|')).toHaveLength(6);

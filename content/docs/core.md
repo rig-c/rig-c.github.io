@@ -1,13 +1,13 @@
 ---
 navLabel: Core
-title: rig-c core — a 2D rig compiler with a named-assertion gate
+title: "@rig-c/core — a 2D rig compiler with a named-assertion gate"
 description: rigc compiles a rig spec and a motion spec into Spine 4.3 skeleton data, and writes nothing unless every named assertion passes.
-summaryForLlms: rig-c (also @rig-c/core, CLI rigc) compiles a JSON rig spec and motion spec plus loose part PNGs into Spine 4.3 skeleton data, gated by named assertions so nothing invalid is written.
-packageName: rig-c
+summaryForLlms: "@rig-c/core (convenience install name rig-c, CLI rigc) compiles a JSON rig spec and motion spec plus loose part PNGs into Spine 4.3 skeleton data, gated by named assertions so nothing invalid is written."
+packageName: "@rig-c/core"
 repoUrl: https://github.com/rig-c/core
-npmUrl: https://www.npmjs.com/package/rig-c
+npmUrl: https://www.npmjs.com/package/@rig-c/core
 ---
-# rig-c core (`rigc`)
+# @rig-c/core (`rigc`)
 
 <p class="mod-role">The compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data out — and nothing written unless every named check passes.</p>
 
@@ -129,11 +129,11 @@ The published package links no Spine runtime, so `A00_ROUNDTRIP_PARSE` — Spine
 ## Install
 
 ```sh
-bun add -d rig-c
+bun add -d @rig-c/core
 bun rigc build --rig rig.json --motion motion.json --out build/
 ```
 
-The published 2.74.0 package declares Bun 1.4.0 or later. The npm package is `rig-c`; `@rig-c/core` is the same package under the scope, and the command is `rigc`. Licensing by playback path: [Licensing](/docs/licensing/).
+The published 2.74.0 package declares Bun 1.4.0 or later. The canonical npm package is `@rig-c/core`; `rig-c` is its convenience install name, and the command is `rigc`. Published legacy name `spine-rigc` remains a compatibility entry point; see [package names and aliases](/#package-names-and-aliases). Licensing by playback path: [Licensing](/docs/licensing/).
 
 ## Inputs and outputs
 
@@ -160,7 +160,7 @@ The published 2.74.0 package declares Bun 1.4.0 or later. The npm package is `ri
 - [docs/AUTHORING.md](https://github.com/rig-c/core/blob/main/docs/AUTHORING.md) — the format guide; read it before writing a spec
 - [docs/RIGGING.md](https://github.com/rig-c/core/blob/main/docs/RIGGING.md) · [docs/MOTION.md](https://github.com/rig-c/core/blob/main/docs/MOTION.md) · [docs/FACE.md](https://github.com/rig-c/core/blob/main/docs/FACE.md) · [docs/INGEST.md](https://github.com/rig-c/core/blob/main/docs/INGEST.md) · [docs/PROMPTING.md](https://github.com/rig-c/core/blob/main/docs/PROMPTING.md)
 - [docs/BENCHMARK.md](https://github.com/rig-c/core/blob/main/docs/BENCHMARK.md) — why you can trust the output, and the 50 assertions with their profiles
-- [npm: rig-c](https://www.npmjs.com/package/rig-c) · [CHANGELOG.md](https://github.com/rig-c/core/blob/main/CHANGELOG.md)
+- [npm: @rig-c/core](https://www.npmjs.com/package/@rig-c/core) · [CHANGELOG.md](https://github.com/rig-c/core/blob/main/CHANGELOG.md)
 - Start here: [/docs/getting-started/](/docs/getting-started/)
 
 <!-- SOURCES (not published)
@@ -198,7 +198,8 @@ The published 2.74.0 package declares Bun 1.4.0 or later. The npm package is `ri
 - preview and vote need spine-core — README.md:50-51; core entry command list excludes them — `bunx rig-c@2.61.0 validate --help` output
 - Spine Runtimes License Agreement applies to that dependency — README.md:77-78
 - Bun >=1.2.0 — package.json:34; README.md:140-144
-- install line `bun add -d rig-c` — README.md:162
+- historical install line `bun add -d rig-c` — README.md:162 (original citation retained; this is not the current scoped recommendation).
+- current scoped install recommendation (2026-10-28): npm @rig-c/core@2.79.0 /latest manifest name and bin (`rigc`: `bin/rigc.cjs`), engines.bun >=1.4.0; published tarball SHA-512 verified. This current registry evidence is separate from the historical README citation above.
 - build and render command shapes — `bunx rig-c@2.61.0 --help` (build --rig/--motion/--out; render --candidate)
 - A00_ROUNDTRIP_PARSE runs only where runtime installed, SKIP elsewhere — README.md:68-70; `rigc build --help` lines 33-34
 - ingest = build backwards, byte for byte — `rigc --help` ("ingest runs build backwards … build(ingest(x)) is x, byte for byte"); README.md:606

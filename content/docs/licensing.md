@@ -23,7 +23,7 @@ Three separate questions, answered separately: the licence of rig-c's own code, 
 | rig-c's model in a page or an engine | [`@rig-c/play`](/docs/play/), [`@rig-c/pixi` / `phaser` / `three`](/docs/adapters/) | rig-c's MIT. These packages link nothing from Esoteric Software and pose the rig with rig-c's own core, so no Spine Runtime is integrated. |
 | Spine data in a product | an official Spine Runtime, or the Spine Web Player (which `rigc preview` loads) | The [Spine Runtimes License](https://esotericsoftware.com/spine-runtimes-license): integration is permitted under Section 2 of the Spine Editor License Agreement, or on the condition that each user of the product obtains their own Spine Editor licence, and redistribution includes that licence and copyright notice. |
 | Spine data in the Spine editor | the Spine editor, to refine by hand | The [Spine Editor License Agreement](https://esotericsoftware.com/spine-editor-license). |
-| rigc with `@esotericsoftware/spine-core` installed beside it | rigc's round-trip gate, `validate`, `preview`, `vote`, `bench`, `bonedist` | That install integrates a Spine Runtime, so the Spine Runtimes License applies there. The published `rig-c` package does not carry spine-core. |
+| rigc with `@esotericsoftware/spine-core` installed beside it | rigc's round-trip gate, `validate`, `preview`, `vote`, `bench`, `bonedist` | That install integrates a Spine Runtime, so the Spine Runtimes License applies there. The published `@rig-c/core` package does not carry spine-core. |
 
 Esoteric Software's licence pages read *Last updated April 5, 2025* when this page was written.
 
