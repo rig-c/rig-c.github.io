@@ -1,87 +1,603 @@
-import{PixiRenderer,WebGLRenderer,Container,Sprite,Texture,Rectangle,Matrix,Shader,GlProgram}from'./runtime.js';
-import{coreAnchorClamp}from'./aperture.js';
-const $=id=>document.getElementById(id),host=$('demo'),image=new Image();image.src=new URL('./look.png',import.meta.url);
-try{
- const[scene,,payload]=await Promise.all([fetch(new URL('./scene.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Scene unavailable');return r.json()}),image.decode(),fetch(new URL('./scene.bin.gz',import.meta.url)).then(r=>{if(!r.ok)throw Error('Geometry unavailable');return r.arrayBuffer()})]);
- const magic=new Uint8Array(payload);let buffer=payload;if(magic[0]===31&&magic[1]===139){if(typeof DecompressionStream!=='function')throw Error('This preview requires a current browser');buffer=await new Response(new Blob([payload]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer()}const signature=new Uint8Array(buffer,0,4);if(signature[0]!==68||signature[1]!==72||signature[2]!==68||signature[3]!==49)throw Error('Invalid geometry payload');
- const read=(spec,T)=>Array.from(new T(buffer,spec[0],spec[1]));
- const parts=scene.parts.map((p,i)=>({...p,base:read(p.base,Float64Array),z:p.depth.values?read(p.depth.values,Float64Array):p.depth.constant,slot:{slot:'m'+i,kind:'mesh',page:'look.png',pma:false,blend:'Normal',tint:[1,1,1,1],sequence:0,vertices:read(p.base,Float64Array),uvs:read(p.uv,Float64Array),triangles:read(p.tri,p.indexWidth===2?Uint16Array:Uint32Array)}}));
- for(const e of scene.eyes)e.core=new Uint8Array(buffer,e.core[0],e.core[1]);
- const renderer=new WebGLRenderer();await renderer.init({width:Math.round(innerWidth*1.5),height:Math.round(innerHeight*1.5),backgroundAlpha:0,antialias:true,resolution:1,preserveDrawingBuffer:true});renderer.canvas.setAttribute('aria-label','Interactive depth-driven head turn');document.body.appendChild(renderer.canvas);
- const stage=new Container(),root=new Container(),masks=new Container();stage.addChild(root,masks);const painter=new PixiRenderer(root,{pageImages:new Map([['look.png',image]])});let width,height,scale,cameraX,cameraY;
- function fit(){width=Math.max(1,Math.round(innerWidth*1.5));height=Math.max(1,Math.round(innerHeight*1.5));renderer.resize(width,height);const b=scene.bounds;scale=Math.min(width*.82/b.width,height*.88/b.height);cameraX=width/2-(b.x+b.width/2)*scale;cameraY=height/2+(b.y+b.height/2)*scale;for(const c of[root,masks]){c.scale.set(scale);c.position.set(cameraX,cameraY)}}fit();
- let gain=1,pivot=55,gaze=.10,counter=.10,x=0,y=0,vx=0,vy=0,tx=0,ty=0;
- // Pixi 8.22.0: retain the meshes and their buffers; a custom shader disables batching.
- const frame={order:parts.map(p=>p.slot)},maskSprites=[];
- painter.render(frame);
- const vertex=`
- in vec2 aPosition;
- in vec2 aUV;
- in float aDepth;
- uniform mat3 uProjectionMatrix;
- uniform mat3 uWorldTransformMatrix;
- uniform mat3 uTransformMatrix;
- uniform vec4 uTurn;
- uniform vec4 uBasis;
- uniform float uCommon;
- uniform vec2 uGaze;
- out vec2 vUV;
- void main(){
-  float z=aDepth*uTurn.z;
-  float dx=z*uTurn.x,dy=z*uTurn.y;
-  vec2 displacement=vec2(uBasis.x*dx+uBasis.y*dy,uBasis.z*dx+uBasis.w*dy)
-   +uCommon*uTurn.w*uTurn.xy+uGaze;
-  // PixiRenderer stores world y with its sign flipped.
-  vec2 position=aPosition+vec2(displacement.x,-displacement.y);
-  mat3 mvp=uProjectionMatrix*uWorldTransformMatrix*uTransformMatrix;
-  gl_Position=vec4((mvp*vec3(position,1.0)).xy,0.0,1.0);
-  vUV=aUV;
- }`;
- const fragment=`
- in vec2 vUV;
- uniform sampler2D uTexture;
- uniform vec4 uColor;
- uniform vec4 uWorldColorAlpha;
- out vec4 finalColor;
- void main(){finalColor=texture(uTexture,vUV)*uColor*uWorldColorAlpha;}`;
- const glProgram=GlProgram.from({vertex,fragment,name:'depth-head-turn',preferredFragmentPrecision:'highp'});
- const turn=new Float32Array(4),basis=new Float32Array([scene.basis.a,scene.basis.b,scene.basis.c,scene.basis.d]);
- parts.forEach((p,i)=>{
-  const mesh=root.children[i],depth=new Float32Array(p.base.length/2);
-  if(typeof p.z==='number')depth.fill(p.z);else depth.set(p.z);
-  mesh.geometry.addAttribute('aDepth',{buffer:depth,format:'float32'});
-  mesh.shader=new Shader({glProgram,resources:{uTexture:mesh.texture.source,depthUniforms:{
-   uTurn:{value:turn,type:'vec4<f32>'},uBasis:{value:basis,type:'vec4<f32>'},
-   uCommon:{value:0,type:'f32'},uGaze:{value:new Float32Array(2),type:'vec2<f32>'}
-  }}});
-  p.mesh=mesh;p.uniforms=mesh.shader.resources.depthUniforms.uniforms;
-  // Alpha-mask filter bounds must follow the displaced iris too. Its depth is constant;
-  // update four bounds scalars, without touching any vertex or GPU buffer.
-  if(p.iris>=0){if(typeof p.z!=='number')throw Error('Iris requires constant depth');
-   let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-   for(let j=0;j<p.base.length;j+=2){minX=Math.min(minX,p.base[j]);maxX=Math.max(maxX,p.base[j]);minY=Math.min(minY,p.base[j+1]);maxY=Math.max(maxY,p.base[j+1])}
-   p.irisBounds=[minX,minY,maxX,maxY];
+import { Container, PixiRig, WebGLRenderer, loadModel, readModel } from "./runtime.js";
+
+export const HEAD_SPRING_OMEGA0 = 20;
+
+export class PointerDialRefusal extends Error {
+  constructor(axis, bone, detail) {
+    super(`PointerDials: axis "${axis}", bone "${bone}": ${detail}`);
+    this.name = "PointerDialRefusal";
+    this.axis = axis;
+    this.bone = bone;
   }
- });
- scene.eyes.forEach((e,i)=>{
-  const sprite=new Sprite(new Texture({source:painter.getPageSource('look.png'),frame:new Rectangle(...e.frame)}));
-  masks.addChild(sprite);maskSprites[i]=sprite;
-  root.children[e.iris].setMask({mask:sprite,channel:'alpha',inverse:false});
- });
- function draw(){const sx=Math.sin(x*15*Math.PI/180),sy=Math.sin(y*12*Math.PI/180),strength=scene.depthGain*gain,T=[pivot*sx,pivot*sy],b=scene.basis;
-  turn[0]=sx;turn[1]=sy;turn[2]=strength;turn[3]=pivot;
-  const eyeShift=scene.eyes.map(e=>coreAnchorClamp(e.core,e.size[0],e.size[1],e.anchor,[gaze*e.size[0]*x,-gaze*e.size[0]*y]).shift);
-  for(const p of parts){const common=p.common===2?-counter:p.common===1?1:0,e=p.iris>=0?scene.eyes[p.iris]:null,shift=e?eyeShift[p.iris]:[0,0],gx=e?e.gazeBasis[0]*shift[0]+e.gazeBasis[1]*shift[1]:0,gy=e?e.gazeBasis[2]*shift[0]+e.gazeBasis[3]*shift[1]:0;
-   p.uniforms.uCommon=common;p.uniforms.uGaze[0]=gx;p.uniforms.uGaze[1]=gy;
-   if(p.irisBounds){const z=p.z*strength,dx=b.a*(z*sx)+b.b*(z*sy)+common*T[0]+gx,dy=b.c*(z*sx)+b.d*(z*sy)+common*T[1]+gy,q=p.irisBounds;
-    p.mesh.geometry.bounds.set(Math.fround(q[0]+dx),Math.fround(-q[3]-dy),Math.fround(q[2]+dx),Math.fround(-q[1]-dy));p.mesh.onViewUpdate();
-   }
+}
+
+export function clampRange(value, min, max) {
+  if (!Number.isFinite(value)) return 0;
+  const clamped = Math.max(min, Math.min(max, value));
+  return clamped === 0 ? 0 : clamped;
+}
+
+function clampUnit(value) {
+  return clampRange(value, -1, 1);
+}
+
+export function pointerToNormalized(clientX, clientY, rect) {
+  if (!(rect.width > 0) || !(rect.height > 0)) {
+    return { fx: 0, fy: 0 };
   }
-  scene.eyes.forEach((e,i)=>{const sprite=maskSprites[i],p=parts[e.unit],z=p.z*strength,dx=z*sx,dy=z*sy,m=e.base;sprite.setFromMatrix(new Matrix(m[0],m[1],m[2],m[3],m[4]+T[0]+b.a*dx+b.b*dy,m[5]-(T[1]+b.c*dx+b.d*dy)))});
-  renderer.render({container:stage});
- }
- const finite=(v,min,max)=>{if(!Number.isFinite(v))throw Error('Control must be finite');return Math.max(min,Math.min(max,v))};
- for(const[id,min,max,set,format]of[['gain',0,3,v=>gain=v,v=>v.toFixed(2)+'×'],['pivot',0,100,v=>pivot=v,v=>v.toFixed(0)],['gaze',0,.25,v=>gaze=v,v=>(v*100).toFixed(0)+'%'],['counter',0,1,v=>counter=v,v=>(v*100).toFixed(0)+'%']])$(id).addEventListener('input',e=>{const v=finite(Number(e.target.value),min,max);set(v);$(id+'Value').value=format(v);draw()});
- renderer.canvas.addEventListener('pointermove',e=>{const r=renderer.canvas.getBoundingClientRect();tx=Math.max(-1,Math.min(1,(e.clientX-r.left-r.width/2)/(r.width/2)));ty=Math.max(-1,Math.min(1,(r.top+r.height/2-e.clientY)/(r.height/2)))});renderer.canvas.addEventListener('pointerleave',()=>{tx=ty=0});
- $('centre').addEventListener('click',()=>{x=y=vx=vy=tx=ty=0;draw()});addEventListener('resize',()=>{fit();draw()});draw();host.setAttribute('aria-busy','false');$('loading').remove();let last=performance.now();function tick(now){const dt=Math.min(.1,(now-last)/1000);last=now;const px=x,py=y,w=20,e=Math.exp(-w*dt),ex=x-tx,ey=y-ty,nx=tx+(ex*(1+w*dt)+vx*dt)*e,ny=ty+(ey*(1+w*dt)+vy*dt)*e;vx=(vx*(1-w*dt)-w*w*dt*ex)*e;vy=(vy*(1-w*dt)-w*w*dt*ey)*e;x=nx;y=ny;if(x!==px||y!==py)draw();requestAnimationFrame(tick)}requestAnimationFrame(tick);
-}catch(e){$('loading').textContent='The demo could not load. Please reload the page.';host.setAttribute('aria-busy','false');console.error(e)}
+  const cx = rect.left + rect.width * 0.5;
+  const cy = rect.top + rect.height * 0.5;
+  const fx = clampUnit((clientX - cx) / (rect.width * 0.5));
+  const fy = clampUnit((cy - clientY) / (rect.height * 0.5));
+  return {
+    fx: fx === 0 ? 0 : fx,
+    fy: fy === 0 ? 0 : fy,
+  };
+}
+
+export function stepCriticallyDampedSpring2D(state, targetX, targetY, dt, omega0 = HEAD_SPRING_OMEGA0) {
+  if (!(dt > 0) || !Number.isFinite(dt)) return;
+  const ex = state.x - targetX;
+  const ey = state.y - targetY;
+  if (ex === 0 && ey === 0 && state.vx === 0 && state.vy === 0) {
+    state.x = targetX;
+    state.y = targetY;
+    return;
+  }
+  const tau = omega0 * dt;
+  const exp = Math.exp(-tau);
+  const nextX = targetX + (ex * (1 + tau) + state.vx * dt) * exp;
+  const nextY = targetY + (ey * (1 + tau) + state.vy * dt) * exp;
+  const nextVx = (state.vx * (1 - tau) - omega0 * omega0 * dt * ex) * exp;
+  const nextVy = (state.vy * (1 - tau) - omega0 * omega0 * dt * ey) * exp;
+
+  state.x = Math.abs(nextX - targetX) < 1e-12 && Math.abs(nextVx) < 1e-9 ? targetX : nextX;
+  state.y = Math.abs(nextY - targetY) < 1e-12 && Math.abs(nextVy) < 1e-9 ? targetY : nextY;
+  state.vx = state.x === targetX ? 0 : nextVx;
+  state.vy = state.y === targetY ? 0 : nextVy;
+}
+
+export function normalizedToDial(normalized, range) {
+  const n = clampUnit(normalized);
+  const neutral = clampRange(0, range[0], range[1]);
+  return clampRange(neutral + Math.abs(n) * ((n < 0 ? range[0] : range[1]) - neutral), range[0], range[1]);
+}
+
+export function readPointerDialBindings(doc, names) {
+  const bindings = {};
+  const used = new Set();
+  for (const axis of ["yaw", "pitch", "roll", "body", "gazeX", "gazeY"]) {
+    const bone = names[axis];
+    if (bone === undefined && axis !== "yaw" && axis !== "pitch") continue;
+    const refuse = (detail) => {
+      throw new PointerDialRefusal(axis, bone ?? "", detail);
+    };
+    if (!bone || !doc.bones.some((b) => b.name === bone)) return refuse("expected a declared dial bone");
+    const matches = doc.constraints.filter(
+      (c) => c.kind === "slider" && c.record?.kind === "slider" && c.record.bone === bone,
+    );
+    if (matches.length !== 1) refuse(`found ${matches.length} slider constraints; expected exactly one`);
+    const record = matches[0].record;
+    if (record?.kind !== "slider") return refuse("expected a parsed slider record");
+    if (!record.local || record.loop) refuse("expected a local, non-looping slider");
+    const { from, to, scale } = record;
+    const duration = record.timelines.duration;
+    if (![from, to, scale, duration].every(Number.isFinite) || scale === 0 || duration <= 0) {
+      refuse("expected finite from/to, nonzero scale and positive animation duration");
+    }
+    const a = from - to / scale;
+    const b = from + (duration - to) / scale;
+    if (![a, b].every(Number.isFinite) || a === b) refuse("slider does not define a finite, nonzero dial range");
+    const range = a < b ? [a, b] : [b, a];
+    const channel = record.property === "rotate" ? "rotation" : record.property;
+    const key = `${bone}/${channel}`;
+    if (used.has(key)) refuse("dial channel is already bound to another axis");
+    used.add(key);
+    bindings[axis] = Object.freeze({
+      bone,
+      slider: matches[0].name,
+      animation: matches[0].animation,
+      channel,
+      range: Object.freeze(range),
+    });
+  }
+  return Object.freeze(bindings);
+}
+
+export function detectSliderDirectionSign(doc, animationName, channel) {
+  if (!animationName) return 1;
+  const anim = doc.animations.find((a) => a.name === animationName);
+  if (!anim) return 1;
+  const probeBone =
+    anim.timelines.bones.find((b) => b.name === "faceshift") ??
+    anim.timelines.bones.find((b) => b.name === "bodyshift") ??
+    anim.timelines.bones.find((b) => b.name === "nose") ??
+    anim.timelines.bones.find((b) => b.name === "eye_r") ??
+    anim.timelines.bones[0];
+  if (!probeBone) return 1;
+  const tl = probeBone.timelines.find((t) => t.kind === channel);
+  if (!tl || tl.keys.length < 2) return 1;
+  const firstKey = tl.keys[0];
+  const lastKey = tl.keys[tl.keys.length - 1];
+  const first = firstKey?.values?.[0] ?? firstKey?.value ?? 0;
+  const last = lastKey?.values?.[0] ?? lastKey?.value ?? 0;
+  return last < first ? -1 : 1;
+}
+
+export class PointerDials {
+  constructor(bindings, direction = { yaw: 1, pitch: 1, body: 1 }) {
+    this.bindings = bindings;
+    this.direction = {
+      yaw: direction.yaw ?? 1,
+      pitch: direction.pitch ?? 1,
+      body: direction.body ?? direction.yaw ?? 1,
+    };
+    this.fx = 0;
+    this.fy = 0;
+    this.gain = 1;
+    this.gazeScale = 1;
+    this.spring = { x: 0, y: 0, vx: 0, vy: 0 };
+    this.values = {};
+    this.adjust = (bones) => {
+      for (const axis of Object.keys(this.bindings)) {
+        const dial = this.bindings[axis];
+        bones.bone(dial.bone)[dial.channel] = clampRange(this.values[axis] ?? 0, dial.range[0], dial.range[1]);
+      }
+    };
+    this.step(0);
+  }
+
+  setPointer(fx, fy) {
+    this.fx = clampUnit(fx);
+    this.fy = clampUnit(fy);
+  }
+
+  clearPointer() {
+    this.setPointer(0, 0);
+  }
+
+  snapToTarget() {
+    this.spring.x = this.fx;
+    this.spring.y = this.fy;
+    this.spring.vx = 0;
+    this.spring.vy = 0;
+    return this.step(0);
+  }
+
+  setDirectValues(overrides) {
+    for (const axis of Object.keys(this.bindings)) {
+      const dial = this.bindings[axis];
+      const raw = overrides[axis] ?? 0;
+      this.values[axis] = clampRange(raw, dial.range[0], dial.range[1]);
+    }
+  }
+
+  step(dt) {
+    stepCriticallyDampedSpring2D(this.spring, this.fx, this.fy, dt);
+    const hx = clampUnit(this.spring.x * this.gain);
+    const hy = clampUnit(this.spring.y * this.gain);
+    const normalized = {
+      yaw: hx * this.direction.yaw,
+      pitch: hy * this.direction.pitch,
+      roll: -hx * hy,
+      body: hx * this.direction.body,
+      gazeX: clampUnit(this.fx * this.gazeScale),
+      gazeY: clampUnit(this.fy * this.gazeScale),
+    };
+    const values = {};
+    for (const axis of Object.keys(this.bindings)) {
+      const dial = this.bindings[axis];
+      values[axis] = normalizedToDial(normalized[axis], dial.range);
+    }
+    this.values = values;
+    return { fx: this.fx, fy: this.fy, hx, hy, values: { ...values } };
+  }
+}
+
+function classifyClipSegment(timeSeconds) {
+  const t = ((timeSeconds % 1) + 1) % 1;
+  const frame = t * 24;
+  if (frame >= 5 && frame < 10) return "left";
+  if (frame >= 10 && frame < 15) return "right";
+  if (frame >= 15 && frame < 20) return "up";
+  if (frame >= 20 && frame <= 24) return "down";
+  return "neutral";
+}
+
+function sampleLinearKeys(keys, time) {
+  if (!keys || keys.length === 0) return 0;
+  if (time <= (keys[0].time ?? 0)) return keys[0].values?.[0] ?? keys[0].value ?? 0;
+  for (let i = 0; i < keys.length - 1; i++) {
+    const k0 = keys[i];
+    const k1 = keys[i + 1];
+    const t0 = k0.time ?? 0;
+    const t1 = k1.time ?? 0;
+    const v0 = k0.values?.[0] ?? k0.value ?? 0;
+    const v1 = k1.values?.[0] ?? k1.value ?? 0;
+    if (time <= t1) {
+      if (k0.curve === "stepped" || !(t1 > t0)) return v0;
+      const u = (time - t0) / (t1 - t0);
+      return v0 + (v1 - v0) * u;
+    }
+  }
+  const last = keys[keys.length - 1];
+  return last.values?.[0] ?? last.value ?? 0;
+}
+
+function readClipDialValues(doc, animName, timeSeconds, bindings) {
+  const anim = doc.animations.find((a) => a.name === animName);
+  if (!anim) return { yaw: 0, pitch: 0, body: 0 };
+  const dur = anim.timelines?.duration > 0 ? anim.timelines.duration : 1;
+  const t = ((timeSeconds % dur) + dur) % dur;
+  const readBoneRotate = (boneName) => {
+    if (!boneName) return 0;
+    const b = anim.timelines.bones.find((entry) => entry.name === boneName);
+    const tl = b?.timelines.find((entry) => entry.kind === "rotate");
+    return tl ? sampleLinearKeys(tl.keys, t) : 0;
+  };
+  return {
+    yaw: readBoneRotate(bindings.yaw?.bone),
+    pitch: readBoneRotate(bindings.pitch?.bone),
+    body: readBoneRotate(bindings.body?.bone),
+  };
+}
+
+function formatDeg(value) {
+  const v = Number.isFinite(value) ? value : 0;
+  const clean = Math.abs(v) < 0.05 ? 0 : v;
+  return `${clean >= 0 ? "+" : "−"}${Math.abs(clean).toFixed(1)}°`;
+}
+
+async function main() {
+  const demo = document.querySelector("#demo");
+  const loading = document.querySelector("#loading");
+  const modePointerBtn = document.querySelector("#mode-pointer");
+  const modeClipBtn = document.querySelector("#mode-clip");
+  const modeHint = document.querySelector("#mode-hint");
+  const yawReadout = document.querySelector("#yawReadout");
+  const pitchReadout = document.querySelector("#pitchReadout");
+  const bodyReadout = document.querySelector("#bodyReadout");
+  const segmentReadout = document.querySelector("#segmentReadout");
+  const gainInput = document.querySelector("#gain");
+  const gainOutput = document.querySelector("#gainValue");
+  const gazeInput = document.querySelector("#gaze");
+  const gazeOutput = document.querySelector("#gazeValue");
+  const centreBtn = document.querySelector("#centre");
+
+  const params = new URLSearchParams(window.location.search);
+  const manualClock = params.get("manual") === "1";
+  const disableIdle = params.get("idle") === "0";
+  const initialMode = params.get("mode") === "clip" ? "clip" : "pointer";
+  const dprOverride = Number(params.get("dpr"));
+
+  const modelUrl = new URL("./skeleton.model.json", import.meta.url).href;
+  const [assets, modelText] = await Promise.all([
+    loadModel({ modelUrl, setsUrl: null, regions: "none" }),
+    fetch(modelUrl).then((res) => {
+      if (!res.ok) throw new Error(`Failed to fetch model (${res.status})`);
+      return res.text();
+    }),
+  ]);
+  const doc = readModel(modelText, modelUrl);
+
+  const hasBodyYawDial = doc.bones.some((b) => b.name === "body_yaw_dial");
+  const hasBodyDial = doc.bones.some((b) => b.name === "body_dial");
+  const dialNames = {
+    yaw: "yaw_dial",
+    pitch: "pitch_dial",
+    ...(doc.bones.some((b) => b.name === "roll_dial") ? { roll: "roll_dial" } : {}),
+    ...(hasBodyYawDial ? { body: "body_yaw_dial" } : hasBodyDial ? { body: "body_dial" } : {}),
+    ...(doc.bones.some((b) => b.name === "gaze_x_dial") ? { gazeX: "gaze_x_dial" } : {}),
+    ...(doc.bones.some((b) => b.name === "gaze_y_dial") ? { gazeY: "gaze_y_dial" } : {}),
+  };
+
+  const bindings = readPointerDialBindings(doc, dialNames);
+  const direction = {
+    yaw: detectSliderDirectionSign(doc, bindings.yaw?.animation, "translatex"),
+    pitch: detectSliderDirectionSign(doc, bindings.pitch?.animation, "translatey"),
+    body: bindings.body ? detectSliderDirectionSign(doc, bindings.body.animation, "translatex") : 1,
+  };
+  const pointerDials = new PointerDials(bindings, direction);
+
+  const renderer = new WebGLRenderer();
+  const resolution = Number.isFinite(dprOverride) && dprOverride > 0
+    ? dprOverride
+    : Math.min(window.devicePixelRatio || 1, 2);
+  await renderer.init({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    resolution,
+    autoDensity: true,
+    antialias: true,
+    backgroundColor: 0x20232a,
+    preference: "webgl",
+    preserveDrawingBuffer: true,
+  });
+
+  const canvas = renderer.canvas;
+  canvas.setAttribute("aria-label", "Depth-driven 2.5D character rig rendered on WebGL");
+  demo.prepend(canvas);
+
+  const stage = new Container();
+  const rig = new PixiRig(assets, { ticker: null, autoUpdate: false });
+  stage.addChild(rig);
+
+  // Measure neutral bounds at setup/idle to frame the bust cleanly in the viewport.
+  const idleName = assets.animations.find((a) => a.name === "idle")?.name ?? assets.animations[0]?.name ?? null;
+  const clipName = assets.animations.find((a) => a.name === "clip")?.name ?? null;
+  if (idleName) {
+    rig.play(idleName, { loop: true });
+  }
+  rig.draw();
+  const neutralBounds = rig.bounds() ?? { x: -350, y: -250, width: 700, height: 950 };
+
+  function layoutStage() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    renderer.resize(w, h);
+    const pad = 0.88;
+    const scaleX = (w * pad) / Math.max(1, neutralBounds.width);
+    const scaleY = (h * pad) / Math.max(1, neutralBounds.height);
+    const scale = Math.min(scaleX, scaleY);
+    rig.scale.set(scale);
+    const centerWorldX = neutralBounds.x + neutralBounds.width * 0.5;
+    const centerWorldY = neutralBounds.y + neutralBounds.height * 0.5;
+    rig.position.set(w * 0.5 - centerWorldX * scale, h * 0.54 + centerWorldY * scale);
+  }
+
+  let mode = initialMode;
+  let directOverride = false;
+
+  function updateReadouts(dials, segLabel) {
+    if (yawReadout) yawReadout.textContent = formatDeg(dials.yaw ?? 0);
+    if (pitchReadout) pitchReadout.textContent = formatDeg(dials.pitch ?? 0);
+    if (bodyReadout) bodyReadout.textContent = formatDeg(dials.body ?? 0);
+    if (segmentReadout) segmentReadout.textContent = segLabel;
+  }
+
+  function applyMode(nextMode) {
+    mode = nextMode === "clip" && clipName ? "clip" : "pointer";
+    directOverride = false;
+    if (modePointerBtn) modePointerBtn.setAttribute("aria-pressed", String(mode === "pointer"));
+    if (modeClipBtn) modeClipBtn.setAttribute("aria-pressed", String(mode === "clip"));
+    if (gainInput) gainInput.disabled = mode !== "pointer";
+    if (gazeInput) gazeInput.disabled = mode !== "pointer";
+
+    if (mode === "clip" && clipName) {
+      rig.adjust = null;
+      rig.timescale = 1;
+      rig.play(clipName, { loop: true });
+      if (modeHint) {
+        modeHint.textContent =
+          "Playing the @rig-c/pose 4-way sign-test clip (neutral → left → right → up → down) via @rig-c/play.";
+      }
+      const clipDials = readClipDialValues(doc, clipName, rig.time, bindings);
+      updateReadouts(clipDials, classifyClipSegment(rig.time));
+    } else {
+      rig.adjust = pointerDials.adjust;
+      if (idleName) {
+        rig.play(idleName, { loop: true });
+      }
+      rig.timescale = disableIdle ? 0 : 1;
+      pointerDials.step(0);
+      rig.repose();
+      if (modeHint) {
+        modeHint.textContent =
+          "Move the pointer across the character to drive the yaw, pitch, body, and gaze dials through a critically damped spring.";
+      }
+      updateReadouts(pointerDials.values, "pointer");
+    }
+    renderer.render({ container: stage });
+  }
+
+  layoutStage();
+  applyMode(initialMode);
+
+  window.addEventListener("resize", () => {
+    layoutStage();
+    renderer.render({ container: stage });
+  });
+
+  window.addEventListener("pointermove", (event) => {
+    if (mode !== "pointer") return;
+    if (event.target instanceof Element && event.target.closest(".controls, #controls-toggle")) return;
+    const { fx, fy } = pointerToNormalized(event.clientX, event.clientY, canvas.getBoundingClientRect());
+    directOverride = false;
+    pointerDials.setPointer(fx, fy);
+  });
+
+  document.addEventListener("pointerleave", () => {
+    if (mode !== "pointer") return;
+    pointerDials.clearPointer();
+  });
+
+  if (modePointerBtn) {
+    modePointerBtn.addEventListener("click", () => applyMode("pointer"));
+  }
+  if (modeClipBtn) {
+    modeClipBtn.addEventListener("click", () => applyMode("clip"));
+  }
+
+  if (gainInput && gainOutput) {
+    gainInput.addEventListener("input", () => {
+      const g = Number(gainInput.value);
+      pointerDials.gain = Number.isFinite(g) ? g : 1;
+      gainOutput.textContent = `${pointerDials.gain.toFixed(2)}×`;
+    });
+  }
+
+  if (gazeInput && gazeOutput) {
+    gazeInput.addEventListener("input", () => {
+      const gz = Number(gazeInput.value);
+      pointerDials.gazeScale = Number.isFinite(gz) ? gz : 1;
+      gazeOutput.textContent = `${Math.round(pointerDials.gazeScale * 100)}%`;
+    });
+  }
+
+  if (centreBtn) {
+    centreBtn.addEventListener("click", () => {
+      pointerDials.clearPointer();
+      if (mode === "clip" && clipName) {
+        rig.seek(0);
+        const clipDials = readClipDialValues(doc, clipName, 0, bindings);
+        updateReadouts(clipDials, classifyClipSegment(0));
+      } else {
+        pointerDials.snapToTarget();
+        rig.repose();
+        updateReadouts(pointerDials.values, "pointer");
+      }
+      renderer.render({ container: stage });
+    });
+  }
+
+  function getFeaturePositions() {
+    const readBone = (name) => {
+      try {
+        const b = rig.bone(name);
+        const wx = Number.isFinite(b.x) ? b.x : b.worldX;
+        const wy = Number.isFinite(b.y) ? b.y : b.worldY;
+        return {
+          worldX: wx,
+          worldY: wy,
+          screenX: rig.position.x + wx * rig.scale.x,
+          screenY: rig.position.y - wy * rig.scale.y,
+        };
+      } catch {
+        return null;
+      }
+    };
+    return {
+      nose: readBone("nose"),
+      eye_l: readBone("eye_l"),
+      eye_r: readBone("eye_r"),
+      faceshift: readBone("faceshift"),
+      face_surface: readBone("face_surface"),
+      rear_shift: readBone("rear_shift"),
+      bodyshift: readBone("bodyshift"),
+      topwear_surface: readBone("topwear_surface"),
+      head: readBone("head"),
+      chest: readBone("chest"),
+    };
+  }
+
+  function getRendererInfo() {
+    const gl = renderer.gl ?? canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+    if (!gl) return { renderer: "unavailable", vendor: "unavailable", version: "unavailable", resolution };
+    const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+    return {
+      vendor: gl.getParameter(gl.VENDOR),
+      renderer: gl.getParameter(gl.RENDERER),
+      version: gl.getParameter(gl.VERSION),
+      unmaskedVendor: dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : null,
+      unmaskedRenderer: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : null,
+      resolution: renderer.resolution,
+      width: renderer.width,
+      height: renderer.height,
+    };
+  }
+
+  function stepFrame(dtSeconds) {
+    const dt = Math.min(Math.max(dtSeconds, 0), 0.05);
+    const t0 = performance.now();
+    let dials;
+    let segment;
+    if (mode === "clip" && clipName) {
+      rig.advance(dt);
+      dials = readClipDialValues(doc, clipName, rig.time, bindings);
+      segment = classifyClipSegment(rig.time);
+    } else {
+      if (!directOverride) {
+        pointerDials.step(dt);
+      }
+      if (rig.timescale > 0) {
+        rig.advance(dt);
+      } else {
+        rig.repose();
+      }
+      dials = { ...pointerDials.values };
+      segment = "pointer";
+    }
+    renderer.render({ container: stage });
+    const callbackMs = performance.now() - t0;
+    updateReadouts(dials, segment);
+    return {
+      callbackMs,
+      mode,
+      time: rig.time,
+      segment,
+      dials,
+      features: getFeaturePositions(),
+    };
+  }
+
+  window.__headTurnDemo = {
+    getMode: () => mode,
+    setMode: (nextMode) => applyMode(nextMode),
+    setPointer: (fx, fy, snap = false) => {
+      if (mode !== "pointer") applyMode("pointer");
+      directOverride = false;
+      pointerDials.setPointer(fx, fy);
+      if (snap) pointerDials.snapToTarget();
+    },
+    clearPointer: () => pointerDials.clearPointer(),
+    setDialsDirect: (overrides) => {
+      if (mode !== "pointer") applyMode("pointer");
+      directOverride = true;
+      pointerDials.setDirectValues(overrides);
+      rig.timescale = 0;
+      rig.repose();
+      renderer.render({ container: stage });
+      updateReadouts(pointerDials.values, "direct");
+      return {
+        dials: { ...pointerDials.values },
+        features: getFeaturePositions(),
+      };
+    },
+    seekClip: (timeSeconds) => {
+      if (mode !== "clip") applyMode("clip");
+      rig.seek(timeSeconds);
+      renderer.render({ container: stage });
+      const dials = readClipDialValues(doc, clipName, timeSeconds, bindings);
+      const segment = classifyClipSegment(timeSeconds);
+      updateReadouts(dials, segment);
+      return {
+        time: timeSeconds,
+        segment,
+        dials,
+        features: getFeaturePositions(),
+      };
+    },
+    stepFrame,
+    getRendererInfo,
+    getFeaturePositions,
+    bindings,
+    direction,
+    doc,
+    rig,
+    renderer,
+    stage,
+    canvas,
+  };
+
+  if (loading) loading.remove();
+  demo.setAttribute("aria-busy", "false");
+
+  if (!manualClock) {
+    let lastNow = performance.now();
+    const tick = (now) => {
+      const dt = (now - lastNow) * 0.001;
+      lastNow = now;
+      stepFrame(dt);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+}
+
+if (typeof document !== "undefined") {
+  main().catch((err) => {
+    console.error(err);
+    const loading = document.querySelector("#loading");
+    if (loading) loading.textContent = "Could not load the depth rig.";
+  });
+}

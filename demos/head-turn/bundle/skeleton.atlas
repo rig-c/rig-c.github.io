@@ -1,0 +1,80 @@
+skeleton.png
+size: 1291, 1289
+filter: Linear, Linear
+pma: false
+brow_l
+bounds: 655, 658, 129, 27
+offsets: 0, 0, 129, 27
+rotate: 0
+brow_r
+bounds: 619, 690, 130, 29
+offsets: 0, 0, 130, 29
+rotate: 0
+collar_back
+bounds: 1163, 546, 123, 62
+offsets: 0, 0, 123, 62
+rotate: 0
+ear_l
+bounds: 662, 389, 85, 131
+offsets: 0, 0, 85, 131
+rotate: 0
+ear_r
+bounds: 662, 249, 85, 136
+offsets: 0, 0, 85, 136
+rotate: 0
+eyewhite_l
+bounds: 547, 2, 111, 84
+offsets: 0, 0, 111, 84
+rotate: 0
+eyewhite_r
+bounds: 2, 2, 103, 83
+offsets: 0, 0, 103, 83
+rotate: 0
+face
+bounds: 710, 729, 427, 533
+offsets: 0, 0, 427, 533
+rotate: 0
+hair_back
+bounds: 2, 2, 656, 761
+offsets: 0, 0, 656, 761
+rotate: 0
+hair_front
+bounds: 762, 106, 414, 619
+offsets: 0, 0, 414, 619
+rotate: 0
+hairpin
+bounds: 662, 2, 627, 243
+offsets: 0, 0, 627, 243
+rotate: 0
+iris_l
+bounds: 1163, 612, 77, 82
+offsets: 0, 0, 77, 82
+rotate: 0
+iris_r
+bounds: 655, 524, 76, 82
+offsets: 0, 0, 76, 82
+rotate: 0
+lash_l
+bounds: 1141, 817, 137, 100
+offsets: 0, 0, 137, 100
+rotate: 0
+lash_r
+bounds: 1141, 722, 140, 91
+offsets: 0, 0, 140, 91
+rotate: 0
+mouth
+bounds: 109, 2, 94, 26
+offsets: 0, 0, 94, 26
+rotate: 0
+neck
+bounds: 222, 626, 230, 137
+offsets: 0, 0, 230, 137
+rotate: 0
+nose
+bounds: 419, 626, 47, 50
+offsets: 0, 0, 47, 50
+rotate: 0
+topwear
+bounds: 2, 767, 704, 520
+offsets: 0, 0, 704, 520
+rotate: 0
