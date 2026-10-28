@@ -13,8 +13,8 @@ export const HEAD_TURN_PAGE_README_REL = 'demos/head-turn/README.md';
 export const HEAD_TURN_APP_REL = 'demos/head-turn/bundle/app.js';
 export const HEAD_TURN_README_REL = 'demos/head-turn/bundle/README.md';
 
-// Approved eleven-file published-stack bundle inventory (@rig-c/parts 1.71.0, @rig-c/pose 1.4.0, @rig-c/play 1.20.0, @rig-c/pixi 0.1.5, rig-c 2.79.0, pixi.js 8.22.0).
-export const HEAD_TURN_BUNDLE_SHA256 = '6c9f3e6fba334c10362f51585e6f02a2c642772505b4a4b64c63b337216ec1d8';
+// Approved eleven-file published-stack bundle inventory (@rig-c/parts 1.71.1, @rig-c/pose 1.4.0, @rig-c/play 1.21.0, @rig-c/pixi 0.1.5, rig-c 2.79.0, pixi.js 8.22.0).
+export const HEAD_TURN_BUNDLE_SHA256 = '3f5a0b5f4b9dc3e2ea1231a937726afa00963f81e2a5d8d2a6194684d8600087';
 // Preserved ten-file GPU displacement prototype inventory at demos/head-turn/prototype/.
 export const HEAD_TURN_PROTOTYPE_SHA256 = 'fb7bc15b188ed8f29a931067df44a4c3cdb61ba3f114c706722eee73c8a6c2fc';
 
