@@ -64,11 +64,11 @@ describe('one current package version across all published surfaces', () => {
     for (const path of ['index.md', 'llms.txt', 'llms-full.txt']) {
       const text = files.get(path)!;
       expect(text).toContain('bun add -d @rig-c/core');
-      expect(text).toContain('Legacy');
+      expect(text).not.toContain('Legacy compatibility names');
       expect(text).not.toContain('bunx rig-pose');
       expect(text).not.toContain('@rig-c/adapters');
       expect(text).toContain('rig-pose');
-      expect(text).toContain('not published');
+      expect(text).not.toContain('is not published');
     }
     expect(files.get('docs/pose/index.md')).toContain('bun run rig-pose retarget');
     expect(files.get('docs/core/index.md')).toContain('bunx rig-c@2.61.0 build');
