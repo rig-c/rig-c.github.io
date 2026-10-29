@@ -154,15 +154,16 @@ await page.waitForFunction(
 
 After `bun install --frozen-lockfile` and
 `PLAYWRIGHT_SKIP_BROWSER_GC=1 bunx --no-install playwright install chromium`,
-run `bun run build:ci` and `bun run test:browser` on the approved pool.
+run `bun run build:ci` and `bun run test:browser` in CI or an approved verification environment.
 `bun run test:browser --out dist` selects another built artifact. The smoke
 starts its own loopback server on an unused port, launches one fresh Chromium,
-uses the manual clock at DPR 2, and closes both. Chromium uses software
-compositing and Canvas2D rasterization, in-process GPU initialization
-(`--in-process-gpu`), and explicit SwiftShader WebGL fallback
-(`--use-angle=swiftshader-webgl`), while the demo still draws through WebGL. It checks pointer/clip screen
-directions (head and body), declared slider limits and saturation, and exact
-wind `[0, 0]` / gravity `[0, 1]` through modes and seeks. It emits measurements
+uses the manual clock at DPR 2, and closes both. Chromium launches with
+Playwright's defaults and no experimental graphics flags. It checks pointer/clip
+screen directions (head and body), declared slider limits and saturation, and
+exact wind `[0, 0]` / gravity `[0, 1]` through modes and seeks. Direct clamps are
+read from the hook's returned `dials` and from public `BoneAdjust` locals after
+the original callback writes them. `rig.bone(name)` returns world transforms;
+it is not a read of the local dial channel. The smoke emits measurements
 and a pass/fail summary; it takes no screenshots and makes no visual-quality
 or performance claim. A missing signal or browser error fails the run.
 The whole smoke is bounded to 60 seconds, with a 30-second readiness limit,

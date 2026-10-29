@@ -40,7 +40,7 @@ Use **Bun 1.4.4** (the Actions runtime is pinned to that release). The browser s
 
 ```bash
 bun run test       # Offline resolver/layout/artifact/live-comparison/workflow tests
-bun run test:browser # Built head-turn artifact; pinned Chromium required (pool for local runs)
+bun run test:browser # Built head-turn artifact; pinned Chromium required (CI or an approved verification environment)
 bun run build      # Fetch eight npm latest manifests, emit an isolated _site/ artifact
 bun run verify     # Check _site/: all routes, redirects, static assets and deployment manifest
 bun run compare:live # Read-only comparison with the currently served deployment manifest

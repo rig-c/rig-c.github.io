@@ -39,9 +39,7 @@ const deadline = setTimeout(() => {
 const errors = [];
 try {
   await new Promise((done, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', done); });
-  browser = await chromium.launch({ headless: true, timeout: 30_000, args: [
-    '--no-sandbox', '--disable-gpu', '--disable-accelerated-2d-canvas', '--disable-gpu-compositing', '--in-process-gpu', '--use-gl=angle', '--use-angle=swiftshader-webgl', '--enable-unsafe-swiftshader',
-  ] });
+  browser = await chromium.launch({ headless: true, timeout: 30_000 });
   page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2 });
   page.setDefaultTimeout(30_000);
   page.on('pageerror', (error) => errors.push(String(error)));
@@ -77,12 +75,29 @@ try {
         }
       }
     }
-    for (const [axis, binding] of Object.entries(d.bindings)) {
-      for (const [input, expected] of [[-1e6, binding.range[0]], [0, 0], [1e6, binding.range[1]]]) {
-        d.setDialsDirect({ [axis]: input });
-        const value = d.rig.bone(binding.bone)[binding.channel];
-        clamps.push({ axis, input, expected, value, range: binding.range });
+    // bone(name) is a world-transform read, not the dial's local channel.
+    // Observe the public adjustment locals after the page applies its callback,
+    // and independently check the direct hook's returned clamped values.
+    d.setMode('pointer');
+    const adjust = d.rig.adjust;
+    if (typeof adjust !== 'function') throw Error('Pointer BoneAdjust is missing');
+    let applied;
+    d.rig.adjust = (bones, context) => {
+      adjust(bones, context);
+      applied = Object.fromEntries(Object.entries(d.bindings).map(([axis, binding]) => [
+        axis, bones.bone(binding.bone)[binding.channel],
+      ]));
+    };
+    try {
+      for (const [axis, binding] of Object.entries(d.bindings)) {
+        for (const [input, expected] of [[-1e6, binding.range[0]], [0, 0], [1e6, binding.range[1]]]) {
+          applied = undefined;
+          const frame = d.setDialsDirect({ [axis]: input });
+          clamps.push({ axis, input, expected, value: frame.dials[axis], applied: applied?.[axis], range: binding.range });
+        }
       }
+    } finally {
+      d.rig.adjust = adjust;
     }
     // Saturated corners exercise all six pointer bindings, including roll and gaze.
     for (const [x, y] of [[-10, -10], [-10, 10], [10, -10], [10, 10]]) {
@@ -126,8 +141,12 @@ try {
   for (const { mode, state, axis, value, range } of result.bounds) {
     assert(Number.isFinite(value) && value >= range[0] && value <= range[1], `${mode}:${state}:${axis} slider bounds: ${value} outside ${range}`);
   }
-  for (const { axis, input, expected, value } of result.clamps) {
+  assert.equal(result.bounds.length, 69, 'Every pointer/clip/saturated bound case must run');
+  assert.equal(result.clamps.length, 18, 'All six min/neutral/max clamps must run');
+  assert.equal(result.environments.length, 12, 'Every environment state must run');
+  for (const { axis, input, expected, value, applied } of result.clamps) {
     assert(Number.isFinite(value) && Math.abs(value - expected) < 1e-6, `${axis} clamp ${input}: expected ${expected}, got ${value}`);
+    assert(Number.isFinite(applied) && Math.abs(applied - expected) < 1e-6, `${axis} applied local ${input}: expected ${expected}, got ${applied}`);
   }
   for (const { label, value } of result.environments) {
     assert.deepEqual(value.wind, [0, 0], `${label} wind`);
@@ -137,7 +156,7 @@ try {
   assert.equal(result.renderer.resolution, 2);
   assert.deepEqual(errors, [], 'Browser errors');
   assert(!timedOut, 'Whole smoke deadline exceeded');
-  console.log('HEAD_TURN_SMOKE_PASS', JSON.stringify({ directions, pointerEvents: 4, bounds: result.bounds.length, clamps: result.clamps.length, environments: result.environments.length, errors: errors.length, retries: 0, elapsedMs: performance.now() - started }));
+  console.log('HEAD_TURN_SMOKE_PASS', JSON.stringify({ directions, pointerEvents: 4, bounds: result.bounds.length, clamps: result.clamps.length, appliedLocals: result.clamps.length, environments: result.environments.length, errors: errors.length, retries: 0, elapsedMs: performance.now() - started }));
 } catch (error) {
   const diagnostic = await Promise.race([
     page?.evaluate(() => ({
