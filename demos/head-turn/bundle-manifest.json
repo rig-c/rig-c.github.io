@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sha256": "216adaab2d048229511faffbbb61ec0be5d445497bb921ce56199a759e8aeadd",
+  "sha256": "eeae9aabdd9937769826fd7b1b6804ac2fe63f32c7846514f45c57c2b53361e7",
   "files": [
     {
       "path": "README.md",
@@ -14,8 +14,8 @@
     },
     {
       "path": "app.js",
-      "bytes": 21387,
-      "sha256": "27ba309caece2ce337ede3164c3143c42019260aa99db5d724c87e2256ace192"
+      "bytes": 21680,
+      "sha256": "b3a3eb19fd70676984a420a3d5c1f8f59b1757b9c2401a013f95a6ca0e4c44e2"
     },
     {
       "path": "depth.jpg",

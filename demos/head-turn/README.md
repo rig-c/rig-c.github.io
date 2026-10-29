@@ -130,3 +130,41 @@ rig.environment({ wind: [0, 0], gravity: [0, 1] });
 ```
 
 This environment belongs to that player and persists across pointer/clip changes and seeks. Wind is zero; gravity uses the runtime axes (x right, y down). Authored physics response strengths remain in the rig. No global runtime default is changed.
+
+## Readiness and browser smoke
+
+The page's single completion signal is `#demo[data-ready="true"]`. It is absent
+while loading and on initialization failure. It is set once, only after
+`loadModel` has resolved the model and atlas pages, `applyMode` has drawn the
+first frame with `renderer.render`, and `window.__headTurnDemo` is available.
+It has the same meaning in pointer/clip and manual/automatic playback. Mode
+changes do not reset it. It describes initial drawing, not future context loss.
+`aria-busy` remains an accessibility status, not a second test prerequisite.
+
+The smoke waits for exactly that attribute, using Playwright's explicit third
+options argument and numeric polling (independent of animation-frame delivery):
+
+```js
+await page.waitForFunction(
+  () => document.querySelector('#demo')?.getAttribute('data-ready') === 'true',
+  undefined,
+  { polling: 100, timeout: 30_000 },
+);
+```
+
+After `bun install --frozen-lockfile` and
+`PLAYWRIGHT_SKIP_BROWSER_GC=1 bunx --no-install playwright install chromium`,
+run `bun run build:ci` and `bun run test:browser` on the approved pool.
+`bun run test:browser --out dist` selects another built artifact. The smoke
+starts its own loopback server on an unused port, launches one fresh Chromium,
+uses the manual clock at DPR 2, and closes both. Chromium uses software
+compositing and Canvas2D rasterization, in-process GPU initialization
+(`--in-process-gpu`), and explicit SwiftShader WebGL fallback
+(`--use-angle=swiftshader-webgl`), while the demo still draws through WebGL. It checks pointer/clip screen
+directions (head and body), declared slider limits and saturation, and exact
+wind `[0, 0]` / gravity `[0, 1]` through modes and seeks. It emits measurements
+and a pass/fail summary; it takes no screenshots and makes no visual-quality
+or performance claim. A missing signal or browser error fails the run.
+The whole smoke is bounded to 60 seconds, with a 30-second readiness limit,
+one browser and zero retries. CI runs it after artifact verification and before
+publication, with a three-minute step limit and ten-minute build-job limit.

@@ -36,10 +36,11 @@ The build requires access to `https://registry.npmjs.org`. Before writing any ou
 
 ## Commands
 
-Use **Bun 1.4.4** (the Actions runtime is pinned to that release). There are no third-party build dependencies to install. Build and full verification bundles run on the project's approved remote verification runner, against frozen inputs; the commands below are also the exact pipeline run by Actions.
+Use **Bun 1.4.4** (the Actions runtime is pinned to that release). The browser smoke uses an exact Playwright development dependency; install it with `bun install --frozen-lockfile`. The site builder has no third-party dependencies. Build and full verification bundles run on the project's approved remote verification runner, against frozen inputs; the commands below are also the exact pipeline run by Actions.
 
 ```bash
 bun run test       # Offline resolver/layout/artifact/live-comparison/workflow tests
+bun run test:browser # Built head-turn artifact; pinned Chromium required (pool for local runs)
 bun run build      # Fetch eight npm latest manifests, emit an isolated _site/ artifact
 bun run verify     # Check _site/: all routes, redirects, static assets and deployment manifest
 bun run compare:live # Read-only comparison with the currently served deployment manifest
@@ -93,7 +94,7 @@ Only HTTP 404/410 are `missing` and produce exit 1. Auth failures, rate limits, 
 
 ## Actions Pages deployment
 
-`.github/workflows/pages.yml` runs on pushes to `main`, pull requests, manual dispatch and hourly at minute **17 UTC** (`17 * * * *`). Pull requests only test, build and verify. Main runs are serialized through deployment to keep the live comparison meaningful. Actions first runs the offline tests, then the real registry-backed build, then artifact verification; only successful, eligible and changed artifacts reach `actions/upload-pages-artifact@v4` and `actions/deploy-pages@v4`. Checkout uses `actions/checkout@v6` with credential persistence disabled. No bot writes source commits.
+`.github/workflows/pages.yml` runs on pushes to `main`, pull requests, manual dispatch and hourly at minute **17 UTC** (`17 * * * *`). Pull requests only test, build and verify. Main runs are serialized through deployment to keep the live comparison meaningful. Actions first runs the offline tests, then the real registry-backed build, then artifact verification and the bounded head-turn browser smoke; only successful, eligible and changed artifacts reach `actions/upload-pages-artifact@v4` and `actions/deploy-pages@v4`. Checkout uses `actions/checkout@v6` with credential persistence disabled. No bot writes source commits.
 
 An independent gate uses **authenticated** `gh api repos/rig-c/rig-c.github.io/pages` to read the actual `build_type`. Its token has `contents: read` and `pages: read`; a public anonymous request is not a substitute. Only `build_type: workflow` allows publication. `legacy` leaves the build in verification-only mode; API/network/authentication errors and unknown modes fail closed. A 404 from the Pages API is an error. The build job has only `contents: read`. Only the deploy job receives `pages: write` and `id-token: write`, and it uses the existing `github-pages` environment. Its `main`-only branch policy is preserved. There is no `configure-pages` call, Pages auto-enable, setting mutation or PR deployment.
 

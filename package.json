@@ -2,9 +2,11 @@
   "name": "rig-c-site",
   "private": true,
   "version": "0.1.0",
-  "description": "Official static website for rig-c (https://rig-c.org) — SEO and AI-crawler (curl / llms.txt) first",
+  "description": "Official static website for rig-c (https://rig-c.org) \u2014 SEO and AI-crawler (curl / llms.txt) first",
   "type": "module",
-  "engines": { "bun": ">=1.4.4" },
+  "engines": {
+    "bun": ">=1.4.4"
+  },
   "scripts": {
     "build": "bun src/build.ts",
     "test": "bun test src --timeout 30000",
@@ -13,6 +15,10 @@
     "verify": "bun src/verify.ts",
     "check:links": "bun src/links.ts",
     "check:external": "bun src/external-links.ts",
-    "serve": "bun src/serve.ts"
+    "serve": "bun src/serve.ts",
+    "test:browser": "node scripts/head-turn-smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.64.1"
   }
 }

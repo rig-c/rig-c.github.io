@@ -581,6 +581,10 @@ async function main() {
     canvas,
   };
 
+  // loadModel has resolved the model and atlas pages; applyMode rendered the
+  // first frame successfully above, and the inspection hook is now published.
+  // One completion signal for both manual and automatic playback; failures leave it absent.
+  demo.setAttribute("data-ready", "true");
   if (loading) loading.remove();
   demo.setAttribute("aria-busy", "false");
 
