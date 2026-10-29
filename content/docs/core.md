@@ -133,7 +133,7 @@ bun add -d @rig-c/core
 bun rigc build --rig rig.json --motion motion.json --out build/
 ```
 
-The published 2.74.0 package declares Bun 1.4.0 or later. The canonical npm package is `@rig-c/core`; `rig-c` is its convenience install name, and the command is `rigc`. Published legacy name `spine-rigc` remains a compatibility entry point; see [package names and aliases](/#package-names-and-aliases). Licensing by playback path: [Licensing](/docs/licensing/).
+The published 2.74.0 package declares Bun 1.4.0 or later. The canonical npm package is `@rig-c/core`; `rig-c` is its convenience install name, and the command is `rigc`. Licensing by playback path: [Licensing](/docs/licensing/).
 
 ## Inputs and outputs
 

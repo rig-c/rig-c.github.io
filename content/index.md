@@ -107,21 +107,9 @@ These short npm names are alternative entry points for the same products. Prefer
 | --- | --- | --- |
 | `@rig-c/core` | `rig-c` | `rigc` |
 | `@rig-c/parts` | `rig-parts` | `rig-parts` |
-| `@rig-c/pose` | Pending: `rig-pose` is not published (checked 2026-10-28) | `rig-pose` |
+| `@rig-c/pose` | `rig-pose` | `rig-pose` |
 | `@rig-c/play` | `rig-play` | None; import the browser library |
 | `@rig-c/review` | — | `rig-review` |
-
-Installing `@rig-c/pose` provides the `rig-pose` command. The proposed unscoped npm convenience package is a separate publication dependency; use `npm i -D @rig-c/pose` and the installed command until that package is published and verified. An executable name alone is not an npm package recommendation.
-
-### Legacy names and compatibility
-
-| Legacy npm name | Canonical package |
-| --- | --- |
-| `spine-rigc` | `@rig-c/core` |
-| `spine-parts` | `@rig-c/parts` |
-| `spine-html` | `@rig-c/play` |
-
-These published legacy entry points remain available for compatibility. Existing links, CLI names, Spine-format support and licensing guidance remain valid. Historical recordings and pinned reproductions keep the package names and versions that produced them.
 
 ## Licensing, stated plainly
 
