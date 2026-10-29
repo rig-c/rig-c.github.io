@@ -12,7 +12,7 @@ Three separate questions, answered separately: the licence of rig-c's own code, 
 
 ## rig-c's own code: MIT
 
-`rig-c` (core), `@rig-c/parts`, `@rig-c/pose`, `@rig-c/review`, `@rig-c/play`, `@rig-c/pixi`, `@rig-c/phaser` and `@rig-c/three` are MIT — each repository's `LICENSE`. That grant covers rig-c's code. It says nothing about Spine, and it does not cover the sample assets below.
+`@rig-c/core` (`rigc`), `@rig-c/parts`, `@rig-c/pose`, `@rig-c/review`, `@rig-c/play`, `@rig-c/pixi`, `@rig-c/phaser` and `@rig-c/three` are MIT — each repository's `LICENSE`. That grant covers rig-c's code. It says nothing about Spine, and it does not cover the sample assets below.
 
 ## Spine terms: they follow what plays the output
 
@@ -38,6 +38,7 @@ Esoteric Software's licence pages read *Last updated April 5, 2025* when this pa
 The image models that generated those paintings, and See-through itself, have their own terms; each repository's `NOTICE.md` records them, and [rig-c/parts `NOTICE.md`](https://github.com/rig-c/parts/blob/main/NOTICE.md) collects See-through's. No rig-c package contains See-through code or weights.
 
 <!-- SOURCES (not published)
+- canonical core package identity: core README at 666b30bf27b1447e71b02271b48253a8b47e7520, canonical npm package / convenience install name; npm view @rig-c/core@2.81.0 name license (2026-10-30): @rig-c/core, MIT.
 - MIT per repo: LICENSE files of rig-c/core, parts, pose, review, play, adapters (gh api .../LICENSE)
 - "what the terms turn on is the integration", "neither adds those terms nor removes them": rig-c/core NOTICE.md "What that means for rigc" + README "Licensing, stated plainly" (origin/main)
 - play/adapters link nothing from Esoteric, own core: rig-c/getting-started README "On a web page" licence line; rig-c/adapters README:99-104
