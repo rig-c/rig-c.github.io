@@ -49,7 +49,16 @@ describe('Actions deployment authority and ordering', () => {
     expect(testIndex).toBeGreaterThanOrEqual(0);
     expect(buildIndex).toBeGreaterThan(testIndex);
     expect(verifyIndex).toBeGreaterThan(buildIndex);
-    expect(compareIndex).toBeGreaterThan(verifyIndex);
+    const smokeIndex = position((step) => step.run === 'bun run test:browser');
+    expect(smokeIndex).toBeGreaterThan(verifyIndex);
+    expect(compareIndex).toBeGreaterThan(smokeIndex);
+    expect(steps[smokeIndex]['timeout-minutes']).toBe(3);
+    expect(steps[smokeIndex]['continue-on-error']).toBeUndefined();
+    expect(jobs.build['timeout-minutes']).toBe(10);
+    const install = steps.find((step: any) => step.run === 'bun install --frozen-lockfile');
+    expect(install).toBeDefined();
+    const browserInstall = steps.find((step: any) => step.run === 'bunx --no-install playwright install --with-deps chromium');
+    expect(browserInstall.env.PLAYWRIGHT_SKIP_BROWSER_GC).toBe('1');
     expect(uploadIndex).toBeGreaterThan(compareIndex);
     expect(steps[buildIndex]['continue-on-error']).toBeUndefined();
     expect(steps[buildIndex].env.SITE_FAILURE_FIXTURE).toBe("${{ inputs.failure_fixture || 'none' }}");

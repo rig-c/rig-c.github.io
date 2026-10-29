@@ -51,6 +51,7 @@ jobs:
           esac
 
   build:
+    timeout-minutes: 10
     needs: pages-mode
     runs-on: ubuntu-latest
     permissions:
@@ -64,6 +65,13 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.4'
+      - name: Install locked browser smoke dependency
+        run: bun install --frozen-lockfile
+      - name: Install pinned Chromium (preserve shared browser revisions)
+        timeout-minutes: 3
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_GC: '1'
+        run: bunx --no-install playwright install --with-deps chromium
       - name: Test resolver, layout, complete artifact and deployment decisions
         run: bun run test
       - name: Build isolated site (fixture errors must escape)
@@ -72,6 +80,9 @@ jobs:
         run: bun run build:ci
       - name: Verify generated artifact
         run: bun run verify
+      - name: Smoke head-turn readiness, directions, bounds and environment
+        timeout-minutes: 3
+        run: bun run test:browser
       - name: Compare verified bytes to current live manifest
         id: compare
         if: needs.pages-mode.outputs.enabled == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && inputs.failure_fixture != 'invalid-version'
