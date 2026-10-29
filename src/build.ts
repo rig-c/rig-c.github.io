@@ -499,7 +499,7 @@ function buildLlmsTxt(): string {
     '',
     '## Package names',
     '',
-    'rig-c is the toolchain brand. Scoped names are canonical. Convenience npm names: @rig-c/core → rig-c (CLI rigc); @rig-c/parts → rig-parts (CLI rig-parts); @rig-c/play → rig-play (browser library, no CLI); @rig-c/pose → rig-pose (CLI rig-pose). @rig-c/review installs CLI rig-review. Engine adapter packages are @rig-c/pixi, @rig-c/phaser and @rig-c/three.',
+    'rig-c is the toolchain brand. Scoped names are canonical. Convenience npm names: @rig-c/core → rig-c (CLI rigc); @rig-c/parts → rig-parts (CLI rig-parts); @rig-c/play → rig-play (browser library, no CLI); @rig-c/pose → rig-pose (CLI rig-pose); @rig-c/review → rig-review (CLI rig-review). Engine adapter packages are @rig-c/pixi, @rig-c/phaser and @rig-c/three.',
     '',
     '## Install',
     '',

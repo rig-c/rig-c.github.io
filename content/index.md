@@ -109,7 +109,7 @@ These short npm names are alternative entry points for the same products. Prefer
 | `@rig-c/parts` | `rig-parts` | `rig-parts` |
 | `@rig-c/pose` | `rig-pose` | `rig-pose` |
 | `@rig-c/play` | `rig-play` | None; import the browser library |
-| `@rig-c/review` | — | `rig-review` |
+| `@rig-c/review` | `rig-review` | `rig-review` |
 
 ## Licensing, stated plainly
 
