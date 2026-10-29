@@ -12,7 +12,7 @@ Every build and runtime dependency is installed from the public npm registry (`h
 
 | Package | Version | Role |
 | --- | --- | --- |
-| `@rig-c/parts` | `1.71.1` | Slices per-part depth sheets from `depth.jpg`, promotes `face` (`head`) and `topwear` (`chest`) to `13×16` depth-sampled surface grids (`360` triangles each), and emits the 2.5D `turn`, `tilt`, and `body_turn` animations and `yaw` / `pitch` / `body_yaw_dial` sliders |
+| `@rig-c/parts` | `1.75.0` | Slices per-part depth sheets from `depth.jpg`, promotes `face` (`head`) and `topwear` (`chest`) to `13×16` depth-sampled surface grids (`360` triangles each), adds depth deform to the authored weighted hair meshes and drives an independent chest-bound neck unit, and emits the 2.5D `turn`, `tilt`, and `body_turn` animations and `yaw` / `pitch` / `body_yaw_dial` sliders |
 | `@rig-c/pose` | `1.4.0` | Cleans and retargets the 4-way sign-test pose sequence (`pose#455`, 25 frames at 24 fps) onto the rig's `yaw`, `pitch`, and `body_yaw_dial` sliders as the `"clip"` animation |
 | `rig-c` | `2.79.0` | Gates (`--profile rig-play`) and compiles `rig.json` + `motion.json` into `skeleton.model.json`, `skeleton.json`, `skeleton.atlas`, and polygon-packed `skeleton.png`, and provides `readModel` in the browser |
 | `@rig-c/play` | `1.21.0` | Loads `skeleton.model.json` + `skeleton.png` (`loadModel`) and steps the runtime pose and animation mixer (`RigPlayer`) |
@@ -26,17 +26,22 @@ Every build and runtime dependency is installed from the public npm registry (`h
 1. **Source art and confirmed depth atlas**
    - Painting: [`bundle/look.png`](./bundle/look.png)
    - Confirmed depth atlas: [`bundle/depth.jpg`](./bundle/depth.jpg) (`1284×1289`, SHA-256 `c814960c7e40dd1d5573a5e6d6e5d97eefeb309d015dea924359dc87f8e998a0`, white = near, `zScale = 109.86819166092819`)
-2. **2.5D head and body turn configuration (`@rig-c/parts@1.71.1`)**
+2. **2.5D head and body turn configuration (`@rig-c/parts@1.75.0`)**
    - `config.turn`:
      - `pivot: 55`, `counter: 0.1`, `grid: [13, 16]`
-     - Head roles: `face: "surface"` (`face_surface` under `faceshift`), `hair_back: "rear"`, `hairpin: "rear"` (`rear_shift`), and facial/hair features (`ear_r`, `ear_l`, `nose`, `mouth`, `eyewhite_r`, `eyewhite_l`, `iris_r`, `iris_l`, `lash_r`, `lash_l`, `brow_l`, `brow_r`, `hair_front`) as `"unit"`
+     - `"unitDepths": {"ear_r": -7.0432, "ear_l": -7.0432}` gives both unit ears the same calibrated depth; their translations match at each angle and reverse between opposite extremes.
+     - Head roles: `face: "surface"` (`face_surface` under `faceshift`); `hair_back`, `hair_front`, and `hairpin` as `"surface"` on their authored weighted meshes; facial features (`ear_r`, `ear_l`, `nose`, `mouth`, `eyewhite_r`, `eyewhite_l`, `iris_r`, `iris_l`, `lash_r`, `lash_l`, `brow_l`, `brow_r`) as `"unit"`
    - `config.turn.body`:
      - `pivot: 55`, `counter: 0.1`, `grid: [13, 16]`
-     - Body roles: `topwear: "surface"` (`topwear_surface` under `bodyshift`), `collar_back: "rear"` (`body_rear_shift`)
+     - Body roles: `topwear: "surface"` (`topwear_surface` under `bodyshift`), `collar_back: "rear"` (`body_rear_shift`), and `neck: "unit"` on its independent chest-bound mesh
+     - `"unitDepths": {"neck": 31.7338}` supplies the neck scalar depth; it has no head turn role or own depth sheet
+   - Weighted hair samples its own depth sheet at each vertex while retaining skinning and physics. The neck is assembled with `["neck", "full", "neck"]` and uses `neck_part` under `chest` at `[422, 734]`, with one segment `["neck_part", [422, 734], [422, 646]]` (`grid: 32`, `r: 5`). The generated `neck_unit` carries that mesh through body yaw independently of the head. Ears retain their calibrated depths and stay behind the face and in front of the back hair.
    - **No rigid 2D spin (`narrowing: false`)**:
      - `rig.json` generates `face` and `topwear` with `generator: { "kind": "grid", "cols": 13, "rows": 16, "depth": true }`.
-     - `motion.json` keys `faceshift`, `rear_shift`, `face_surface`, `turn_units`, `bodyshift`, `body_rear_shift`, and `topwear_surface` exclusively via `derive: { kind: "yaw" | "pitch", degrees, depth, narrowing: false }` and surface `deform` via `transform: { kind: "yaw" | "pitch", degrees, depth: true, narrowing: false }`.
+     - `motion.json` uses depth-derived translations and generated-grid transforms with `narrowing: false`. Authored weighted hair meshes carry explicit per-influence deform keys. The neck unit uses a scalar-depth body translation.
      - In the compiled `skeleton.json` / `skeleton.model.json`, `animations.turn`, `animations.tilt`, and `animations.body_turn` carry only translation (`translatex` / `translatey`) and per-vertex `deform` offsets—zero `rotate` timelines and zero `scalex` narrowing timelines.
+   - The full-source neck removes the garment collar pixels embedded in the former head-source cut. Painted skin shading and collar outlines remain; no manual art cleanup is applied.
+
 3. **4-way sign-test pose clip (`@rig-c/pose@1.4.0`)**
    - 25 frames at 24 fps (`1.000 s` duration):
      - Frames `0..4`: neutral (`yaw = 0°`, `pitch = 0°`, `body = 0°`)
@@ -65,17 +70,19 @@ Every build and runtime dependency is installed from the public npm registry (`h
    mkdir -p build-env && cd build-env
    npm init -y
    PLAYWRIGHT_SKIP_BROWSER_GC=1 npm install --no-save \
-     @rig-c/parts@1.71.1 \
+     @rig-c/parts@1.75.0 \
      @rig-c/pose@1.4.0 \
      @rig-c/play@1.21.0 \
      @rig-c/pixi@0.1.5 \
      rig-c@2.79.0 \
      pixi.js@8.22.0
    ```
-2. **Reassemble the approved source layers using `@rig-c/parts@1.71.1` with the turn roles in the assemble config**:
+2. **Reassemble the approved source layers using `@rig-c/parts@1.75.0` with the turn roles in the assemble config**:
+   - Set `assemble.yield_refused: true` to yield drift-refused front pixels only to an opaque behind holder matching the painting.
    - Do not reuse PNGs assembled by an older version: moving head parts must keep their own fringe and seam colours.
    - Then run `@rig-c/parts` (`rigStage`) on the cut parts + depth sheets cropped from `depth.jpg`:
    - Configure `config.turn` (head) and `config.turn.body` (torso `topwear` + `collar_back`) with `pivot: 55`, `counter: 0.1`, `grid: [13, 16]`, and `zScale: 109.86819166092819`.
+   - Supply the `hairpin` depth sheet from its region of the same confirmed atlas, in addition to `face`, `hair_front`, `hair_back`, `topwear`, and `collar_back`. Omit the neck depth sheet: its body `unitDepths` value is `31.7338`. Keep the hair bindings and use the single `neck_part` segment above.
    - Emit `rig-out/rig.json`, `rig-out/motion.json`, `rig-out/images/`, `rig-out/depth_sheets.json`, and `rig-out/mesh_report.json`.
 3. **Clean and retarget the 4-way sign-test pose clip with `@rig-c/pose`**:
    ```bash

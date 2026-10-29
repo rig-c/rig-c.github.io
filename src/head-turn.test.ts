@@ -86,7 +86,7 @@ describe('verifyHeadTurnDemo & verifyHeadTurnBundle', () => {
       fs.readFileSync(path.join(ROOT_DIR, HEAD_TURN_PACKAGE_MANIFEST_REL), 'utf-8'),
     ) as { packages: Array<{ name: string; version: string; integrity: string }> };
     const byName = new Map(pkgManifest.packages.map((p) => [p.name, p]));
-    expect(byName.get('@rig-c/parts')?.version).toBe('1.71.1');
+    expect(byName.get('@rig-c/parts')?.version).toBe('1.75.0');
     expect(byName.get('@rig-c/pose')?.version).toBe('1.4.0');
     expect(byName.get('@rig-c/play')?.version).toBe('1.21.0');
     expect(byName.get('@rig-c/pixi')?.version).toBe('0.1.5');
@@ -114,6 +114,12 @@ describe('verifyHeadTurnDemo & verifyHeadTurnBundle', () => {
         }
       >;
     };
+
+    const slots = (skel as unknown as { slots: Array<{ name: string }> }).slots.map((s) => s.name);
+    for (const ear of ['ear_r', 'ear_l']) {
+      expect(slots.indexOf(ear)).toBeGreaterThan(slots.indexOf('hair_back'));
+      expect(slots.indexOf(ear)).toBeLessThan(slots.indexOf('face'));
+    }
 
     const sliders = skel.constraints.filter((c) => c.type === 'slider');
     const sliderRangeByBone = new Map<string, [number, number]>();
@@ -143,6 +149,10 @@ describe('verifyHeadTurnDemo & verifyHeadTurnBundle', () => {
           Object.values(defaultSkinAtts[slot] ?? {}).some((att) => Array.isArray(att.deform) && att.deform.length > 0),
         );
         expect(deformSlots.length).toBeGreaterThan(0);
+        const requiredSurfaces = animName === 'body_turn'
+          ? ['topwear']
+          : ['face', 'hair_back', 'hair_front', 'hairpin'];
+        for (const slot of requiredSurfaces) expect(deformSlots).toContain(slot);
       }
     }
 
@@ -159,6 +169,39 @@ describe('verifyHeadTurnDemo & verifyHeadTurnBundle', () => {
         expect(v).toBeGreaterThanOrEqual(min - 1e-6);
         expect(v).toBeLessThanOrEqual(max + 1e-6);
       }
+    }
+  });
+
+  test('neck is an independent chest unit with one named binding and scalar depth', () => {
+    const skeleton = JSON.parse(read('demos/head-turn/bundle/skeleton.json'));
+    const model = JSON.parse(read('demos/head-turn/bundle/skeleton.model.json'));
+    const parentOf = (name: string) => model.bones.find((bone: { name: string }) => bone.name === name)?.parent;
+    expect(parentOf('neck_unit')).toBe('bodyshift');
+    expect(parentOf('neck_part')).toBe('neck_unit');
+    expect(parentOf('bodyshift')).toBe('chest');
+    expect(model.meshes.find((mesh: { slot: string }) => mesh.slot === 'neck').bones).toEqual(['neck_part']);
+    for (const animation of ['turn', 'tilt', 'body_turn']) {
+      expect(skeleton.animations[animation].attachments?.default?.neck).toBeUndefined();
+    }
+    const depths = model.trackDerivations
+      .filter((track: { animation: string }) => track.animation === 'body_turn')
+      .flatMap((track: { model: { members?: Array<{ member: string; depth: number }> } }) =>
+        (track.model.members ?? []).filter((member) => member.member === 'neck_unit').map((member) => member.depth));
+    expect(depths).toHaveLength(4);
+    expect([...new Set(depths)]).toEqual([31.7338]);
+  });
+
+  test('unit ears share depth translation and reverse together across opposite turn extremes', () => {
+    const skeleton = JSON.parse(read('demos/head-turn/bundle/skeleton.json'));
+    for (const [animation, channel] of [['turn', 'translatex'], ['tilt', 'translatey']]) {
+      const bones = skeleton.animations[animation].bones;
+      const right = bones.ear_r[channel] as Array<{ value?: number }>;
+      const left = bones.ear_l[channel] as Array<{ value?: number }>;
+      expect(left).toEqual(right);
+      const carrier = bones.faceshift[channel] as Array<{ value?: number }>;
+      const total = (index: number) => (carrier[index].value ?? 0) + (right[index].value ?? 0);
+      expect(total(0)).not.toBe(0);
+      expect(total(0)).toBe(-total(right.length - 1));
     }
   });
 

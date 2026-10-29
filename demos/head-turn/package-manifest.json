@@ -4,11 +4,11 @@
   "packages": [
     {
       "name": "@rig-c/parts",
-      "version": "1.71.1",
-      "spec": "@rig-c/parts@1.71.1",
-      "integrity": "sha512-cFRsUkOv12Nsndqa4+IKHM2zHWotyYiSHx3n3IHlS7tWlZl1OvPKXDAw4+EhVGQDd2jlthpalt5q61kjrULN5g==",
-      "shasum": "457eda46ef12b43fd1a69c58aba7ac7f912f1a4d",
-      "tarball": "https://registry.npmjs.org/@rig-c/parts/-/parts-1.71.1.tgz"
+      "version": "1.75.0",
+      "spec": "@rig-c/parts@1.75.0",
+      "integrity": "sha512-svM0Pc80MR68fhlSHof+158iBnxCTxaT7MvkBAA/e7BiXz9o1IWdYDgo1xU415M5JJuddE9UhkdvwYfFtQibmg==",
+      "shasum": "8c7505a7c16761ed25b379c3af30b3b077b29b14",
+      "tarball": "https://registry.npmjs.org/@rig-c/parts/-/parts-1.75.0.tgz"
     },
     {
       "name": "@rig-c/pose",
