@@ -133,7 +133,7 @@ bun add -d @rig-c/core
 bun rigc build --rig rig.json --motion motion.json --out build/
 ```
 
-The published 2.74.0 package declares Bun 1.4.0 or later. The canonical npm package is `@rig-c/core`; `rig-c` is its convenience install name, and the command is `rigc`. Licensing by playback path: [Licensing](/docs/licensing/).
+The published package declares Bun 1.4.0 or later. The canonical npm package is `@rig-c/core`; `rig-c` is its convenience install name, and the command is `rigc`. Licensing by playback path: [Licensing](/docs/licensing/).
 
 ## Inputs and outputs
 
@@ -164,6 +164,7 @@ The published 2.74.0 package declares Bun 1.4.0 or later. The canonical npm pack
 - Start here: [/docs/getting-started/](/docs/getting-started/)
 
 <!-- SOURCES (not published)
+- install requirements: npm view @rig-c/core@2.81.0 engines and package.json at 666b30bf27b1447e71b02271b48253a8b47e7520 (2026-10-30): bun >=1.4.0; this is the declared runtime floor, not an older-runtime test result.
 - declared runtime refreshed from npm rig-c@2.74.0 tarball package.json engines.bun (>=1.4.0); recorded cases below retain their original pins.
 - key-pose film: rig-c/core@539572d (539572d34bb034b9e905e30dc2d45bcd2650b34f, the commit that last changed it; identical at v2.64.1 51dba78) assets/rigc-keypose.gif — 234 frames, 600x405, 5 cs each = 11.70 s, opaque; encoded by scripts/encode-video.sh row core-keypose (20 fps, cropped to 600x404); caption from films/two-keypose/README.md (summary, shot table, honesty stance; shot 2 = spine-rigc@0.9.0 output); "spine-rigc" is drawn in the caption band of every frame
 - three cases: rig-c 2.61.0 on rig-c/examples@c239b09 family/roa/out/rig — verbatim fail.log / pass.log / guide.txt of each case (case run 2026-10-19)

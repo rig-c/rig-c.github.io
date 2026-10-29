@@ -99,7 +99,7 @@ npm i -D @rig-c/parts
 rig-parts --help
 ```
 
-Declares [Bun](https://bun.sh) 1.4.0 or later in the published 1.68.0 package; rig-c comes with it as a dependency. Which Spine terms apply depends on what plays the output: see [Licensing](/docs/licensing/).
+The published package declares [Bun](https://bun.sh) 1.4.0 or later; `@rig-c/core` comes with it as a dependency. Which Spine terms apply depends on what plays the output: see [Licensing](/docs/licensing/).
 
 ## Inputs and outputs
 
@@ -133,6 +133,7 @@ From the [1.68.0 README](https://github.com/rig-c/parts/blob/89a7671229d155976fc
 - Character 1's own files: [its folder in rig-c/examples](https://github.com/rig-c/examples/tree/c239b09328ca7364361b9761fac817502c09ede0/family/roa)
 
 <!-- SOURCES (not published)
+- install requirements: npm view @rig-c/parts@1.78.0 engines dependencies and package.json at 97a123395b83f5bee9ebce6407735f2a408855a6 (2026-10-30): bun >=1.4.0, @rig-c/core ^2.72.0; feature/config references below retain their historical pins.
 - hero clip parts-explode.mp4 + poster: scripts/parts-explode.py (reads rig-c/examples@c239b09 family/roa/out/parts/*.png + parts.json via git show; assembled frames = parts.json x/y in list order, placement vs out/recomposite_rig.png mean abs diff 0.0134; grid layout and dissolves are illustration)
 - Character 1 assets: rig-c/examples@c239b09 family/roa — docs/roa_layers_sheet.png, out/parts/*.png, out/parts.json (17 parts, recomposite: mean_abs 0.873, within_share 0.9831, uncovered_error_px 6041, holes[0] 834 px bordering bottomwear), out/recomposite_rig.png, out/recomposite_error_rig.png, docs/idle.gif (41 frames, 80 ms), out/check/contact.png
 - red = uncovered error, blue = covered error (>40 off): rig-c/parts docs/AUTHORING.md lines 2200, 2633

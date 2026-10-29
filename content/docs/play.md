@@ -79,13 +79,13 @@ Runs in the browser as an ES module; rig-c's posing core is bundled, so there is
 | (optional) your own `PosedFrame` records, via `DomRenderer.render` | |
 
 ## Limits
-From the README's *Status* and *No counterpart in 1.0.0* (it has no limits section):
-- **Status: "Production."** — 60 fps on every engine measured for the practical scenario (README §"Status").
-- **Reads rigc's model only**: "a Spine export is refused by name"; `loadModel` reads a compiled model document and nothing else (README §"Why", §"No counterpart in 1.0.0").
-- **Which render mode is faster where is "not measured on a device yet"**, so the default stays `dom` (README §"Status").
-- **Dark/two-colour tint stays out of scope in DOM mode**; RGB tint needs reference-filter support, Safari 15+ (README §"Status").
-- **Clipping caveats**: an inverse polygon matches Spine's clipper only when convex, and the cost of many `clip-path`s on real-device Safari is not measured (README §"Status").
-- **No per-slot changes from code** (attachment, colour) and no `scale` on load; scaling the root element is the caller's (README §"No counterpart in 1.0.0").
+From [REFERENCE.md §Status](https://github.com/rig-c/play/blob/main/docs/REFERENCE.md#status) and [MIGRATION.md §No counterpart in 1.0.0](https://github.com/rig-c/play/blob/main/docs/MIGRATION.md#no-counterpart-in-100):
+- **Status: "Production."** — 60 fps on every engine measured for the practical scenario (REFERENCE.md §"Status").
+- **Reads rigc's model only**: "a Spine export is refused by name"; `loadModel` reads a compiled model document and nothing else ([README §Why](https://github.com/rig-c/play#why), MIGRATION.md §"No counterpart in 1.0.0").
+- **Which render mode is faster where is "not measured on a device yet"**, so the default stays `dom` (REFERENCE.md §"Status").
+- **Dark/two-colour tint stays out of scope in DOM mode**; RGB tint needs reference-filter support, Safari 15+ (REFERENCE.md §"Status").
+- **Clipping caveats**: an inverse polygon matches Spine's clipper only when convex, and the cost of many `clip-path`s on real-device Safari is not measured (REFERENCE.md §"Status").
+- **No per-slot changes from code** (attachment, colour) and no `scale` on load; scaling the root element is the caller's (MIGRATION.md §"No counterpart in 1.0.0").
 
 ## Go deeper
 - [Measured runtime costs and unresolved results](/docs/performance/) — historical package comparisons, with CPU, GPU and presentation boundaries.
@@ -97,6 +97,7 @@ From the README's *Status* and *No counterpart in 1.0.0* (it has no limits secti
 - [How it works](https://github.com/rig-c/play#how-it-works)
 - [npm](https://www.npmjs.com/package/@rig-c/play) · [CHANGELOG](https://github.com/rig-c/play/blob/main/CHANGELOG.md)
 <!-- SOURCES (not published)
+- six Limits bullets rechecked against @rig-c/play 1.21.1 (npm gitHead = main 7f84c22f1fb8dacbf8db4aa1333efa3fbac6120a, 2026-10-30): docs/REFERENCE.md Status (production, practical scenario, mode cost, tint and clipping caveats); docs/MIGRATION.md No counterpart in 1.0.0 (model input, no load scale, no per-slot API); README Why (Spine export refused). Older line references below document the original 1.12.0 page/recording.
 - live player picks: the 20 Family rigs = rig-c/examples@c239b09 family/ (same pin as /examples/), each with one animation `idle` (skeleton.model.json animations); sizes measured on jsDelivr: skeleton.png 1.19–2.00 MB + model ~0.09 MB compressed
 - live player: @rig-c/play 1.12.0 from jsDelivr; Character 1 office model assets/rigs/character-1-swing = the Pose case's swing-build (Character 1 rig @examples c239b09 + retargeted cup swing; rig-c 2.61.0, @rig-c/pose 0.35.0)
 - minimal page: rig-c/play README "A minimal page" (lines 301-326), style attribute only in the sample code
