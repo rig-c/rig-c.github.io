@@ -1,10 +1,10 @@
 ---
 navLabel: Examples
 title: rig-c Examples — See the Rigs, Play Them Live, Rebuild Them
-description: The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus the inputs, configs and commands that rebuild them.
+description: The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus rigboy’s seven clips and live aim dial, and the inputs and commands that rebuild them.
 keywords: rig-c examples, live demo, @rig-c/play, examples, rig-c trailer, reproducible rigging, Spine 4.3 examples
 repoUrl: https://github.com/rig-c/examples
-summaryForLlms: Examples in three steps: a recorded preview of the Family rigs, a live in-browser demo that plays all 20 Family rigs (5 characters × 4 outfits) with the published @rig-c/play, then the sources and rebuild commands (rig-c/examples family suite, six standalone input sets, rig-c/trailer).
+summaryForLlms: Examples in three steps: a recorded preview of the Family rigs, a live in-browser demo that plays all 20 Family rigs (5 characters × 4 outfits) with the published @rig-c/play, a separate rigboy player with seven clips and a −8°…+8° aim dial, then the sources and rebuild commands (rig-c/examples family suite, six standalone input sets, rig-c/trailer).
 ---
 # Examples
 
@@ -29,6 +29,18 @@ See what the rigs look like, play one in your browser, then open the files and c
 {{live-demo}}
 
 The live demo loads the published [`@rig-c/play`](/docs/play/) 1.12.0 from jsDelivr and the Family models from rig-c/examples at one pinned commit. Each rig plays its own `idle` — the only motion these models carry — with its physics; the blink and the breeze in the recording above come from the Family viewer, not from the models.
+
+### rigboy — seven clips and an aim dial
+
+{{rigboy-demo}}
+
+rigboy is a separate motion section beside Family: its seven clips and aim/travel controls need different controls from Family’s character and outfit choices. Both use the same loader, pause button and bone/mesh overlays.
+
+Select `idle`, `walk`, `run`, `jump`, `aim`, `shoot` or `hit`. The aim dial calls the pinned `controls.js`’s `setAimDegrees` over −8°…+8°, giving toy world angles of about 82° / 90° / 98°; `aim` holds idle at time zero as a neutral carrier while the dial samples the aim range through its property. It does not autoplay the aim range. `shoot` restores the authored recoil spring after direct aim.
+
+Walk and run are in-place cycles. Optional travel uses `setTravel` (64 / 192 rig pixels per second), wraps inside the frame and starts off. Stationary clips disable travel. Start loads the model and controls from [examples at `8aa22071`](https://github.com/rig-c/examples/tree/8aa220713b1c8216ea535a8a14a8a34f65ee5a2a/rigboy) and the published `@rig-c/play` **1.21.2** from jsDelivr. Measured decoded download: **2,264,805 bytes (2.26 MB)** for player + controls + model + atlas; compressed transfer and cache hits vary.
+
+Limit: the clips are modest because one profile painting folds at deep knee flexion.
 
 ## 3. Open the sources and rebuild
 
