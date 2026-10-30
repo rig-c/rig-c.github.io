@@ -71,7 +71,7 @@ These are inputs — painting, See-through inputs and layers; [`@rig-c/parts`](/
 
 ### `rig-c/trailer` — the 12-second short
 
-[`rig-c/trailer`](https://github.com/rig-c/trailer) is the loop on the landing page: a character on a swing breathes, tilts her head, smiles, kicks her legs, hops and waves, her twin tails following on physics chains — 240 frames at 20 fps, rebuilt from one painting, two See-through layer sets and agent-authored configs:
+[`rig-c/trailer`](https://github.com/rig-c/trailer) is the loop on the landing page: a character on a swing breathes, tilts her head, smiles and looks around through a 2.5D depth turn, kicks her legs, hops and waves, her long hair draping over the seat on physics chains — 240 frames at 20 fps, rebuilt from one painting, two See-through layer sets and agent-authored configs:
 
 ```sh
 git clone https://github.com/rig-c/trailer && cd trailer
