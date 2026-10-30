@@ -53,9 +53,12 @@ CLIPS=(
   # ships in core's README: 234 frames at 5 cs = 11.700 s, 600x405, opaque.
   # Its last 7 frames dissolve back into frame 0, so it is a loop.
   "core-keypose|assets/docs/core-keypose.mp4|rig-c/core|539572d34bb034b9e905e30dc2d45bcd2650b34f|assets/rigc-keypose.gif|20|234|11.700|-|build"
-  # Landing hero. Built by rig-c/trailer build.sh -> out/scene/trailer.webp
-  # (a build output); the commit the site's MP4 came from is not recorded.
-  "trailer|assets/trailer.mp4|rig-c/trailer|unknown|out/scene/trailer.webp|20|240|12.000|-|hold"
+  # Landing hero. rig-c/trailer v2's published loop, the root trailer.webp
+  # (6,406,188 bytes, SHA-256 a441e986...): 240 frames at 50 ms = 12.000 s,
+  # 960x540, opaque. build.sh writes its own copy under out/v2-final/scene/;
+  # the trailer's README records one build reproducing the root file byte for
+  # byte, so the root file is read here rather than rebuilt.
+  "trailer|assets/trailer.mp4|rig-c/trailer|e42bc79b0dcbbcdf54e95eca841450f8dbecedd1|trailer.webp|20|240|12.000|-|build"
   # Landing, under the hero ("From loose parts to a living rig"). Rendered and
   # encoded by scripts/landing-film.py from rig-c/trailer@2248a13 (its pinned
   # @rig-c/parts 1.12.0 and rig-c 2.47.1; build.sh steps 1-3, then the
