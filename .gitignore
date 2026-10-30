@@ -4,3 +4,4 @@ _site/
 dist/
 ._site-*/
 .dist-*/
+_site-smoke/

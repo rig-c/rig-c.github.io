@@ -9,6 +9,8 @@ const PLAY_URL = 'https://cdn.jsdelivr.net/npm/@rig-c/play@1.12.0/dist/index.js'
 for (const root of document.querySelectorAll('.live-demo')) init(root);
 
 function init(section) {
+  const rigboy = section.dataset.demo === 'rigboy';
+  const playUrl = rigboy ? `https://cdn.jsdelivr.net/npm/@rig-c/play@${section.dataset.playVersion}/dist/index.js` : PLAY_URL;
   const sha = section.dataset.sha;
   const base = `https://raw.githubusercontent.com/rig-c/examples/${sha}/family`;
   const repo = `https://github.com/rig-c/examples/tree/${sha}/family`;
@@ -19,6 +21,7 @@ function init(section) {
     play: $('demo-play'), bones: $('demo-bones'), mesh: $('demo-mesh'),
     start: $('demo-start'), stage: $('demo-stage'), overlay: $('demo-overlay'),
     status: $('demo-status'), source: $('demo-source'),
+    aim: $('demo-aim'), angle: $('demo-angle'), travel: $('demo-travel'),
   };
   section.classList.add('demo-ready');
   setControls(false);
@@ -26,9 +29,10 @@ function init(section) {
   const query = new URLSearchParams(location.search);
   for (const [key, el] of [['character', ui.character], ['outfit', ui.outfit]]) {
     const value = query.get(key);
-    if (value && [...el.options].some((opt) => opt.value === value)) el.value = value;
+    if (el && value && [...el.options].some((opt) => opt.value === value)) el.value = value;
   }
 
+  let controlFactory = null;
   let lib = null; // the imported @rig-c/play module
   let current = null; // { player, assets, el, bones }
   let playing = false;
@@ -40,8 +44,8 @@ function init(section) {
   const dir = (c, o) => (o === 'office' ? c : `outfits/${o}/${c}`);
   const config = (c, o) => (o === 'office' ? `${c}/config.json` : `outfits/${o}/${c}/authoring/config.json`);
   const siteModel = (c, o) => Boolean(section.dataset.modelUrl) && section.dataset.modelFor === `${c}/${o}`;
-  const label = (c, o) => (siteModel(c, o) ? section.dataset.modelLabel : null) ?? `${ui.character.selectedOptions[0].textContent}, ${o}`;
-  const size = (c, o) => (siteModel(c, o) ? section.dataset.modelSize : null) ?? section.dataset.familySize ?? 'about 1.3–2.1 MB';
+  const label = (c, o) => rigboy ? 'rigboy' : (siteModel(c, o) ? section.dataset.modelLabel : null) ?? `${ui.character.selectedOptions[0].textContent}, ${o}`;
+  const size = (c, o) => rigboy ? section.dataset.modelSize : (siteModel(c, o) ? section.dataset.modelSize : null) ?? section.dataset.familySize ?? 'about 1.3–2.1 MB';
 
   // Keep the pick in the address bar, so a link reopens the same rig.
   function remember(c, o) {
@@ -71,7 +75,8 @@ function init(section) {
   }
 
   function setControls(enabled) {
-    for (const el of [ui.character, ui.outfit, ui.motion, ui.mode, ui.play, ui.bones, ui.mesh]) if (el) el.disabled = !enabled;
+    for (const el of [ui.character, ui.outfit, ui.motion, ui.mode, ui.play, ui.bones, ui.mesh, ui.aim, ui.travel]) if (el) el.disabled = !enabled;
+    if (ui.travel) ui.travel.disabled = !enabled || !['walk', 'run'].includes(ui.motion.value);
   }
 
   function syncButtons() {
@@ -82,6 +87,7 @@ function init(section) {
   }
 
   function showSource(c, o) {
+    if (rigboy) return;
     if (siteModel(c, o)) {
       ui.source.innerHTML = modelSource;
       return;
@@ -182,15 +188,15 @@ function init(section) {
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
     if (current && playing && !document.hidden) {
-      current.player.frame(dt);
+      current.player.frame(rigboy && ui.motion.value === 'aim' ? 0 : dt);
       drawOverlay();
     }
     requestAnimationFrame(tick);
   }
 
   async function load() {
-    const c = ui.character.value;
-    const o = ui.outfit.value;
+    const c = ui.character?.value;
+    const o = ui.outfit?.value;
     const id = ++request;
     const keepTime = current ? current.player.time : 0;
     const keepMotion = current ? current.player.current : null;
@@ -200,9 +206,10 @@ function init(section) {
     try {
       let bones = [];
       const assets = await lib.loadModel({
-        modelUrl: siteModel(c, o) ? section.dataset.modelUrl : `${base}/${dir(c, o)}/out/check/build/skeleton.model.json`,
+        modelUrl: rigboy || siteModel(c, o) ? section.dataset.modelUrl : `${base}/${dir(c, o)}/out/check/build/skeleton.model.json`,
         crossOrigin: 'anonymous',
         setsUrl: null,
+        ...(rigboy ? { regions: 'data' } : {}),
         fetch: async (input, init) => {
           const response = await fetch(input, init);
           if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${String(input).split('/family/')[1] ?? input}`);
@@ -217,6 +224,7 @@ function init(section) {
       // Dispose the old rig before creating the new one: the mesh renderer shares one WebGL
       // context per page, and disposing after the new player exists tears down what it uses.
       if (current) {
+        current.controls?.dispose();
         current.player.dispose();
         current.assets.dispose();
         current.el.remove();
@@ -224,18 +232,36 @@ function init(section) {
       }
       const el = document.createElement('div');
       ui.stage.insertBefore(el, ui.overlay);
-      const player = new lib.RigPlayer(el, assets, ui.mode ? { mode: ui.mode.value } : {});
+      const player = new lib.RigPlayer(el, assets, rigboy ? { mode: 'dom', meshBackend: 'canvas2d' } : ui.mode ? { mode: ui.mode.value } : {});
       const names = assets.animations.map((a) => a.name);
       const motion = names.includes(keepMotion) ? keepMotion : names[0];
       current = { player, assets, el, bones };
       ui.motion.replaceChildren(...names.map((n) => new Option(n, n, false, n === motion)));
       player.play(motion);
+      if (rigboy) {
+        current.controls = controlFactory(player);
+        const upstream = player.adjust;
+        // Upstream travel uses unwrapped track time. Wrap its root offset rather than
+        // resetting the animation/physics clock. The authored stage leaves this margin.
+        player.adjust = (bones, context) => {
+          upstream(bones, context);
+          if (ui.travel.checked && ['walk', 'run'].includes(context.animation)) {
+            const root = bones.bone('root');
+            const span = assets.stage.width * 0.24;
+            root.x = ((root.x + span / 2) % span + span) % span - span / 2;
+          }
+        };
+        applyRigboyControls();
+      }
       if (keepTime > 0) player.seek(keepTime % (assets.animations.find((a) => a.name === motion)?.duration || 1));
       if (!playing) player.pause();
       fit();
       player.frame(0);
       drawOverlay();
       showSource(c, o);
+      if (query.get('demo-test') === '1') {
+        section.demo = { get player() { return current.player; }, get assets() { return current.assets; }, get view() { return current.view; }, draw: () => { current.player.draw(); drawOverlay(); } };
+      }
       const backend = player.mode === 'canvas' ? 'everything in one canvas (canvas mode)' : `meshes drawn with ${player.renderer.meshBackendActive ?? 'canvas'} (DOM mode)`;
       const motions = names.length === 1 ? `its one motion, ${names[0]}` : `${names.length} motions`;
       status(`Live: ${name} — ${motions}, ${backend}.${playing ? '' : ' Paused; press Play.'}`, 'ready');
@@ -257,8 +283,10 @@ function init(section) {
       status('Loading the @rig-c/play runtime…', 'loading');
       try {
         // A failed module import is cached by the browser, so each retry asks for a fresh URL.
-        lib = await import(attempts++ ? `${PLAY_URL}?retry=${attempts}` : PLAY_URL);
+        lib = await import(attempts++ ? `${playUrl}?retry=${attempts}` : playUrl);
+        if (rigboy) controlFactory = (await import(attempts > 1 ? `${section.dataset.controlsUrl}?retry=${attempts}` : section.dataset.controlsUrl)).rigboyControls;
       } catch (err) {
+        lib = null;
         status(`The live demo could not load the @rig-c/play runtime from jsDelivr (${err.message}).`, 'error', true);
         offerRetry();
         return;
@@ -273,17 +301,44 @@ function init(section) {
     await load();
   }
 
+  // The aim clip is a slider's sampled pose range, not a base animation to autoplay.
+  // Use idle at time zero as the neutral carrier; aim_dial adds the pose via aim_control.
+  function applyRigboyControls() {
+    const { player, controls } = current;
+    controls.setAimDegrees(Number(ui.aim.value));
+    ui.angle.value = `${ui.aim.value}°`;
+    if (ui.motion.value === 'shoot') controls.recoilPhysics();
+    const travel = ['walk', 'run'].includes(ui.motion.value);
+    if (!travel) ui.travel.checked = false;
+    ui.travel.disabled = !travel;
+    controls.setTravel(travel && ui.travel.checked);
+    if (ui.motion.value === 'aim') player.pause();
+    player.repose(); // property changes must update even while paused
+    player.draw();
+  }
+  ui.aim?.addEventListener('input', () => {
+    if (!current) return;
+    applyRigboyControls();
+    drawOverlay();
+  });
+  ui.travel?.addEventListener('change', () => {
+    if (!current) return;
+    applyRigboyControls();
+    drawOverlay();
+  });
   ui.start.addEventListener('click', start);
   const pick = () => {
     remember(ui.character.value, ui.outfit.value);
     if (lib) load();
   };
-  ui.character.addEventListener('change', pick);
-  ui.outfit.addEventListener('change', pick);
+  ui.character?.addEventListener('change', pick);
+  ui.outfit?.addEventListener('change', pick);
   if (ui.mode) ui.mode.addEventListener('change', load);
   ui.motion.addEventListener('change', () => {
     if (!current) return;
-    current.player.play(ui.motion.value);
+    current.player.play(rigboy && ui.motion.value === 'aim' ? 'idle' : ui.motion.value);
+    if (rigboy && ui.motion.value === 'aim') current.player.seek(0);
+    if (rigboy) applyRigboyControls();
     if (!playing) current.player.pause();
     current.player.frame(0);
     drawOverlay();
@@ -291,7 +346,7 @@ function init(section) {
   ui.play.addEventListener('click', () => {
     if (!current) return;
     playing = !playing;
-    if (playing) current.player.resume();
+    if (playing && !(rigboy && ui.motion.value === 'aim')) current.player.resume();
     else current.player.pause();
     last = performance.now();
     syncButtons();

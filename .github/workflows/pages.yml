@@ -83,6 +83,9 @@ jobs:
       - name: Smoke head-turn readiness, directions, bounds and environment
         timeout-minutes: 3
         run: bun run test:browser
+      - name: Smoke rigboy controls and Family regression
+        timeout-minutes: 6
+        run: bun run test:rigboy
       - name: Compare verified bytes to current live manifest
         id: compare
         if: needs.pages-mode.outputs.enabled == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && inputs.failure_fixture != 'invalid-version'
