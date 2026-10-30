@@ -21,15 +21,24 @@ export async function captureNative(page, out) {
   });
   const hash = b => createHash('sha256').update(b).digest('hex');
   // A genuine unanimated setup pose, drawn with the published renderer and the loaded page assets.
-  await section.evaluate(async s => {
+  const setupRecord = await section.evaluate(async s => {
     const { RigPlayer } = await import(`https://cdn.jsdelivr.net/npm/@rig-c/play@${s.dataset.playVersion}/dist/index.js`);
     const el = document.createElement('div'); el.style.cssText = 'position:absolute;left:416px;top:1216px';
     s.querySelector('.demo-stage').append(el); s.demo.player.root.hidden = true;
     const setup = new RigPlayer(el, s.demo.assets, { mode: 'dom', meshBackend: 'canvas2d' });
-    const frame = setup.posedFrame();
+    // A new player has no evaluated pose; posedFrame() is empty until evaluated.
+    // The published clear() contract evaluates track 0 as setup, with no clip
+    // contribution. Unlike idle at t=0 this keeps every authored setup channel.
+    setup.clear(0, { mix: 0 });
+    setup.pause();
+    setup.renderer.syncPixelRatio();
+    setup.frame(0);
+    const frame = setup.posedFrame(), bounds = setup.bounds();
     if (!frame.order.length) throw Error('Setup pose contains no drawn slots');
-    setup.renderer.syncPixelRatio(); setup.renderer.render(frame);
+    if (setup.current !== null) throw Error('Setup capture still has an active animation');
+    if (!bounds || !Object.values(bounds).every(Number.isFinite) || !(bounds.width > 0 && bounds.height > 0)) throw Error('Setup pose has no finite drawable bounds');
     s.nativeSetup = { el, player: setup };
+    return { method: 'clear(0, { mix: 0 }); pause(); frame(0)', current: setup.current, time: setup.time, drawnSlots: frame.order.length, sourceSlots: s.demo.assets.document.parsed.slots.length, bounds };
   });
   const setup = await stage.screenshot({ path: join(dir, 'setup.png') });
   await section.evaluate(s => { s.nativeSetup.player.dispose(); s.nativeSetup.el.remove(); delete s.nativeSetup; s.demo.player.root.hidden = false; });
@@ -86,7 +95,7 @@ export async function captureNative(page, out) {
     writeFileSync(join(dir,`${clip}-diff.png`), Buffer.from(products.diff,'base64'));
     writeFileSync(join(dir,`${clip}-sheet.png`), Buffer.from(products.sheet,'base64'));
     for (const [joint,data] of Object.entries(products.crops)) writeFileSync(join(dir,`${clip}-${joint}-boundary.png`),Buffer.from(data,'base64'));
-    records.push({ clip, ...extreme, nativeScale:1, width:832,height:1216, changedPixels:products.changed, setupSha256:hash(setup), minSha256:hash(shots.min), maxSha256:hash(shots.max), joints, cropBoxes: products.cropBoxes, diffSha256: hash(Buffer.from(products.diff,'base64')) });
+    records.push({ clip, setup: setupRecord, ...extreme, nativeScale:1, width:832,height:1216, changedPixels:products.changed, setupSha256:hash(setup), minSha256:hash(shots.min), maxSha256:hash(shots.max), joints, cropBoxes: products.cropBoxes, diffSha256: hash(Buffer.from(products.diff,'base64')) });
     writeFileSync(join(dir,'receipt.json'),JSON.stringify(records,null,2));
   }
   writeFileSync(join(dir,'receipt.json'),JSON.stringify(records,null,2));
