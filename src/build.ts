@@ -202,9 +202,9 @@ function hero(page: Page): string {
         </div>
         <figure class="hero-media">
           <div class="media">
-            <video data-loop="the trailer loop" controls muted loop playsinline preload="metadata" poster="/assets/trailer-poster.jpg" width="960" height="540" aria-label="Recorded video: a rigged character on a swing breathes, smiles, kicks her legs and waves">
+            <video data-loop="the trailer loop" controls muted loop playsinline preload="metadata" poster="/assets/trailer-poster.jpg" width="960" height="540" aria-label="Recorded video: a rigged character on a swing breathes, tilts, smiles and looks around, her long hair draping over the seat; she kicks, hops and waves">
               <source src="/assets/trailer.mp4" type="video/mp4">
-              <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, smiles, kicks her legs and waves" width="960" height="540">
+              <img src="/assets/trailer-poster.jpg" alt="A rigged character on a swing breathes, tilts, smiles and looks around, her long hair draping over the seat; she kicks, hops and waves" width="960" height="540">
             </video>
           </div>
           <figcaption><span class="media-kind">Recorded video</span> One generated painting, two See-through layer sets and a config an agent wrote, rebuilt by one command — <a href="https://github.com/rig-c/trailer">rig-c/trailer</a>. The sky, the lights, the mesh-and-bone reveal and the captions are the film layer (<code>film/compose.py</code>); the rest is the rig.</figcaption>
