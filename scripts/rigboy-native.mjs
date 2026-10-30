@@ -13,6 +13,8 @@ export async function captureNative(page, out) {
   await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
   await section.evaluate(s => {
     const d = s.demo, el = d.player.root;
+    if (!(el instanceof HTMLElement) || el.parentElement !== s.querySelector('.demo-stage')) throw Error('Published RigPlayer.root is not the stage child');
+    if (!Array.isArray(d.assets.document?.parsed?.animations)) throw Error('Published ModelAssets.document.parsed animations unavailable');
     Object.assign(d.view, { scale: 1, left: 416, top: 1216 });
     el.style.cssText = 'position:absolute;transform-origin:0 0;transform:scale(1);left:416px;top:1216px';
     d.player.renderer.syncPixelRatio();
@@ -24,7 +26,9 @@ export async function captureNative(page, out) {
     const el = document.createElement('div'); el.style.cssText = 'position:absolute;left:416px;top:1216px';
     s.querySelector('.demo-stage').append(el); s.demo.player.root.hidden = true;
     const setup = new RigPlayer(el, s.demo.assets, { mode: 'dom', meshBackend: 'canvas2d' });
-    setup.renderer.syncPixelRatio(); setup.renderer.render(setup.posedFrame());
+    const frame = setup.posedFrame();
+    if (!frame.order.length) throw Error('Setup pose contains no drawn slots');
+    setup.renderer.syncPixelRatio(); setup.renderer.render(frame);
     s.nativeSetup = { el, player: setup };
   });
   const setup = await stage.screenshot({ path: join(dir, 'setup.png') });
@@ -47,6 +51,7 @@ export async function captureNative(page, out) {
         const p = s.demo.player, aim = s.querySelector('[data-part=demo-aim]');
         aim.value = clip === 'aim' ? key.value : 0; aim.dispatchEvent(new Event('input', { bubbles: true }));
         p.pause(); p.seek(key.time); p.draw();
+        if (Math.abs(p.time - key.time) > 1e-8) throw Error('Native single-base seek did not hold requested time');
         return Object.fromEntries(['chest','hip','near_knee','far_knee','near_foot','far_foot','near_arm','toy','head','fringe'].map(n => { const b = p.bone(n); return [n, { x: 416+b.x, y: 1216-b.y }]; }));
       }, { clip, key: extreme[name] });
       shots[name] = await stage.screenshot({ path: join(dir, `${clip}-${name}.png`) });
@@ -60,21 +65,29 @@ export async function captureNative(page, out) {
       let changed=0; for (let i=0;i<bd.data.length;i+=4) { let delta=0; for (let j=0;j<3;j++) { const d=Math.abs(cd.data[i+j]-bd.data[i+j]); bd.data[i+j]=d; delta+=d; } if(delta)changed++; bd.data[i+3]=255; } dc.putImageData(bd,0,0);
       const sheet=canvas(832*4,1250), sc=sheet.getContext('2d'); sc.fillStyle='#172036';sc.fillRect(0,0,sheet.width,sheet.height);sc.font='18px sans-serif'; sc.fillStyle='white';
       for(const [i,img] of [a,b,c,diff].entries()){sc.fillText(`${clip} · ${['setup','min','max','abs(max−min)'][i]} · native 1:1`,i*832+10,24);sc.drawImage(img,i*832,34);}
-      const crops={};
+      const crops={}, cropBoxes={};
       for(const joint of Object.keys(joints.min)){
-        const sheet=canvas(1800,520), ctx=sheet.getContext('2d');ctx.fillStyle='#172036';ctx.fillRect(0,0,1800,520);ctx.font='16px sans-serif';ctx.fillStyle='white';ctx.imageSmoothingEnabled=false;
+        // All three panels use the same min/max union. Moving joints remain in the diff.
+        const lo=joints.min[joint],hi=joints.max[joint];
+        const x=Math.max(0,Math.floor(Math.min(lo.x,hi.x)-60));
+        const y=Math.max(0,Math.floor(Math.min(lo.y,hi.y)-60));
+        const w=Math.min(832,Math.ceil(Math.max(lo.x,hi.x)+60))-x;
+        const h=Math.min(1216,Math.ceil(Math.max(lo.y,hi.y)+60))-y;
+        const unit=w*5, sheet=canvas(unit*3,h*4+40),ctx=sheet.getContext('2d');
+        ctx.fillStyle='#172036';ctx.fillRect(0,0,sheet.width,sheet.height);ctx.font='16px sans-serif';ctx.fillStyle='white';ctx.imageSmoothingEnabled=false;
         for(const [i,img] of [b,c,diff].entries()){
-          const point=joints[i===1?'max':'min'][joint],x=Math.round(point.x-60),y=Math.round(point.y-60);
-          ctx.fillText(`${clip} / ${joint} / ${['min','max','diff'][i]} / 1x + 4x NN`,600*i+8,24);
-          ctx.drawImage(img,x,y,120,120,600*i,40,120,120);ctx.drawImage(img,x,y,120,120,600*i+120,40,480,480);
-        }crops[joint]=sheet.toDataURL('image/png').split(',')[1];
+          ctx.fillText(`${clip} / ${joint} / ${['min','max','diff'][i]} / native + 4x NN union`,unit*i+8,24);
+          ctx.drawImage(img,x,y,w,h,unit*i,40,w,h);ctx.drawImage(img,x,y,w,h,unit*i+w,40,w*4,h*4);
+        }
+        crops[joint]=sheet.toDataURL('image/png').split(',')[1];cropBoxes[joint]={x,y,width:w,height:h};
       }
-      return {diff:diff.toDataURL('image/png').split(',')[1],sheet:sheet.toDataURL('image/png').split(',')[1],crops,changed};
+      return {diff:diff.toDataURL('image/png').split(',')[1],sheet:sheet.toDataURL('image/png').split(',')[1],crops,cropBoxes,changed};
     }, { setup: setup.toString('base64'), min: shots.min.toString('base64'), max: shots.max.toString('base64'), joints, clip });
     writeFileSync(join(dir,`${clip}-diff.png`), Buffer.from(products.diff,'base64'));
     writeFileSync(join(dir,`${clip}-sheet.png`), Buffer.from(products.sheet,'base64'));
     for (const [joint,data] of Object.entries(products.crops)) writeFileSync(join(dir,`${clip}-${joint}-boundary.png`),Buffer.from(data,'base64'));
-    records.push({ clip, ...extreme, nativeScale:1, width:832,height:1216, changedPixels:products.changed, setupSha256:hash(setup), minSha256:hash(shots.min), maxSha256:hash(shots.max), joints });
+    records.push({ clip, ...extreme, nativeScale:1, width:832,height:1216, changedPixels:products.changed, setupSha256:hash(setup), minSha256:hash(shots.min), maxSha256:hash(shots.max), joints, cropBoxes: products.cropBoxes, diffSha256: hash(Buffer.from(products.diff,'base64')) });
+    writeFileSync(join(dir,'receipt.json'),JSON.stringify(records,null,2));
   }
   writeFileSync(join(dir,'receipt.json'),JSON.stringify(records,null,2));
   return records;

@@ -38,6 +38,18 @@ describe('Actions deployment authority and ordering', () => {
     expect(workflow.on.schedule).toEqual([{ cron: '17 * * * *' }]);
   });
 
+  test('browser evidence is preserved on failure without granting deployment authority', () => {
+    const steps = jobs.build.steps;
+    const smoke = steps.findIndex((s: any) => s.run === 'bun run test:rigboy');
+    const evidence = steps.findIndex((s: any) => s.uses === 'actions/upload-artifact@v4');
+    expect(evidence).toBeGreaterThan(smoke);
+    expect(steps[evidence].if).toBe('always()');
+    expect(steps[evidence].with.path).toBe('_site-smoke/');
+    expect(steps[evidence].with['if-no-files-found']).toBe('warn');
+    expect(steps[evidence].with.name).toContain('github.run_id');
+    expect(jobs.build.permissions).toEqual({ contents: 'read' });
+  });
+
   test('test, build, verify and live comparison precede standard artifact upload', () => {
     const steps = jobs.build.steps;
     const position = (predicate: (step: any) => boolean) => steps.findIndex(predicate);

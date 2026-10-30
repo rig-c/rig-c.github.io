@@ -72,6 +72,8 @@ jobs:
         env:
           PLAYWRIGHT_SKIP_BROWSER_GC: '1'
         run: bunx --no-install playwright install --with-deps chromium
+      - name: Target rigboy markup and evidence workflow contracts
+        run: bun test src/rigboy.test.ts src/workflow.test.ts
       - name: Test resolver, layout, complete artifact and deployment decisions
         run: bun run test
       - name: Build isolated site (fixture errors must escape)
@@ -84,8 +86,16 @@ jobs:
         timeout-minutes: 3
         run: bun run test:browser
       - name: Smoke rigboy controls and Family regression
-        timeout-minutes: 6
+        timeout-minutes: 9
         run: bun run test:rigboy
+      - name: Preserve rigboy browser evidence (including failure reports)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rigboy-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: _site-smoke/
+          if-no-files-found: warn
+          retention-days: 7
       - name: Compare verified bytes to current live manifest
         id: compare
         if: needs.pages-mode.outputs.enabled == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && inputs.failure_fixture != 'invalid-version'

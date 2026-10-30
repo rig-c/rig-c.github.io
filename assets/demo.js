@@ -109,15 +109,32 @@ function init(section) {
 
   function fit() {
     if (!current) return;
-    const box = current.assets.stage ?? current.player.bounds();
+    let box = current.assets.stage ?? current.player.bounds();
+    if (rigboy && current.travelEnvelope) {
+      const e = current.travelEnvelope;
+      const x = Math.min(box.x, e.minX), y = Math.min(box.y, e.minY);
+      box = { x, y, width: Math.max(box.x + box.width, e.maxX) - x, height: Math.max(box.y + box.height, e.maxY) - y };
+    }
     const w = ui.stage.clientWidth;
     const h = ui.stage.clientHeight;
     const scale = Number(section.dataset.fit ?? 0.94) * Math.min(w / box.width, h / box.height);
     const left = (w - box.width * scale) / 2 - box.x * scale;
     const top = (h - box.height * scale) / 2 + (box.y + box.height) * scale;
     current.view = { box, scale, left, top };
+    if (rigboy && current.travelEnvelope) {
+      // Translate the measured unshifted walk/run envelope into the visible stage.
+      // Eight CSS pixels leave a raster/rounding margin on either edge.
+      const padding = 8;
+      const low = (padding - left) / scale - current.travelEnvelope.minX;
+      const high = (w - padding - left) / scale - current.travelEnvelope.maxX;
+      current.travelWindow = { low, high, span: Math.max(0, high - low), padding };
+    }
     current.el.style.cssText = `position:absolute;transform-origin:0 0;transform:scale(${scale});left:${left}px;top:${top}px`;
     current.player.renderer.syncPixelRatio();
+    if (rigboy && current.controls) {
+      current.player.repose();
+      current.player.draw();
+    }
   }
 
   function drawOverlay() {
@@ -235,20 +252,24 @@ function init(section) {
       const player = new lib.RigPlayer(el, assets, rigboy ? { mode: 'dom', meshBackend: 'canvas2d' } : ui.mode ? { mode: ui.mode.value } : {});
       const names = assets.animations.map((a) => a.name);
       const motion = names.includes(keepMotion) ? keepMotion : names[0];
-      current = { player, assets, el, bones };
+      current = { player, assets, el, bones, modelKey: rigboy ? 'rigboy' : `${c}/${o}` };
       ui.motion.replaceChildren(...names.map((n) => new Option(n, n, false, n === motion)));
       player.play(motion);
       if (rigboy) {
         current.controls = controlFactory(player);
+        current.travelEnvelope = measureTravelEnvelope(player, assets, current.controls);
+        player.play(motion);
         const upstream = player.adjust;
-        // Upstream travel uses unwrapped track time. Wrap its root offset rather than
-        // resetting the animation/physics clock. The authored stage leaves this margin.
+        // Keep the helper's unwrapped travel, but map it into the visible interval
+        // derived from actual posed walk/run bounds, including both aim endpoints.
         player.adjust = (bones, context) => {
           upstream(bones, context);
           if (ui.travel.checked && ['walk', 'run'].includes(context.animation)) {
             const root = bones.bone('root');
-            const span = assets.stage.width * 0.24;
-            root.x = ((root.x + span / 2) % span + span) % span - span / 2;
+            const window = current.travelWindow;
+            root.x = window?.span > 0
+              ? window.low + ((root.x - window.low) % window.span + window.span) % window.span
+              : 0;
           }
         };
         applyRigboyControls();
@@ -260,7 +281,7 @@ function init(section) {
       drawOverlay();
       showSource(c, o);
       if (query.get('demo-test') === '1') {
-        section.demo = { get player() { return current.player; }, get assets() { return current.assets; }, get view() { return current.view; }, draw: () => { current.player.draw(); drawOverlay(); } };
+        section.demo = { get player() { return current.player; }, get assets() { return current.assets; }, get view() { return current.view; }, get travelEnvelope() { return current.travelEnvelope; }, get travelWindow() { return current.travelWindow; }, get modelKey() { return current.modelKey; }, get runtimeUrl() { return playUrl; }, draw: () => { current.player.draw(); drawOverlay(); } };
       }
       const backend = player.mode === 'canvas' ? 'everything in one canvas (canvas mode)' : `meshes drawn with ${player.renderer.meshBackendActive ?? 'canvas'} (DOM mode)`;
       const motions = names.length === 1 ? `its one motion, ${names[0]}` : `${names.length} motions`;
@@ -299,6 +320,34 @@ function init(section) {
       requestAnimationFrame(tick);
     }
     await load();
+  }
+
+  // Measure before adding the travel wrapper: the helper is off, so every bound is
+  // in the same unshifted world. Two cycles at 60Hz include the authored physics.
+  // This affects only rigboy; Family keeps its original loading and fitting path.
+  function measureTravelEnvelope(player, assets, controls) {
+    const envelope = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity, samples: 0, hz: 60, cycles: 2, aims: [-8, 0, 8], clips: ['walk', 'run'] };
+    controls.setTravel(false);
+    for (const clip of envelope.clips) {
+      const duration = assets.animations.find(a => a.name === clip).duration;
+      const steps = Math.ceil(duration * envelope.hz * envelope.cycles);
+      for (const angle of envelope.aims) {
+        player.play(clip);
+        controls.setAimDegrees(angle);
+        player.repose();
+        for (let i = 0; i <= steps; i++) {
+          const b = player.bounds();
+          if (!b) throw new Error(`No posed bounds for ${clip}`);
+          envelope.minX = Math.min(envelope.minX, b.x);
+          envelope.maxX = Math.max(envelope.maxX, b.x + b.width);
+          envelope.minY = Math.min(envelope.minY, b.y);
+          envelope.maxY = Math.max(envelope.maxY, b.y + b.height);
+          envelope.samples++;
+          if (i < steps) player.advance(duration * envelope.cycles / steps);
+        }
+      }
+    }
+    return envelope;
   }
 
   // The aim clip is a slider's sampled pose range, not a base animation to autoplay.
