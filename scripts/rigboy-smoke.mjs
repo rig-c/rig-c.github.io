@@ -112,7 +112,7 @@ try {
     const after = await state();
     assert.equal(after.current, clip); assert(after.time > before.time);
     if (clip !== 'aim') {
-      assert.notEqual(JSON.stringify(after.bounds), JSON.stringify(before.bounds), `${clip} pose did not change`);
+      assert.notEqual(JSON.stringify([after.gun, after.hip, after.head]), JSON.stringify([before.gun, before.hip, before.head]), `${clip} pose did not change`);
     } else {
       assert.equal(JSON.stringify(after.bounds), JSON.stringify(before.bounds), 'aim is a 0s static pose clip');
       const idleGun = report.clips.find(c => c.clip === 'idle').before.gun.rotationX;
