@@ -1,4 +1,4 @@
-# rig-c.github.io (`rig-c.org`)
+# rig-c/rig-c.github.io
 
 Official static website for the **rig-c** 2D character rigging and animation toolchain, served at `https://rig-c.org` (GitHub Pages custom domain; the `CNAME` file holds it).
 
