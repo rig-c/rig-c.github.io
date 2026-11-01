@@ -29,7 +29,7 @@ One character painting goes in; a rigged, animated 2D character that plays in th
   <figcaption><span class="media-kind">Recorded video</span> rig-c's mascot — the trailer's painting, built by <code>@rig-c/parts</code> 1.12.0 into 23 parts, a rig and an idle, then the film rig's performance compiled and rendered by <code>rig-c</code> 2.47.1; the labels, the glide and the dissolves are this film's; the placement and the motion are the rig's. From <a href="https://github.com/rig-c/trailer">rig-c/trailer</a>.</figcaption>
 </figure>
 
-1. **[Parts](/docs/parts/)** merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle.
+1. **[Parts](/docs/parts/)** merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle. Given per-part depth maps from a model you run, it also builds a [depth-driven turn](https://github.com/rig-c/parts/blob/main/docs/DEPTH.md): a head that reads as having volume when its dials move.
 2. **[Pose](/docs/pose/)** cleans a recorded body-18 pose sequence and retargets it onto the rig as an animation.
 3. **[Core](/docs/core/)** compiles the rig and motion specs and gates them by named assertions — nothing is written unless every one passes.
 4. **[Review](/docs/review/)** lets a person look at what an agent built and hand back feedback bound to a frame, bone or slot.
