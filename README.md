@@ -39,7 +39,7 @@ The build requires access to `https://registry.npmjs.org`. Before writing any ou
 Use **Bun 1.4.4** (the Actions runtime is pinned to that release). The browser smoke uses an exact Playwright development dependency; install it with `bun install --frozen-lockfile`. The site builder has no third-party dependencies. Build and full verification bundles run on the project's approved remote verification runner, against frozen inputs; the commands below are also the exact pipeline run by Actions.
 
 ```bash
-bun run test:rigboy # Built examples page: seven clips, aim, bounded travel, Family regression + native captures
+bun run test:rigboy # Built examples page: nine v2 clips, pause/overlays, Family regression + native captures
 bun run test       # Offline resolver/layout/artifact/live-comparison/workflow tests
 bun run test:browser # Built head-turn artifact; pinned Chromium required (CI or an approved verification environment)
 bun run build      # Fetch eight npm latest manifests, emit an isolated _site/ artifact

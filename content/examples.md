@@ -1,10 +1,10 @@
 ---
 navLabel: Examples
 title: rig-c Examples — See the Rigs, Play Them Live, Rebuild Them
-description: The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus rigboy’s seven clips and live aim dial, and the inputs and commands that rebuild them.
+description: The 20 Family rigs (5 characters × 4 outfits) as a recorded preview and live in your browser with @rig-c/play, plus rigboy v2’s nine clips on 20 region pieces, and the inputs and commands that rebuild them.
 keywords: rig-c examples, live demo, @rig-c/play, examples, rig-c trailer, reproducible rigging, Spine 4.3 examples
 repoUrl: https://github.com/rig-c/examples
-summaryForLlms: Examples in three steps: a recorded preview of the Family rigs, a live in-browser demo that plays all 20 Family rigs (5 characters × 4 outfits) with the published @rig-c/play, a separate rigboy player with seven clips and a −8°…+8° aim dial, then the sources and rebuild commands (rig-c/examples family suite, six standalone input sets, rig-c/trailer).
+summaryForLlms: Examples in three steps: a recorded preview of the Family rigs, a live in-browser demo that plays all 20 Family rigs (5 characters × 4 outfits) with the published @rig-c/play, a separate rigboy v2 player with nine clips on 20 region pieces (0 meshes), then the sources and rebuild commands (rig-c/examples family suite, six standalone input sets, rig-c/trailer).
 ---
 # Examples
 
@@ -30,17 +30,19 @@ See what the rigs look like, play one in your browser, then open the files and c
 
 The live demo loads the published [`@rig-c/play`](/docs/play/) 1.12.0 from jsDelivr and the Family models from rig-c/examples at one pinned commit. Each rig plays its own `idle` — the only motion these models carry — with its physics; the blink and the breeze in the recording above come from the Family viewer, not from the models.
 
-### rigboy — seven clips and an aim dial
+### rigboy v2 — nine clips on 20 region pieces
+
+<span id="rigboy-seven-clips-and-an-aim-dial"></span>
 
 {{rigboy-demo}}
 
-rigboy is a separate motion section beside Family: its seven clips and aim/travel controls need different controls from Family’s character and outfit choices. Both use the same loader, pause button and bone/mesh overlays.
+rigboy v2 is a separate motion section beside Family: **20 region pieces** with circular joint caps (**0 meshes**; `19` body pieces at `416×624` and `gun.png` at `122×67`) on **40 bones**, **28 slots** (`20` attached regions, `8` unattached) and **10 constraints** (`6` IK, `4` transform). Both sections share the same loader, play/pause button and bone/mesh overlays (with `0` meshes, the mesh overlay draws nothing).
 
-Select `idle`, `walk`, `run`, `jump`, `aim`, `shoot` or `hit`. The aim dial calls the pinned `controls.js`’s `setAimDegrees` over −8°…+8°, giving toy world angles of about 82° / 90° / 98°; `aim` holds idle at time zero as a neutral carrier while the dial samples the aim range through its property. It does not autoplay the aim range. `shoot` restores the authored recoil spring after direct aim.
+Select `idle` (`1.67 s`), `walk` (`1.00 s`), `run` (`0.67 s`), `jump` (`1.33 s`), `shoot` (`0.63 s`), `aim` (`0.00 s` static pose), `idle-turn` (`0.27 s`), `run-to-idle` (`0.27 s`) or `death` (`4.93 s`). Start loads the model and two atlas pages from [`rigboy/v2` at `97f34f35`](https://github.com/rig-c/examples/tree/97f34f352a720e4830c94cc1150d4f69505f9e14/rigboy/v2) and the published `@rig-c/play` **1.22.1** from jsDelivr. Measured decoded download: **1,353,981 bytes (1.35 MB)** for player (`624,707` B) + model JSON (`410,013` B) + two atlas pages (`251,383` B + `67,878` B); compressed transfer and cache hits vary. The no-JavaScript fallback still points to `rigboy/preview.webp` (the v1 seven-clip montage).
 
-Walk and run are in-place cycles. Optional travel uses `setTravel` (64 / 192 rig pixels per second), wraps inside the frame and starts off. Stationary clips disable travel. Start loads the model and controls from [examples at `8aa22071`](https://github.com/rig-c/examples/tree/8aa220713b1c8216ea535a8a14a8a34f65ee5a2a/rigboy) and the published `@rig-c/play` **1.21.2** from jsDelivr. Measured decoded download: **2,264,805 bytes (2.26 MB)** for player + controls + model + atlas; compressed transfer and cache hits vary.
+`rigboy v2` derives its bone hierarchy, constraints and nine human animation timelines from Esoteric Software LLC's `spineboy-pro.json`; only the public-domain project file was used, and none of Spineboy's images are used or redistributed.
 
-Limit: the clips are modest because one profile painting folds at deep knee flexion.
+Limit: v2 keeps the nine human animations only, dropping Spineboy's `hoverboard` and `portal` clips (27 prop/effect bones, 26 slots and 4 board constraints), leaving 8 muzzle/crosshair slots unattached and `aim` as a `0.0000 s` static pose with no slider.
 
 ## 3. Open the sources and rebuild
 
