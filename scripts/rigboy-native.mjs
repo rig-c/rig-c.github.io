@@ -15,6 +15,7 @@ export async function captureNative(page, out) {
     const d = s.demo, el = d.player.root;
     if (!(el instanceof HTMLElement) || el.parentElement !== s.querySelector('.demo-stage')) throw Error('Published RigPlayer.root is not the stage child');
     if (!Array.isArray(d.assets.document?.parsed?.animations)) throw Error('Published ModelAssets.document.parsed animations unavailable');
+    s.nativeCapture = true;
     Object.assign(d.view, { scale: 1, left: 416, top: 1216 });
     el.style.cssText = 'position:absolute;transform-origin:0 0;transform:scale(1);left:416px;top:1216px';
     d.player.renderer.syncPixelRatio();
@@ -42,13 +43,12 @@ export async function captureNative(page, out) {
   });
   const setup = await stage.screenshot({ path: join(dir, 'setup.png') });
   await section.evaluate(s => { s.nativeSetup.player.dispose(); s.nativeSetup.el.remove(); delete s.nativeSetup; s.demo.player.root.hidden = false; });
-  const channels = { idle: ['chest','translatey'], walk: ['near_knee','rotate'], run: ['near_knee','rotate'], jump: ['hip','translatey'], shoot: ['near_arm','rotate'], hit: ['chest','translatex'] };
+  const channels = { idle: ['head','rotate'], walk: ['front-upper-arm','rotate'], run: ['front-upper-arm','rotate'], jump: ['front-thigh','rotate'], shoot: ['gun','rotate'], aim: ['gun','rotate'], 'idle-turn': ['head','rotate'], 'run-to-idle': ['torso','rotate'], death: ['torso','rotate'] };
   const records = [];
-  for (const clip of ['idle','walk','run','jump','aim','shoot','hit']) {
+  for (const clip of ['idle','walk','run','jump','shoot','aim','idle-turn','run-to-idle','death']) {
     // Dispatch the page's normal selector handler while its controls are hidden for native capture.
     await section.locator('select').evaluate((el, clip) => { el.value = clip; el.dispatchEvent(new Event('change', { bubbles: true })); }, clip);
     const extreme = await section.evaluate((s, { clip, channels }) => {
-      if (clip === 'aim') return { channel: 'aim_control.rotate property', min: { value: -8, time: 0 }, max: { value: 8, time: 0 } };
       const [bone, channel] = channels[clip];
       const animation = s.demo.assets.document.parsed.animations.find(a => a.name === clip);
       const keys = animation.bones.find(b => b.name === bone).timelines.find(t => t.name === channel).keys;
@@ -56,13 +56,12 @@ export async function captureNative(page, out) {
     }, { clip, channels });
     const shots = {}, joints = {};
     for (const name of ['min','max']) {
-      joints[name] = await section.evaluate((s, { clip, key }) => {
-        const p = s.demo.player, aim = s.querySelector('[data-part=demo-aim]');
-        aim.value = clip === 'aim' ? key.value : 0; aim.dispatchEvent(new Event('input', { bubbles: true }));
+      joints[name] = await section.evaluate((s, { key }) => {
+        const p = s.demo.player;
         p.pause(); p.seek(key.time); p.draw();
         if (Math.abs(p.time - key.time) > 1e-8) throw Error('Native single-base seek did not hold requested time');
-        return Object.fromEntries(['chest','hip','near_knee','far_knee','near_foot','far_foot','near_arm','toy','head','fringe'].map(n => { const b = p.bone(n); return [n, { x: 416+b.x, y: 1216-b.y }]; }));
-      }, { clip, key: extreme[name] });
+        return Object.fromEntries(['torso','hip','front-shin','rear-shin','front-foot','rear-foot','front-upper-arm','gun','head','hair1'].map(n => { const b = p.bone(n); return [n, { x: 416+b.x, y: 1216-b.y }]; }));
+      }, { key: extreme[name] });
       shots[name] = await stage.screenshot({ path: join(dir, `${clip}-${name}.png`) });
     }
     const products = await page.evaluate(async ({ setup, min, max, joints, clip }) => {
@@ -98,6 +97,7 @@ export async function captureNative(page, out) {
     records.push({ clip, setup: setupRecord, ...extreme, nativeScale:1, width:832,height:1216, changedPixels:products.changed, setupSha256:hash(setup), minSha256:hash(shots.min), maxSha256:hash(shots.max), joints, cropBoxes: products.cropBoxes, diffSha256: hash(Buffer.from(products.diff,'base64')) });
     writeFileSync(join(dir,'receipt.json'),JSON.stringify(records,null,2));
   }
+  await section.evaluate(s => { delete s.nativeCapture; });
   writeFileSync(join(dir,'receipt.json'),JSON.stringify(records,null,2));
   return records;
 }

@@ -90,25 +90,25 @@ function liveDemo(target: 'html' | 'md'): string {
 }
 
 // Keep motion controls beside the Family section, on the same loader and overlays.
-const RIGBOY_SHA = '8aa220713b1c8216ea535a8a14a8a34f65ee5a2a';
+const RIGBOY_SHA = '97f34f352a720e4830c94cc1150d4f69505f9e14';
+const RIGBOY_CLIPS = ['idle', 'walk', 'run', 'jump', 'shoot', 'aim', 'idle-turn', 'run-to-idle', 'death'] as const;
 function rigboyDemo(target: 'html' | 'md'): string {
-  if (target === 'md') return `The rigboy live player on ${SITE_ORIGIN}/examples/#rigboy-seven-clips-and-an-aim-dial offers idle, walk, run, jump, aim, shoot and hit, a −8°…+8° property-driven aim dial, optional bounded travel, pause and bone/mesh overlays. Start loads 2,264,805 uncompressed bytes; JavaScript is required. [Recorded preview](https://raw.githubusercontent.com/rig-c/examples/${RIGBOY_SHA}/rigboy/preview.webp).`;
-  const source = `https://raw.githubusercontent.com/rig-c/examples/${RIGBOY_SHA}/rigboy`;
-  const repo = `https://github.com/rig-c/examples/tree/${RIGBOY_SHA}/rigboy`;
-  return `<section class="live-demo live-demo-rigboy" id="rigboy-demo" data-sha="${RIGBOY_SHA}" data-demo="rigboy" data-play-version="1.21.2" data-fit="0.9" data-model-url="${source}/build/skeleton.model.json" data-controls-url="https://cdn.jsdelivr.net/gh/rig-c/examples@${RIGBOY_SHA}/rigboy/controls.js" data-model-size="2.26 MB uncompressed, including player and controls" data-fallback-href="${source}/preview.webp" data-fallback-text="Watch the recorded seven-clip preview" aria-label="rigboy live player">
-<div class="demo-head"><span class="badge-live">Live</span><span>rigboy · seven clips · @rig-c/play 1.21.2</span></div>
+  if (target === 'md') return `The rigboy v2 live player on ${SITE_ORIGIN}/examples/#rigboy-v2-nine-clips-on-20-region-pieces offers idle, walk, run, jump, shoot, aim, idle-turn, run-to-idle and death, pause and bone/mesh overlays. Start loads 1,353,981 uncompressed bytes; JavaScript is required. [Recorded v1 preview](https://raw.githubusercontent.com/rig-c/examples/${RIGBOY_SHA}/rigboy/preview.webp).`;
+  const raw = `https://raw.githubusercontent.com/rig-c/examples/${RIGBOY_SHA}/rigboy`;
+  const source = `${raw}/v2`;
+  const repo = `https://github.com/rig-c/examples/tree/${RIGBOY_SHA}/rigboy/v2`;
+  return `<section class="live-demo live-demo-rigboy" id="rigboy-demo" data-sha="${RIGBOY_SHA}" data-demo="rigboy" data-play-version="1.22.1" data-fit="0.9" data-model-url="${source}/build/skeleton.model.json" data-model-size="1.35 MB uncompressed, including player and two atlas pages" data-fallback-href="${raw}/preview.webp" data-fallback-text="Watch the recorded v1 seven-clip preview" aria-label="rigboy live player">
+<div class="demo-head"><span class="badge-live">Live</span><span>rigboy v2 · nine clips · @rig-c/play 1.22.1</span></div>
 <div class="demo-body">
 <div class="demo-stage" data-part="demo-stage"><button type="button" class="btn btn-primary demo-start" data-part="demo-start">Start rigboy</button><canvas class="demo-overlay" data-part="demo-overlay" aria-hidden="true"></canvas></div>
 <div class="demo-panel">
 <div class="demo-controls" role="group" aria-label="rigboy controls">
-<label>Motion <select data-part="demo-motion">${['idle', 'walk', 'run', 'jump', 'aim', 'shoot', 'hit'].map(n => `<option value="${n}">${n}</option>`).join('')}</select></label>
-<label>Aim <span><output data-part="demo-angle">0°</output> · −8° to +8°</span><input data-part="demo-aim" aria-label="Aim degrees" type="range" min="-8" max="8" step="1" value="0"></label>
-<label class="demo-check"><input data-part="demo-travel" type="checkbox"> Travel in walk / run (wrap inside frame)</label>
+<label>Motion <select data-part="demo-motion">${RIGBOY_CLIPS.map(n => `<option value="${n}">${n}</option>`).join('')}</select></label>
 <div class="demo-buttons"><button type="button" class="btn" data-part="demo-play">Play</button><button type="button" class="btn" data-part="demo-bones" aria-pressed="false">Bones</button><button type="button" class="btn" data-part="demo-mesh" aria-pressed="false">Mesh</button></div>
 </div>
-<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads 2.26 MB uncompressed (2,264,805 bytes): the pinned player, controls, model JSON and one atlas. Compression and caching reduce transfer bytes.</p>
-<p class="demo-source" data-part="demo-source">Pinned source: <a href="${repo}/README.md">rigboy README</a> · <a href="${repo}/controls.js">controls.js</a> · <a href="${repo}/build/skeleton.model.json">built model</a> · <a href="${source}/preview.webp">recorded preview</a>.</p>
-<noscript><p class="demo-status">JavaScript is off. <a href="${source}/preview.webp">Watch the recorded seven-clip preview</a>.</p><img src="${source}/preview.webp" alt="Recorded rigboy montage: idle, walk, run, jump, aim, shoot and hit" loading="lazy" width="832" height="1216"></noscript>
+<p class="demo-status" data-part="demo-status" role="status" aria-live="polite">Not loaded yet. Start downloads 1.35 MB uncompressed (1,353,981 bytes): the pinned player, model JSON and two atlas pages. Compression and caching reduce transfer bytes.</p>
+<p class="demo-source" data-part="demo-source">Pinned source: <a href="${repo}/README.md">rigboy v2 README</a> · <a href="${repo}/rig/rig.json">rig.json</a> · <a href="${repo}/rig/motion.json">motion.json</a> · <a href="${repo}/build/skeleton.model.json">built model</a> · <a href="${raw}/preview.webp">recorded v1 preview</a>.</p>
+<noscript><p class="demo-status">JavaScript is off. <a href="${raw}/preview.webp">Watch the recorded v1 seven-clip preview</a>.</p><img src="${raw}/preview.webp" alt="Recorded rigboy v1 montage: idle, walk, run, jump, aim, shoot and hit" loading="lazy" width="832" height="1216"></noscript>
 </div>
 </div>
 </section>`;

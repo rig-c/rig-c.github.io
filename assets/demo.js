@@ -21,7 +21,6 @@ function init(section) {
     play: $('demo-play'), bones: $('demo-bones'), mesh: $('demo-mesh'),
     start: $('demo-start'), stage: $('demo-stage'), overlay: $('demo-overlay'),
     status: $('demo-status'), source: $('demo-source'),
-    aim: $('demo-aim'), angle: $('demo-angle'), travel: $('demo-travel'),
   };
   section.classList.add('demo-ready');
   setControls(false);
@@ -32,7 +31,6 @@ function init(section) {
     if (el && value && [...el.options].some((opt) => opt.value === value)) el.value = value;
   }
 
-  let controlFactory = null;
   let lib = null; // the imported @rig-c/play module
   let current = null; // { player, assets, el, bones }
   let playing = false;
@@ -75,8 +73,7 @@ function init(section) {
   }
 
   function setControls(enabled) {
-    for (const el of [ui.character, ui.outfit, ui.motion, ui.mode, ui.play, ui.bones, ui.mesh, ui.aim, ui.travel]) if (el) el.disabled = !enabled;
-    if (ui.travel) ui.travel.disabled = !enabled || !['walk', 'run'].includes(ui.motion.value);
+    for (const el of [ui.character, ui.outfit, ui.motion, ui.mode, ui.play, ui.bones, ui.mesh]) if (el) el.disabled = !enabled;
   }
 
   function syncButtons() {
@@ -108,33 +105,16 @@ function init(section) {
   }
 
   function fit() {
-    if (!current) return;
-    let box = current.assets.stage ?? current.player.bounds();
-    if (rigboy && current.travelEnvelope) {
-      const e = current.travelEnvelope;
-      const x = Math.min(box.x, e.minX), y = Math.min(box.y, e.minY);
-      box = { x, y, width: Math.max(box.x + box.width, e.maxX) - x, height: Math.max(box.y + box.height, e.maxY) - y };
-    }
+    if (!current || section.nativeCapture) return;
+    const box = (rigboy ? current.clipBoxes?.[ui.motion.value] : null) ?? current.assets.stage ?? current.player.bounds();
     const w = ui.stage.clientWidth;
     const h = ui.stage.clientHeight;
     const scale = Number(section.dataset.fit ?? 0.94) * Math.min(w / box.width, h / box.height);
     const left = (w - box.width * scale) / 2 - box.x * scale;
     const top = (h - box.height * scale) / 2 + (box.y + box.height) * scale;
     current.view = { box, scale, left, top };
-    if (rigboy && current.travelEnvelope) {
-      // Translate the measured unshifted walk/run envelope into the visible stage.
-      // Eight CSS pixels leave a raster/rounding margin on either edge.
-      const padding = 8;
-      const low = (padding - left) / scale - current.travelEnvelope.minX;
-      const high = (w - padding - left) / scale - current.travelEnvelope.maxX;
-      current.travelWindow = { low, high, span: Math.max(0, high - low), padding };
-    }
     current.el.style.cssText = `position:absolute;transform-origin:0 0;transform:scale(${scale});left:${left}px;top:${top}px`;
     current.player.renderer.syncPixelRatio();
-    if (rigboy && current.controls) {
-      current.player.repose();
-      current.player.draw();
-    }
   }
 
   function drawOverlay() {
@@ -181,11 +161,11 @@ function init(section) {
       const joints = [];
       for (const spec of bones) {
         const bone = player.bone(spec.name);
-        if (!bone.active) continue;
+        if (bone.active === false) continue;
         joints.push(project(bone.x, bone.y));
         if (spec.parent && spec.parent !== 'root') {
           const parent = player.bone(spec.parent);
-          if (!parent.active) continue;
+          if (parent.active === false) continue;
           const [px, py] = project(parent.x, parent.y);
           const [bx, by] = project(bone.x, bone.y);
           ctx.moveTo(px, py);
@@ -205,7 +185,7 @@ function init(section) {
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
     if (current && playing && !document.hidden) {
-      current.player.frame(rigboy && ui.motion.value === 'aim' ? 0 : dt);
+      current.player.frame(dt);
       drawOverlay();
     }
     requestAnimationFrame(tick);
@@ -222,6 +202,7 @@ function init(section) {
     status(`Loading ${name} — ${size(c, o)}…`, 'loading');
     try {
       let bones = [];
+      let attachedBones = new Set();
       const assets = await lib.loadModel({
         modelUrl: rigboy || siteModel(c, o) ? section.dataset.modelUrl : `${base}/${dir(c, o)}/out/check/build/skeleton.model.json`,
         crossOrigin: 'anonymous',
@@ -230,7 +211,15 @@ function init(section) {
         fetch: async (input, init) => {
           const response = await fetch(input, init);
           if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${String(input).split('/family/')[1] ?? input}`);
-          if (String(input).endsWith('skeleton.model.json')) bones = (await response.clone().json()).bones ?? [];
+          if (String(input).endsWith('skeleton.model.json')) {
+            const model = await response.clone().json();
+            bones = model.bones ?? [];
+            if (rigboy) {
+              const skin = Array.isArray(model.skins) ? model.skins[0] : model.skins?.default;
+              const atts = skin?.attachments ?? skin ?? {};
+              attachedBones = new Set((model.slots ?? []).filter((s) => s.name in atts).map((s) => s.bone));
+            }
+          }
           return response;
         },
       });
@@ -241,7 +230,6 @@ function init(section) {
       // Dispose the old rig before creating the new one: the mesh renderer shares one WebGL
       // context per page, and disposing after the new player exists tears down what it uses.
       if (current) {
-        current.controls?.dispose();
         current.player.dispose();
         current.assets.dispose();
         current.el.remove();
@@ -254,26 +242,10 @@ function init(section) {
       const motion = names.includes(keepMotion) ? keepMotion : names[0];
       current = { player, assets, el, bones, modelKey: rigboy ? 'rigboy' : `${c}/${o}` };
       ui.motion.replaceChildren(...names.map((n) => new Option(n, n, false, n === motion)));
-      player.play(motion);
       if (rigboy) {
-        current.controls = controlFactory(player);
-        current.travelEnvelope = measureTravelEnvelope(player, assets, current.controls);
-        player.play(motion);
-        const upstream = player.adjust;
-        // Keep the helper's unwrapped travel, but map it into the visible interval
-        // derived from actual posed walk/run bounds, including both aim endpoints.
-        player.adjust = (bones, context) => {
-          upstream(bones, context);
-          if (ui.travel.checked && ['walk', 'run'].includes(context.animation)) {
-            const root = bones.bone('root');
-            const window = current.travelWindow;
-            root.x = window?.span > 0
-              ? window.low + ((root.x - window.low) % window.span + window.span) % window.span
-              : 0;
-          }
-        };
-        applyRigboyControls();
+        current.clipBoxes = measureClipBoxes(player, assets, bones.filter((b) => attachedBones.has(b.name)));
       }
+      player.play(motion);
       if (keepTime > 0) player.seek(keepTime % (assets.animations.find((a) => a.name === motion)?.duration || 1));
       if (!playing) player.pause();
       fit();
@@ -281,9 +253,9 @@ function init(section) {
       drawOverlay();
       showSource(c, o);
       if (query.get('demo-test') === '1') {
-        section.demo = { get player() { return current.player; }, get assets() { return current.assets; }, get view() { return current.view; }, get travelEnvelope() { return current.travelEnvelope; }, get travelWindow() { return current.travelWindow; }, get modelKey() { return current.modelKey; }, get runtimeUrl() { return playUrl; }, draw: () => { current.player.draw(); drawOverlay(); } };
+        section.demo = { get player() { return current.player; }, get assets() { return current.assets; }, get view() { return current.view; }, get clipBoxes() { return current.clipBoxes; }, get modelKey() { return current.modelKey; }, get runtimeUrl() { return playUrl; }, draw: () => { current.player.draw(); drawOverlay(); } };
       }
-      const backend = player.mode === 'canvas' ? 'everything in one canvas (canvas mode)' : `meshes drawn with ${player.renderer.meshBackendActive ?? 'canvas'} (DOM mode)`;
+      const backend = player.mode === 'canvas' ? 'everything in one canvas (canvas mode)' : rigboy ? 'region pieces, no meshes (DOM mode)' : `meshes drawn with ${player.renderer.meshBackendActive ?? 'canvas'} (DOM mode)`;
       const motions = names.length === 1 ? `its one motion, ${names[0]}` : `${names.length} motions`;
       status(`Live: ${name} — ${motions}, ${backend}.${playing ? '' : ' Paused; press Play.'}`, 'ready');
     } catch (err) {
@@ -305,7 +277,6 @@ function init(section) {
       try {
         // A failed module import is cached by the browser, so each retry asks for a fresh URL.
         lib = await import(attempts++ ? `${playUrl}?retry=${attempts}` : playUrl);
-        if (rigboy) controlFactory = (await import(attempts > 1 ? `${section.dataset.controlsUrl}?retry=${attempts}` : section.dataset.controlsUrl)).rigboyControls;
       } catch (err) {
         lib = null;
         status(`The live demo could not load the @rig-c/play runtime from jsDelivr (${err.message}).`, 'error', true);
@@ -322,59 +293,51 @@ function init(section) {
     await load();
   }
 
-  // Measure before adding the travel wrapper: the helper is off, so every bound is
-  // in the same unshifted world. Two cycles at 60Hz include the authored physics.
-  // This affects only rigboy; Family keeps its original loading and fitting path.
-  function measureTravelEnvelope(player, assets, controls) {
-    const envelope = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity, samples: 0, hz: 60, cycles: 2, aims: [-8, 0, 8], clips: ['walk', 'run'] };
-    controls.setTravel(false);
-    for (const clip of envelope.clips) {
-      const duration = assets.animations.find(a => a.name === clip).duration;
-      const steps = Math.ceil(duration * envelope.hz * envelope.cycles);
-      for (const angle of envelope.aims) {
-        player.play(clip);
-        controls.setAimDegrees(angle);
-        player.repose();
-        for (let i = 0; i <= steps; i++) {
-          const b = player.bounds();
-          if (!b) throw new Error(`No posed bounds for ${clip}`);
-          envelope.minX = Math.min(envelope.minX, b.x);
-          envelope.maxX = Math.max(envelope.maxX, b.x + b.width);
-          envelope.minY = Math.min(envelope.minY, b.y);
-          envelope.maxY = Math.max(envelope.maxY, b.y + b.height);
-          envelope.samples++;
-          if (i < steps) player.advance(duration * envelope.cycles / steps);
+  // Frame each clip from its posed attached-bone envelope (including the large SD head/hair/visor
+  // silhouette on `head` and the barrel reach on `gun`) so high arcs (jump), backward tilts (aim,
+  // shoot) and horizontal falls (death) never clip against .demo-stage on desktop or phone.
+  function measureClipBoxes(player, assets, attachedSpecs) {
+    const pad = 28;
+    const boxes = {};
+    for (const anim of assets.animations) {
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      const steps = Math.max(1, Math.ceil((anim.duration || 0) * 30));
+      player.play(anim.name);
+      player.repose();
+      for (let i = 0; i <= steps; i++) {
+        for (const spec of attachedSpecs) {
+          const b = player.bone(spec.name);
+          if (b.active === false) continue;
+          const rad = (b.rotationX * Math.PI) / 180;
+          const cos = Math.cos(rad), sin = Math.sin(rad);
+          if (spec.name === 'head') {
+            for (const lx of [-25, 195]) {
+              for (const ly of [-115, 195]) {
+                const px = b.x + lx * cos - ly * sin;
+                const py = b.y + lx * sin + ly * cos;
+                minX = Math.min(minX, px);
+                maxX = Math.max(maxX, px);
+                minY = Math.min(minY, py);
+                maxY = Math.max(maxY, py);
+              }
+            }
+          } else {
+            const len = spec.name === 'gun' ? 125 : (spec.length || 0);
+            const tx = b.x + cos * len;
+            const ty = b.y + sin * len;
+            minX = Math.min(minX, b.x - pad, tx - pad);
+            maxX = Math.max(maxX, b.x + pad, tx + pad);
+            minY = Math.min(minY, b.y - pad, ty - pad);
+            maxY = Math.max(maxY, b.y + pad, ty + pad);
+          }
         }
+        if (i < steps && anim.duration > 0) player.advance(anim.duration / steps);
       }
+      boxes[anim.name] = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
     }
-    return envelope;
+    return boxes;
   }
 
-  // The aim clip is a slider's sampled pose range, not a base animation to autoplay.
-  // Use idle at time zero as the neutral carrier; aim_dial adds the pose via aim_control.
-  function applyRigboyControls() {
-    const { player, controls } = current;
-    controls.setAimDegrees(Number(ui.aim.value));
-    ui.angle.value = `${ui.aim.value}°`;
-    if (ui.motion.value === 'shoot') controls.recoilPhysics();
-    const travel = ['walk', 'run'].includes(ui.motion.value);
-    if (!travel) ui.travel.checked = false;
-    ui.travel.disabled = !travel;
-    controls.setTravel(travel && ui.travel.checked);
-    if (ui.motion.value === 'aim') player.pause();
-    player.repose(); // property changes must update even while paused
-    player.draw();
-  }
-  ui.aim?.addEventListener('input', () => {
-    if (!current) return;
-    applyRigboyControls();
-    drawOverlay();
-  });
-  ui.travel?.addEventListener('change', () => {
-    if (!current) return;
-    applyRigboyControls();
-    drawOverlay();
-  });
   ui.start.addEventListener('click', start);
   const pick = () => {
     remember(ui.character.value, ui.outfit.value);
@@ -385,17 +348,16 @@ function init(section) {
   if (ui.mode) ui.mode.addEventListener('change', load);
   ui.motion.addEventListener('change', () => {
     if (!current) return;
-    current.player.play(rigboy && ui.motion.value === 'aim' ? 'idle' : ui.motion.value);
-    if (rigboy && ui.motion.value === 'aim') current.player.seek(0);
-    if (rigboy) applyRigboyControls();
+    current.player.play(ui.motion.value);
     if (!playing) current.player.pause();
+    if (rigboy) fit();
     current.player.frame(0);
     drawOverlay();
   });
   ui.play.addEventListener('click', () => {
     if (!current) return;
     playing = !playing;
-    if (playing && !(rigboy && ui.motion.value === 'aim')) current.player.resume();
+    if (playing) current.player.resume();
     else current.player.pause();
     last = performance.now();
     syncButtons();
