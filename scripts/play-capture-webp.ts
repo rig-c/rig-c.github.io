@@ -9,20 +9,24 @@
  *   bun add -d playwright@1.63.0
  *   PLAYWRIGHT_MODULE=$PWD/node_modules/playwright/index.mjs \
  *     bun /path/to/site/scripts/play-capture-webp.ts \
- *       --root DIR --model PATH --anim NAME --fps N --frames N \
+ *       --root DIR --model PATH --anim NAME[,NAME...] --fps N --frames N \
  *       --out BASENAME [--long-side 640] [--q 85] [--settle 0] [--player DIR] [--keep DIR]
- *       [--under NAME] [--breeze] [--step-hz 120]
+ *       [--no-poster] [--under NAME] [--breeze] [--step-hz 120]
  *
  *   --root     the folder served to the page: it holds node_modules/@rig-c/play
  *              and the build (default: the current directory)
  *   --model    the build's skeleton.model.json, relative to --root
- *   --anim     the animation to draw
+ *   --anim     the animation to draw, or a comma-separated list of animations
+ *              drawn back-to-back in one shared frame box
  *   --fps      frames per second; frame i is the pose at i/fps s
- *   --frames   frame count; must equal the animation's duration x fps, so the
- *              last frame is one step before the duration and the loop wraps
- *              from it back to frame 0 (no repeated end pose)
+ *   --frames   frame count; for a single animation, must equal duration x fps,
+ *              so the last frame is one step before the duration and the loop
+ *              wraps from it back to frame 0 (no repeated end pose); for a
+ *              comma-separated list, must equal the sum of max(1, round(duration x fps))
+ *              across the listed clips
  *   --out      output path without extension, relative to the site root
  *              (e.g. assets/docs/getting-started-hello)
+ *   --no-poster  write only <out>.webp (skip <out>-poster.png)
  *   --long-side  the frame's long side in px (default 640, as rigc render --max 640)
  *   --q        WebP quality of the colour planes (default 85; alpha is lossless)
  *   --settle   whole loops to play before frame 0 (default 0): frame i is the
@@ -45,7 +49,7 @@
  *              requestAnimationFrame loop does; nothing is seeked, so the
  *              physics carries its history and two runs step alike
  *
- * The site's three clips (each page's SOURCES gives the run and versions):
+ * The site's four clips (each page's SOURCES gives the run and versions):
  *
  *   # Getting Started step 8: the walkthrough's my-rig folder as --root
  *   --root $WALKTHROUGH --model out/check/build/skeleton.model.json --anim idle \
@@ -62,6 +66,13 @@
  *   --root $PARTS_ROOT --model build/skeleton.model.json --anim idle \
  *     --fps 12 --frames 40 --settle 1 --player $WALKTHROUGH/../getting-started/scripts \
  *     --out assets/docs/parts-idle
+ *   # Examples page rigboy v2 nine-clip preview: a folder holding
+ *   # node_modules/@rig-c/play 1.22.1 and, under build/,
+ *   # rig-c/examples@97f34f352a720e4830c94cc1150d4f69505f9e14 rigboy/v2/build/*
+ *   --root $RIGBOY_ROOT --model build/skeleton.model.json \
+ *     --anim idle,walk,run,jump,shoot,aim,idle-turn,run-to-idle,death \
+ *     --fps 12 --frames 130 --no-poster --player $GETTING_STARTED_SCRIPTS \
+ *     --out assets/rigboy-preview
  *
  * Why not `rigc render`: its frames are composited over a fixed grey
  * (232, 232, 232) and `rigc check` refuses frames that are not opaque, so a
@@ -117,17 +128,21 @@ const need = (name: string) => {
 const here = resolve(arg('--root') ?? '.');
 const model = need('--model').replace(/^\/+/, '');
 const anim = need('--anim');
+const anims = anim.split(',').map((s) => s.trim()).filter(Boolean);
+if (anims.length === 0) throw new Error('--anim must name at least one animation');
 const FPS = Number(need('--fps'));
 const FRAMES = Number(need('--frames'));
 const MAX_SIDE = Number(arg('--long-side') ?? 640);
 const QUALITY = arg('--q') ?? '85';
 const SETTLE = Number(arg('--settle') ?? 0);
+const NO_POSTER = process.argv.includes('--no-poster');
 if (!(SETTLE >= 0) || !Number.isInteger(SETTLE)) throw new Error('--settle must be a whole number of loops');
 if (!(FPS > 0) || !Number.isInteger(FRAMES) || FRAMES < 2 || !(MAX_SIDE > 0)) throw new Error('--fps, --frames and --long-side must be positive numbers');
 const UNDER = arg('--under');
 const BREEZE = process.argv.includes('--breeze');
 const STEP_HZ = Number(arg('--step-hz') ?? 120);
 const STEPPED = Boolean(UNDER) || BREEZE;
+if (STEPPED && anims.length > 1) throw new Error('--under and --breeze take a single --anim');
 if (STEPPED && !(Number.isInteger(STEP_HZ) && STEP_HZ > 0 && Number.isInteger(STEP_HZ / FPS))) throw new Error('--step-hz must be a whole multiple of --fps');
 const playerDir = resolve(arg('--player') ?? join(here, '../getting-started/scripts'));
 for (const f of [join(here, model), join(here, 'node_modules/@rig-c/play/dist/index.js'), join(playerDir, 'serve.ts')]) {
@@ -251,26 +266,89 @@ try {
   if (STEPPED) {
     await captureStepped(page);
   } else {
-  await page.goto(`${origin}/?model=${encodeURIComponent(model)}&anim=${encodeURIComponent(anim)}`);
+  await page.goto(`${origin}/?model=${encodeURIComponent(model)}&anim=${encodeURIComponent(anims[0])}`);
   await page.waitForFunction(() => (window as any).rigPlayer);
   await page.clock.pauseAt(1000); // the page's rAF loop stops; only seek moves the rig
   await page.addStyleTag({ content: 'html, body, #stage { background: transparent !important; } #bar { display: none !important; }' });
 
-  const view = await page.evaluate(async ({ FRAMING_FPS, PAD, MAX_SIDE, model, anim }) => {
+  const view = await page.evaluate(async ({ FRAMING_FPS, PAD, MAX_SIDE, model, anims }) => {
     const player = (window as any).rigPlayer;
     const { loadModel } = await import('/node_modules/@rig-c/play/dist/index.js');
     const assets = await loadModel({ modelUrl: `/${model}` });
-    const clip = assets.animations.find((a: any) => a.name === anim);
-    if (!clip) return { error: `no animation ${anim} (animations: ${assets.animations.map((a: any) => a.name).join(', ')})` };
-    const duration: number = clip.duration;
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    const n = Math.round(duration * FRAMING_FPS);
-    for (let i = 0; i <= n; i++) {
-      player.seek(Math.min(duration, i / FRAMING_FPS));
-      const b = player.bounds();
-      minX = Math.min(minX, b.x); minY = Math.min(minY, b.y);
-      maxX = Math.max(maxX, b.x + b.width); maxY = Math.max(maxY, b.y + b.height);
+    const clips: { name: string; duration: number }[] = [];
+    for (const name of anims) {
+      const clip = assets.animations.find((a: any) => a.name === name);
+      if (!clip) return { error: `no animation ${name} (animations: ${assets.animations.map((a: any) => a.name).join(', ')})` };
+      clips.push({ name: clip.name, duration: clip.duration });
     }
+    const opaqueBox = new Map<string, [number, number, number, number]>();
+    const f0 = player.posedFrame();
+    if (f0.order.length > 0 && f0.order.every((s: any) => s.kind === 'region')) {
+      const c = document.createElement('canvas');
+      const ctx = c.getContext('2d', { willReadFrequently: true })!;
+      for (const [name, reg] of assets.regionImages.entries() as Iterable<[string, any]>) {
+        const img = new Image();
+        img.src = reg.url;
+        await img.decode();
+        c.width = reg.width;
+        c.height = reg.height;
+        ctx.clearRect(0, 0, reg.width, reg.height);
+        ctx.drawImage(img, 0, 0);
+        const d = ctx.getImageData(0, 0, reg.width, reg.height).data;
+        let x0 = reg.width, y0 = reg.height, x1 = 0, y1 = 0;
+        for (let y = 0; y < reg.height; y++) {
+          for (let x = 0; x < reg.width; x++) {
+            if (d[(y * reg.width + x) * 4 + 3] > 0) {
+              if (x < x0) x0 = x;
+              if (x + 1 > x1) x1 = x + 1;
+              if (y < y0) y0 = y;
+              if (y + 1 > y1) y1 = y + 1;
+            }
+          }
+        }
+        if (x0 < x1 && y0 < y1) opaqueBox.set(name, [x0 / reg.width, y0 / reg.height, x1 / reg.width, y1 / reg.height]);
+      }
+    }
+    const poseBounds = () => {
+      if (opaqueBox.size === 0) return player.bounds();
+      const f = player.posedFrame();
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const s of f.order) {
+        const sub = opaqueBox.get(s.region);
+        const k = s.corners;
+        if (!sub) {
+          for (let j = 0; j < 8; j += 2) {
+            x0 = Math.min(x0, k[j]); x1 = Math.max(x1, k[j]);
+            y0 = Math.min(y0, k[j + 1]); y1 = Math.max(y1, k[j + 1]);
+          }
+          continue;
+        }
+        const [u0, v0, u1, v1] = sub;
+        const blx = k[0], bly = k[1], ulx = k[2], uly = k[3], urx = k[4], ury = k[5];
+        const ux = urx - ulx, uy = ury - uly, vx = blx - ulx, vy = bly - uly;
+        for (const [u, v] of [[u0, v0], [u1, v0], [u1, v1], [u0, v1]]) {
+          const wx = ulx + u * ux + v * vx;
+          const wy = uly + u * uy + v * vy;
+          x0 = Math.min(x0, wx); x1 = Math.max(x1, wx);
+          y0 = Math.min(y0, wy); y1 = Math.max(y1, wy);
+        }
+      }
+      return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+    };
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let totalDuration = 0;
+    for (const clip of clips) {
+      totalDuration += clip.duration;
+      player.play(clip.name, { loop: false });
+      const n = Math.round(clip.duration * FRAMING_FPS);
+      for (let i = 0; i <= n; i++) {
+        player.seek(Math.min(clip.duration, i / FRAMING_FPS));
+        const b = poseBounds();
+        minX = Math.min(minX, b.x); minY = Math.min(minY, b.y);
+        maxX = Math.max(maxX, b.x + b.width); maxY = Math.max(maxY, b.y + b.height);
+      }
+    }
+    assets.dispose();
     const pad = Math.max(maxX - minX, maxY - minY) * PAD;
     minX -= pad; minY -= pad; maxX += pad; maxY += pad;
     const scale = MAX_SIDE / Math.max(maxX - minX, maxY - minY);
@@ -283,16 +361,36 @@ try {
     root.style.top = `${maxY * scale}px`;
     root.style.transform = `scale(${scale})`;
     player.renderer.syncPixelRatio();
-    return { duration, width, height, scale, box: [minX, minY, maxX - minX, maxY - minY], animations: assets.animations.map((a: any) => a.name) };
-  }, { FRAMING_FPS, PAD, MAX_SIDE, model, anim });
+    return { duration: totalDuration, clips, width, height, scale, box: [minX, minY, maxX - minX, maxY - minY], animations: assets.animations.map((a: any) => a.name) };
+  }, { FRAMING_FPS, PAD, MAX_SIDE, model, anims });
   if ('error' in view) throw new Error(view.error);
   console.log(`${anim} ${view.duration.toFixed(4)} s (animations: ${view.animations.join(', ')}); frame ${view.width}x${view.height}, scale ${view.scale.toFixed(5)}, viewport x ${view.box[0].toFixed(2)} y ${view.box[1].toFixed(2)} w ${view.box[2].toFixed(2)} h ${view.box[3].toFixed(2)}`);
-  if (Math.abs(view.duration - FRAMES / FPS) > 1e-6) throw new Error(`${anim} lasts ${view.duration} s, not ${FRAMES}/${FPS} (pass --frames ${Math.round(view.duration * FPS)})`);
 
   const stage = page.locator('#stage');
-  for (let i = 0; i < FRAMES; i++) {
-    await page.evaluate((t) => { const p = (window as any).rigPlayer; p.seek(t); p.draw(); }, SETTLE > 0 ? SETTLE * view.duration + i / FPS : i / FPS);
-    await stage.screenshot({ path: join(frameDir, `f${String(i).padStart(4, '0')}.png`), omitBackground: true, animations: 'disabled' });
+  if (view.clips.length === 1) {
+    if (Math.abs(view.duration - FRAMES / FPS) > 1e-6) throw new Error(`${anim} lasts ${view.duration} s, not ${FRAMES}/${FPS} (pass --frames ${Math.round(view.duration * FPS)})`);
+    await page.evaluate((name) => (window as any).rigPlayer.play(name), view.clips[0].name);
+    for (let i = 0; i < FRAMES; i++) {
+      await page.evaluate((t) => { const p = (window as any).rigPlayer; p.seek(t); p.draw(); }, SETTLE > 0 ? SETTLE * view.duration + i / FPS : i / FPS);
+      await stage.screenshot({ path: join(frameDir, `f${String(i).padStart(4, '0')}.png`), omitBackground: true, animations: 'disabled' });
+    }
+  } else {
+    const counts = view.clips.map((c: { name: string; duration: number }) => Math.max(1, Math.round(c.duration * FPS)));
+    const expected = counts.reduce((a: number, b: number) => a + b, 0);
+    if (expected !== FRAMES) throw new Error(`${anim} at ${FPS} fps totals ${expected} frames (${view.clips.map((c: any, idx: number) => `${c.name}:${counts[idx]}`).join(' + ')}), not ${FRAMES}`);
+    let frameIndex = 0;
+    for (let idx = 0; idx < view.clips.length; idx++) {
+      const clip = view.clips[idx];
+      const count = counts[idx];
+      const start = frameIndex;
+      await page.evaluate((name) => (window as any).rigPlayer.play(name, { loop: false }), clip.name);
+      for (let j = 0; j < count; j++) {
+        await page.evaluate((t) => { const p = (window as any).rigPlayer; p.seek(t); p.draw(); }, Math.min(clip.duration, j / FPS));
+        await stage.screenshot({ path: join(frameDir, `f${String(frameIndex).padStart(4, '0')}.png`), omitBackground: true, animations: 'disabled' });
+        frameIndex++;
+      }
+      console.log(`  clip ${idx + 1}/${view.clips.length} ${clip.name}: f${String(start).padStart(4, '0')}..f${String(frameIndex - 1).padStart(4, '0')} (${count} frame(s), ${clip.duration.toFixed(4)} s)`);
+    }
   }
   }
 } finally {
@@ -309,6 +407,10 @@ args.push('-o', outWebp);
 execFileSync(process.env.IMG2WEBP ?? 'img2webp', args, { stdio: 'inherit' });
 // img2webp writes an opaque white background colour into the ANIM chunk; make it transparent.
 execFileSync(process.env.WEBPMUX ?? 'webpmux', ['-set', 'bgcolor', '0,0,0,0', outWebp, '-o', outWebp], { stdio: 'inherit' });
-copyFileSync(join(frameDir, 'f0000.png'), outPoster);
-console.log(`wrote ${outWebp} (${statSync(outWebp).size} bytes), ${outPoster} (${statSync(outPoster).size} bytes)`);
+if (!NO_POSTER) {
+  copyFileSync(join(frameDir, 'f0000.png'), outPoster);
+  console.log(`wrote ${outWebp} (${statSync(outWebp).size} bytes), ${outPoster} (${statSync(outPoster).size} bytes)`);
+} else {
+  console.log(`wrote ${outWebp} (${statSync(outWebp).size} bytes)`);
+}
 if (!keep) rmSync(frameDir, { recursive: true, force: true });

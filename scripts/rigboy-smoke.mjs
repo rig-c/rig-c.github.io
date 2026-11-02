@@ -64,9 +64,23 @@ const ready = async (s) => {
   assert.equal(await s.locator('[role=status]').getAttribute('data-kind'), 'ready');
 };
 const state = () => page.locator('#rigboy-demo').evaluate(s => {
-  const p = s.demo.player, gun = p.bone('gun'), hip = p.bone('hip'), head = p.bone('head');
-  return { time: p.time, current: p.current, gun: { x: gun.x, y: gun.y, rotationX: gun.rotationX }, hip: { x: hip.x, y: hip.y }, head: { x: head.x, y: head.y, rotationX: head.rotationX }, bounds: p.bounds(), view: s.demo.view };
+  const p = s.demo.player, gun = p.bone('gun'), hip = p.bone('hip'), head = p.bone('head'), stage = s.querySelector('.demo-stage');
+  return { time: p.time, current: p.current, gun: { x: gun.x, y: gun.y, rotationX: gun.rotationX }, hip: { x: hip.x, y: hip.y }, head: { x: head.x, y: head.y, rotationX: head.rotationX }, bounds: p.bounds(), view: s.demo.view, pixelRatio: p.renderer.pixelRatio, stageWidth: stage.clientWidth, stageHeight: stage.clientHeight };
 });
+const readDemoFit = (loc) => loc.evaluate(s => {
+  const stage = s.querySelector('.demo-stage');
+  return {
+    modelKey: s.demo.modelKey,
+    mode: s.demo.player.mode,
+    current: s.demo.player.current,
+    stageWidth: stage.clientWidth,
+    stageHeight: stage.clientHeight,
+    view: s.demo.view,
+    pixelRatio: s.demo.player.renderer.pixelRatio,
+    rootStyle: s.demo.player.root.style.cssText,
+  };
+});
+const waitRaf = (p) => p.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
 async function overlays(s) {
   const hasMeshes = await s.evaluate(el => el.demo.player.posedFrame().order.some(slot => slot.kind === 'mesh'));
   for (const part of ['bones', 'mesh']) {
@@ -100,10 +114,24 @@ try {
   assert.equal(await section.locator('[data-part=demo-aim], [data-part=demo-travel]').count(), 0, 'v1 aim/travel controls must be absent');
   await section.locator('[data-part=demo-start]').click(); await ready(section);
   await Promise.all(pending);
+  report.clipBox = await section.evaluate(s => s.demo.clipBox);
   report.clipBoxes = await section.evaluate(s => s.demo.clipBoxes);
   assert.deepEqual(Object.keys(report.clipBoxes), clips);
   assert.equal(report.downloads.length, 4, 'runtime, model and two atlas pages only');
   assert.equal(report.downloads.reduce((n, d) => n + d.bytes, 0), 1353981);
+  const checkClipStageBounds = (view, stageWidth, stageHeight, label) => {
+    const out = {};
+    for (const clip of clips) {
+      const b = report.clipBoxes[clip];
+      const x0 = view.left + b.x * view.scale;
+      const x1 = view.left + (b.x + b.width) * view.scale;
+      const y0 = view.top - (b.y + b.height) * view.scale;
+      const y1 = view.top - b.y * view.scale;
+      assert(x0 >= 0 && x1 <= stageWidth && y0 >= 0 && y1 <= stageHeight, `${label} ${clip} exceeds stage (${x0.toFixed(2)}..${x1.toFixed(2)} vs 0..${stageWidth}, ${y0.toFixed(2)}..${y1.toFixed(2)} vs 0..${stageHeight})`);
+      out[clip] = { x0, x1, y0, y1, stageWidth, stageHeight };
+    }
+    return out;
+  };
   phase = 'UI clip playback'; console.log('RIGBOY_PHASE', phase);
   for (const clip of clips) {
     await section.locator('select').selectOption(clip);
@@ -118,12 +146,20 @@ try {
       const idleGun = report.clips.find(c => c.clip === 'idle').before.gun.rotationX;
       assert(Math.abs(after.gun.rotationX - idleGun) > 20, 'aim must raise gun angle vs idle');
     }
+    if (report.clips.length > 0) {
+      const ref = report.clips[0].after;
+      assert.equal(after.view.scale, ref.view.scale, `desktop ${clip} scale must equal idle scale`);
+      assert.equal(after.view.left, ref.view.left, `desktop ${clip} left must equal idle left`);
+      assert.equal(after.view.top, ref.view.top, `desktop ${clip} top must equal idle top`);
+      assert.equal(after.pixelRatio, ref.pixelRatio, `desktop ${clip} pixelRatio must equal idle pixelRatio`);
+    }
     report.clips.push({ clip, before, after });
     if (!precheck) {
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       await section.screenshot({ path: join(out, `desktop-${clip}.png`) });
     }
   }
+  report.stageBounds = { desktop: checkClipStageBounds(report.clips[0].after.view, report.clips[0].after.stageWidth, report.clips[0].after.stageHeight, 'desktop') };
   await section.locator('select').selectOption('idle');
   phase = 'pause and overlays';
   await section.locator('[data-part=demo-play]').click();
@@ -135,19 +171,39 @@ try {
   if (!precheck) {
     phase = 'phone screenshots';
     await page.setViewportSize({ width: 375, height: 1000 });
+    await waitRaf(page);
+    report.phoneClips = [];
     for (const clip of clips) {
       await section.locator('select').selectOption(clip);
+      const st = await state();
+      if (report.phoneClips.length > 0) {
+        const ref = report.phoneClips[0];
+        assert.equal(st.view.scale, ref.view.scale, `phone ${clip} scale must equal idle scale`);
+        assert.equal(st.view.left, ref.view.left, `phone ${clip} left must equal idle left`);
+        assert.equal(st.view.top, ref.view.top, `phone ${clip} top must equal idle top`);
+        assert.equal(st.pixelRatio, ref.pixelRatio, `phone ${clip} pixelRatio must equal idle pixelRatio`);
+      }
+      report.phoneClips.push({ clip, ...st });
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${clip} horizontal scroll`);
       await section.screenshot({ path: join(out, `phone-${clip}.png`) });
     }
+    report.stageBounds.phone = checkClipStageBounds(report.phoneClips[0].view, report.phoneClips[0].stageWidth, report.phoneClips[0].stageHeight, 'phone');
     phase = 'native setup extrema diff';
     report.native = await captureNative(page, out);
     await page.goto(`${base}/examples/?demo-test=1`, { waitUntil: 'commit' });
     await page.locator('#live-demo.demo-ready').waitFor({ timeout: READY_MS });
     phase = 'Family regression';
+    report.otherDemosFit = { family: { desktop: {}, phone: {} }, play: { desktop: {}, phone: {} } };
     await page.setViewportSize({ width: 1280, height: 1000 });
+    await waitRaf(page);
     const family = page.locator('#live-demo');
     await family.locator('#demo-start').click(); await ready(family);
+    report.otherDemosFit.family.desktop['roa/office'] = await readDemoFit(family);
+    await page.setViewportSize({ width: 375, height: 1000 });
+    await waitRaf(page);
+    report.otherDemosFit.family.phone['roa/office'] = await readDemoFit(family);
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await waitRaf(page);
     assert.equal(await family.locator('#demo-motion').inputValue(), 'idle');
     const time = await family.evaluate(s => s.demo.player.time);
     await family.locator('#demo-play').click();
@@ -181,7 +237,19 @@ try {
       assert(source.includes(key === 'luna/office' ? '/family/luna/config.json' : '/family/outfits/homewear/luna/authoring/config.json'));
     };
     await switchFamily('#demo-character', 'luna', 'luna/office', 'Character 2, office');
+    report.otherDemosFit.family.desktop['luna/office'] = await readDemoFit(family);
+    await page.setViewportSize({ width: 375, height: 1000 });
+    await waitRaf(page);
+    report.otherDemosFit.family.phone['luna/office'] = await readDemoFit(family);
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await waitRaf(page);
     await switchFamily('#demo-outfit', 'homewear', 'luna/homewear', 'Character 2, homewear');
+    report.otherDemosFit.family.desktop['luna/homewear'] = await readDemoFit(family);
+    await page.setViewportSize({ width: 375, height: 1000 });
+    await waitRaf(page);
+    report.otherDemosFit.family.phone['luna/homewear'] = await readDemoFit(family);
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await waitRaf(page);
     assert(familyRuntimeRequests.some(u => u.includes('/family/luna/')));
     assert(familyRuntimeRequests.some(u => u.includes('/family/outfits/homewear/luna/')));
     report.family.push({ runtime: await family.evaluate(s => s.demo.runtimeUrl), requests: familyRuntimeRequests });
@@ -194,11 +262,23 @@ try {
     const play = page.locator('.live-demo-play');
     await play.locator('[data-part=demo-start]').click(); await ready(play);
     assert.match(await play.locator('[data-part=demo-status]').textContent(), /2 motions/);
+    report.otherDemosFit.play.desktop['roa/office:dom'] = await readDemoFit(play);
+    await page.setViewportSize({ width: 375, height: 1000 });
+    await waitRaf(page);
+    report.otherDemosFit.play.phone['roa/office:dom'] = await readDemoFit(play);
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await waitRaf(page);
     await play.locator('[data-part=demo-mode]').selectOption('canvas');
     await page.waitForFunction(() => document.querySelector('.live-demo-play').demo.player.mode === 'canvas' && document.querySelector('.live-demo-play [role=status]').dataset.kind === 'ready', null, { timeout: READY_MS });
     await ready(play);
     assert.equal(await play.evaluate(s => s.demo.modelKey), 'roa/office');
     assert.equal(await play.evaluate(s => s.demo.runtimeUrl), 'https://cdn.jsdelivr.net/npm/@rig-c/play@1.12.0/dist/index.js');
+    report.otherDemosFit.play.desktop['roa/office:canvas'] = await readDemoFit(play);
+    await page.setViewportSize({ width: 375, height: 1000 });
+    await waitRaf(page);
+    report.otherDemosFit.play.phone['roa/office:canvas'] = await readDemoFit(play);
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await waitRaf(page);
     await overlays(play);
     report.family.push({ play: await play.locator('[data-part=demo-status]').textContent() });
     phase = 'reduced motion';
@@ -213,7 +293,12 @@ try {
     phase = 'noscript';
     const nojs = await browser.newPage({ javaScriptEnabled: false }); nojs.setDefaultTimeout(READY_MS); nojs.setDefaultNavigationTimeout(READY_MS); await watch(nojs);
     await nojs.goto(`${base}/examples/`, { waitUntil: 'load', timeout: READY_MS });
-    assert.equal(await nojs.locator('#rigboy-demo noscript a').getAttribute('href'), `https://raw.githubusercontent.com/rig-c/examples/${sha}/rigboy/preview.webp`);
+    assert.equal(await nojs.locator('#rigboy-demo').getAttribute('data-fallback-href'), '/assets/rigboy-preview.webp');
+    assert.equal(await nojs.locator('#rigboy-demo noscript a').getAttribute('href'), '/assets/rigboy-preview.webp');
+    assert.equal(await nojs.locator('#rigboy-demo noscript img').getAttribute('src'), '/assets/rigboy-preview.webp');
+    const rigboyHtml = await nojs.locator('#rigboy-demo').evaluate(el => el.outerHTML);
+    assert(!rigboyHtml.includes('v1'), '#rigboy-demo HTML must not contain v1');
+    assert(!rigboyHtml.includes('rigboy/preview.webp'), '#rigboy-demo HTML must not reference v1 preview.webp');
     await nojs.close();
   }
   assert.deepEqual(report.errors, []);

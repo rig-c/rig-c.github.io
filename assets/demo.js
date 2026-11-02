@@ -106,7 +106,7 @@ function init(section) {
 
   function fit() {
     if (!current || section.nativeCapture) return;
-    const box = (rigboy ? current.clipBoxes?.[ui.motion.value] : null) ?? current.assets.stage ?? current.player.bounds();
+    const box = (rigboy ? current.clipBox : null) ?? current.assets.stage ?? current.player.bounds();
     const w = ui.stage.clientWidth;
     const h = ui.stage.clientHeight;
     const scale = Number(section.dataset.fit ?? 0.94) * Math.min(w / box.width, h / box.height);
@@ -244,6 +244,7 @@ function init(section) {
       ui.motion.replaceChildren(...names.map((n) => new Option(n, n, false, n === motion)));
       if (rigboy) {
         current.clipBoxes = measureClipBoxes(player, assets, bones.filter((b) => attachedBones.has(b.name)));
+        current.clipBox = unionBoxes(Object.values(current.clipBoxes));
       }
       player.play(motion);
       if (keepTime > 0) player.seek(keepTime % (assets.animations.find((a) => a.name === motion)?.duration || 1));
@@ -253,7 +254,7 @@ function init(section) {
       drawOverlay();
       showSource(c, o);
       if (query.get('demo-test') === '1') {
-        section.demo = { get player() { return current.player; }, get assets() { return current.assets; }, get view() { return current.view; }, get clipBoxes() { return current.clipBoxes; }, get modelKey() { return current.modelKey; }, get runtimeUrl() { return playUrl; }, draw: () => { current.player.draw(); drawOverlay(); } };
+        section.demo = { get player() { return current.player; }, get assets() { return current.assets; }, get view() { return current.view; }, get clipBox() { return current.clipBox; }, get clipBoxes() { return current.clipBoxes; }, get modelKey() { return current.modelKey; }, get runtimeUrl() { return playUrl; }, draw: () => { current.player.draw(); drawOverlay(); } };
       }
       const backend = player.mode === 'canvas' ? 'everything in one canvas (canvas mode)' : rigboy ? 'region pieces, no meshes (DOM mode)' : `meshes drawn with ${player.renderer.meshBackendActive ?? 'canvas'} (DOM mode)`;
       const motions = names.length === 1 ? `its one motion, ${names[0]}` : `${names.length} motions`;
@@ -338,6 +339,17 @@ function init(section) {
     return boxes;
   }
 
+  function unionBoxes(boxes) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const b of boxes) {
+      minX = Math.min(minX, b.x);
+      minY = Math.min(minY, b.y);
+      maxX = Math.max(maxX, b.x + b.width);
+      maxY = Math.max(maxY, b.y + b.height);
+    }
+    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+  }
+
   ui.start.addEventListener('click', start);
   const pick = () => {
     remember(ui.character.value, ui.outfit.value);
@@ -350,7 +362,6 @@ function init(section) {
     if (!current) return;
     current.player.play(ui.motion.value);
     if (!playing) current.player.pause();
-    if (rigboy) fit();
     current.player.frame(0);
     drawOverlay();
   });
