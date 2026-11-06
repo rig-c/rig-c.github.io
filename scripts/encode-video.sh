@@ -42,7 +42,7 @@ CLIPS=(
   # Examples page. Source metadata family/docs/family-preview.json: 67 frames,
   # duration 3.333 s (49/50 ms each). 67 / 20.1 = 3.333 s. Composited over the
   # page background (--bg in styles.css), as the WebP's alpha is shown there.
-  "family-preview|assets/family-preview.mp4|rig-c/examples|c239b09328ca7364361b9761fac817502c09ede0|family/docs/family-preview.webp|201/10|67|3.333|#070b18|build"
+  "family-preview|assets/family-preview.mp4|rig-c/examples|13cfd38617db06ebe6ff9bd6cc4fdf11b60f50d3|family/docs/family-preview.webp|201/10|67|3.333|#070b18|build"
   # Parts page, "A drafted rig that idles": no longer an MP4. Character 1's
   # idle (rig-c/examples@c239b09 family/roa/out/check/build) is an
   # animated WebP with alpha (assets/docs/parts-idle.webp + -poster.png),

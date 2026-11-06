@@ -114,7 +114,7 @@ The demo above is a separate, precompiled implementation with its own pointer an
 - 20 rigs / 396 part rows / outfits / config paths / repro commands: family/README.md §현재 승인된 입력과 재검증
 - every model carries one animation, idle; stage 800x2284; 2 files per rig; jsDelivr CORS: demo survey of all 20 models at c239b09
 - blink from the viewer's adjust, not the model: family/viewer/index.html lines 545-568
-- family-preview.mp4: encoded by scripts/encode-video.sh from examples@c239b09 family/docs/family-preview.webp (67 frames, 3.333 s per family-preview.json) at 20.1 fps over the page --bg #070b18; loop seam 0.960 vs max step 1.324 (scripts/loop-seam.py)
+- family-preview.mp4: encoded by scripts/encode-video.sh from examples@13cfd38 family/docs/family-preview.webp (67 frames, 3.333 s per family-preview.json; lineup and overlap order from examples #98 and #100, rigs unchanged) at 20.1 fps over the page --bg #070b18; loop seam 0.914 vs max step 1.197 (scripts/loop-seam.py)
 - standalone table: examples README Layout table; trailer: rig-c/trailer README
 - released-producer paragraph re-read 2026-11-01 against @rig-c/parts 2.0.3 (config.depth, depth-prepare, depth-apply, turn.roles); first release from the 1.68.0 line below.
 - release reconciliation: npm @rig-c/parts@1.68.0 tarball README and src/turn.ts buildDepth25DTurn; AUTHORING.md turn row and CHANGELOG at npm gitHead 89a7671229d155976fc8b5e87ffd6459301ff7b9. README still has pre-consumer wording; turn contract, shipped code and release changelog establish the released path.
