@@ -305,7 +305,10 @@ function head(page: Page): string {
     <meta name="keywords" content="${escapeHtml(page.keywords.join(', '))}">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="${canonicalUrl}">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
     <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <link rel="icon" href="/assets/favicon-96.png" type="image/png" sizes="96x96">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="alternate" type="text/markdown" href="${mdRoute(page.route)}" title="${escapeHtml(page.navLabel)} (Markdown)">
     <link rel="alternate" type="text/plain" href="/llms.txt" title="rig-c LLM Documentation Index">
     <link rel="alternate" type="text/plain" href="/llms-full.txt" title="rig-c Full LLM Documentation">
@@ -639,7 +642,7 @@ export async function buildSite({ outDir = DEFAULT_OUTPUT, fetchRegistry }: Buil
   const staging = mkdtempSync(join(dirname(destination), `.${basename(destination)}-`));
   try {
     // These are authored inputs in this repository. Never read a sibling checkout.
-    for (const name of ['assets', 'demos', 'styles.css', 'CNAME']) {
+    for (const name of ['assets', 'demos', 'styles.css', 'CNAME', 'favicon.ico', 'apple-touch-icon.png']) {
       cpSync(join(ROOT_DIR, name), join(staging, name), { recursive: true, dereference: false, errorOnExist: true });
     }
     for (const [relPath, content] of files) {

@@ -145,7 +145,7 @@ describe('isolated deployable site', () => {
   });
 
   test('verification rejects missing redirects, CNAME or assets even with an updated valid digest', () => {
-    for (const path of ['parts/index.html', 'CNAME', 'assets/logo.svg', 'demos/head-turn/bundle/skeleton.model.json', 'demos/head-turn/prototype/scene.bin.gz', 'demos/head-turn/site-ui.js']) {
+    for (const path of ['parts/index.html', 'CNAME', 'favicon.ico', 'apple-touch-icon.png', 'assets/logo.svg', 'assets/favicon-96.png', 'demos/head-turn/bundle/skeleton.model.json', 'demos/head-turn/prototype/scene.bin.gz', 'demos/head-turn/site-ui.js']) {
       const absolute = join(out, path);
       const original = readFileSync(absolute);
       const manifest = readFileSync(join(out, 'deployment-manifest.json'));
