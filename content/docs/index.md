@@ -2,9 +2,9 @@
 navLabel: Overview
 title: rig-c Docs — What Each Package Is, When to Use It, How It Works
 description: Choose a rig-c route by goal, required inputs, minimum packages and output, then explore how the packages fit together.
-keywords: rig-c docs, 2D rigging documentation, Spine 4.3, @rig-c/parts, @rig-c/pose, @rig-c/core, @rig-c/review, @rig-c/play
+keywords: rig-c docs, 2D rigging documentation, Spine 4.3, @rig-c/create, @rig-c/parts, @rig-c/pose, @rig-c/core, @rig-c/review, @rig-c/play
 repoUrl: https://github.com/rig-c
-summaryForLlms: "Docs hub: six goal-based entry points with required inputs, minimum packages, outputs and next steps, followed by the package pipeline. Playback and inspection can start from an existing build."
+summaryForLlms: "Docs hub: seven goal-based entry points with required inputs, minimum packages, outputs and next steps, followed by the package pipeline. Playback and inspection can start from an existing build."
 ---
 # Docs
 
@@ -16,6 +16,7 @@ Pick the row that matches what you already have. Each route starts there; you do
 
 | I want to… | Have ready | Minimum packages | What comes out | Next step |
 | --- | --- | --- | --- | --- |
+| Start a project | The user's direction and a new or empty project folder; Bun 1.4.0+ and Git | `@rig-c/create` (installs pinned rig-c dependencies at init) | Project scaffold, interview and a plan for the user to sign | [Create: install](/docs/create/#install) — `bunx rig-create init p1` |
 | Start from a painting and layers | Painting, full-figure and head layers (See-through or layered PSD), joints and a corrected config | `@rig-c/parts` + `@rig-c/core` to build | Parts, rig/motion specs, a gated native model and Spine export | [Getting Started](/docs/getting-started/) — prepared inputs through a first build and browser playback |
 | Play an existing compiled rig | Native `skeleton.model.json` and its image pages; for a host, a PixiJS, Phaser or Three.js scene | `@rig-c/play`; add only the matching `@rig-c/pixi`, `@rig-c/phaser` or `@rig-c/three` and host package for an engine scene | A rig playing in a page or host scene | [Play: a minimal page](https://github.com/rig-c/play#a-minimal-page); for a host, [Adapters](/docs/adapters/) |
 | Apply a pose sequence | Body-18 sequence (or COCO-17 converted by `clean`), target rig spec with its parts, explicit bone map; clean before retargeting | `@rig-c/pose` + `@rig-c/core` | Motion spec, optional report and gated compiled build | [Pose: inputs and outputs](/docs/pose/#inputs-and-outputs) |
@@ -33,8 +34,9 @@ For interactive work, compare [2D, depth-driven 2.5D and full 3D capabilities](/
 
 ## How the pieces fit
 
-1. **Parts** turns the painting's layers into rig-space parts and authors a first rig over them.
-2. **Pose** turns a recorded body pose sequence into an animation on that rig.
-3. **Core** (`rigc`) compiles the rig and motion specs, gates them by named assertions, and writes only when every one passes.
-4. **Review** lets a person look at what an agent built and hand back feedback bound to a frame, bone, or slot.
-5. **Play** and the **adapters** run the compiled model in a page or a game engine with no Spine runtime.
+1. **[Create](/docs/create/)** starts the project: it interviews you, and you sign the plan before any rigging.
+2. **Parts** turns the painting's layers into rig-space parts and authors a first rig over them.
+3. **Pose** turns a recorded body pose sequence into an animation on that rig.
+4. **Core** (`rigc`) compiles the rig and motion specs, gates them by named assertions, and writes only when every one passes.
+5. **Review** lets a person look at what an agent built and hand back feedback bound to a frame, bone, or slot.
+6. **Play** and the **adapters** run the compiled model in a page or a game engine with no Spine runtime.

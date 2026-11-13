@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { renderSite } from './build.ts';
 import { htmlRel, mdRoute, PAGES } from './content.ts';
 
-const names = ['@rig-c/core', '@rig-c/parts', '@rig-c/pose', '@rig-c/review', '@rig-c/play', '@rig-c/pixi', '@rig-c/phaser', '@rig-c/three'];
+const names = [...new Set(PAGES.flatMap((page) => page.packageName?.split(',').map((name) => name.trim()) ?? []))];
 // Distinct versions catch accidental aliasing, especially independently versioned adapters.
 const versions = new Map(names.map((name, index) => [name, `200.${index}.3`]));
 
@@ -84,7 +84,7 @@ describe('one current package version across all published surfaces', () => {
     const files = renderSite(versions);
     const path = 'docs/parts/index.html';
     const original = files.get(path)!;
-    const planted = original.replace('<span class="ver">200.1.3</span>', '<span class="ver">999.0.0</span>');
+    const planted = original.replace(`<span class="ver">${versions.get('@rig-c/parts')}</span>`, '<span class="ver">999.0.0</span>');
     expect(planted).not.toBe(original);
     files.set(path, planted);
     expect(() => assertConsistent(files)).toThrow();

@@ -9,7 +9,7 @@ import { outputRoot, ROOT_DIR } from './output.ts';
 import { verifySite } from './verify.ts';
 import { buildForActions } from '../scripts/build-site.ts';
 
-const NAMES = ['@rig-c/core', '@rig-c/parts', '@rig-c/pose', '@rig-c/review', '@rig-c/play', '@rig-c/pixi', '@rig-c/phaser', '@rig-c/three'];
+const NAMES = [...new Set(PAGES.flatMap((page) => page.packageName?.split(',').map((name) => name.trim()) ?? []))];
 const versions = new Map(NAMES.map((name, i) => [name, `100.0.${i}`]));
 const temp = mkdtempSync(join(realpathSync(tmpdir()), 'site-build-'));
 const out = join(temp, 'output');
@@ -25,7 +25,7 @@ beforeAll(async () => {
 afterAll(() => rmSync(temp, { recursive: true, force: true }));
 
 describe('isolated deployable site', () => {
-  test('resolves exactly eight real names once, verifies every route, mirror and redirect', () => {
+  test(`resolves exactly ${NAMES.length} real names once, verifies every route, mirror and redirect`, () => {
     expect(calls.sort()).toEqual([...NAMES].sort());
     verifySite(out);
     for (const page of PAGES) {
@@ -56,31 +56,31 @@ describe('isolated deployable site', () => {
     expect(row).toBeDefined();
     // Start at the adapter link rather than an earlier table row.
     const cell = row!.slice(row!.indexOf('href="/docs/adapters/"')).match(/<\/td>\s*<td>([\s\S]*?)<\/td>/)?.[1];
-    expect(cell).toBe('<code>@rig-c/pixi 100.0.5</code><br><code>@rig-c/phaser 100.0.6</code><br><code>@rig-c/three 100.0.7</code>');
+    expect(cell).toBe(`<code>@rig-c/pixi ${versions.get('@rig-c/pixi')}</code><br><code>@rig-c/phaser ${versions.get('@rig-c/phaser')}</code><br><code>@rig-c/three ${versions.get('@rig-c/three')}</code>`);
     expect(cell).not.toContain('&lt;br');
     // One adapter package per line in the package cell too, as in the version and install cells.
     expect(row!.match(/<td>([\s\S]*?)<\/td>/)?.[1]).toBe('<a href="/docs/adapters/"><strong>@rig-c/pixi</strong></a><br><a href="/docs/adapters/"><strong>@rig-c/phaser</strong></a><br><a href="/docs/adapters/"><strong>@rig-c/three</strong></a>');
-    expect(html).toContain('"softwareVersion": "100.0.0"');
+    expect(html).toContain(`"softwareVersion": "${versions.get('@rig-c/core')}"`);
   });
 
-  test('Markdown and llms contain all eight on their own lines; table row stays intact', () => {
+  test(`Markdown and llms contain all ${NAMES.length} packages on their own lines; table row stays intact`, () => {
     for (const path of ['index.md', 'llms.txt', 'llms-full.txt']) {
       const text = read(path);
       for (const name of NAMES) expect(text.split('\n')).toContain(`- \`${name}\`: \`${versions.get(name)}\``);
       expect(text).not.toContain('{{version:');
     }
     const row = read('index.md').split('\n').find((line) => line.startsWith('| [**@rig-c/pixi**](/docs/adapters/)<br>[**@rig-c/phaser**](/docs/adapters/)<br>[**@rig-c/three**](/docs/adapters/) |'))!;
-    expect(row).toContain('`@rig-c/pixi 100.0.5`; `@rig-c/phaser 100.0.6`; `@rig-c/three 100.0.7`');
+    expect(row).toContain(`\`@rig-c/pixi ${versions.get('@rig-c/pixi')}\`; \`@rig-c/phaser ${versions.get('@rig-c/phaser')}\`; \`@rig-c/three ${versions.get('@rig-c/three')}\``);
     expect(row.endsWith('|')).toBe(true);
     expect(row.split('|')).toHaveLength(6);
   });
 
   test('current docs metadata is resolved while the live player stays pinned', () => {
-    expect(read('docs/play/index.html')).toContain('"version": "100.0.4"');
+    expect(read('docs/play/index.html')).toContain(`"version": "${versions.get('@rig-c/play')}"`);
     expect(read('docs/play/index.html')).toContain('@rig-c/play 1.12.0 running in your browser');
     expect(read('docs/play/index.html')).toContain('c239b09328ca7364361b9761fac817502c09ede0');
-    expect(read('llms.txt')).toContain('`@rig-c/play@100.0.4`');
-    expect(read('index.md')).toContain('`@rig-c/play`: `100.0.4`');
+    expect(read('llms.txt')).toContain(`\`@rig-c/play@${versions.get('@rig-c/play')}\``);
+    expect(read('index.md')).toContain(`\`@rig-c/play\`: \`${versions.get('@rig-c/play')}\``);
   });
 
   test('invalid resolver fixture writes nothing and a CLI fixture is a real red process', async () => {

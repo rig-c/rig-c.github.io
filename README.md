@@ -14,7 +14,7 @@ Every documentation page is one Markdown file under `content/` (frontmatter + bo
 | `/docs/` | `content/docs/index.md` | Docs hub: the packages in pipeline order (the list is generated from each page's frontmatter) |
 | `/docs/capabilities/` | `content/docs/capabilities.md` | Input, producer, controls, output and playback matrix for 2D, depth-driven 2.5D and full 3D |
 | `/docs/getting-started/` | `content/docs/getting-started.md` | The three-step pipeline and the 10-step no-GPU walkthrough from [`rig-c/getting-started`](https://github.com/rig-c/getting-started) |
-| `/docs/parts/` … `/docs/adapters/` | `content/docs/<slug>.md` | One concept page per package: what it is, when to use it, what it solves, what you get, how it works, key concepts, and links into the repo for detail |
+| `/docs/create/` … `/docs/adapters/` | `content/docs/<slug>.md` | One concept page per package: what it is, when to use it, what it solves, what you get, how it works, key concepts, and links into the repo for detail |
 | `/docs/performance/` | `content/docs/performance.md` | Historical runtime costs, CPU/GPU boundaries, unresolved results and source-pinned methodology |
 | `/examples/` | `content/examples.md` | Reproducible examples (`rig-c/examples`, `rig-c/trailer`) |
 | `/demos/head-turn/` | `demos/head-turn/index.html` | Standalone depth-driven head-turn demo (separate from the released Parts producer) (JavaScript/WebGL required) |
@@ -42,7 +42,7 @@ Use **Bun 1.4.4** (the Actions runtime is pinned to that release). The browser s
 bun run test:rigboy # Built examples page: nine v2 clips, pause/overlays, Family regression + native captures
 bun run test       # Offline resolver/layout/artifact/live-comparison/workflow tests
 bun run test:browser # Built head-turn artifact; pinned Chromium required (CI or an approved verification environment)
-bun run build      # Fetch eight npm latest manifests, emit an isolated _site/ artifact
+bun run build      # Fetch nine npm latest manifests, emit an isolated _site/ artifact
 bun run verify     # Check _site/: all routes, redirects, static assets and deployment manifest
 bun run compare:live # Read-only comparison with the currently served deployment manifest
 bun run serve      # Serve only _site/ on http://localhost:4321 (after a build)
@@ -61,7 +61,7 @@ Inside this repository, output is restricted to `_site/` or `dist/`; an external
 
 The builder copies **only this repository's** `assets/`, `demos/`, `styles.css` and `CNAME`, byte for byte. It never reads a sibling checkout or runs the media scripts. Site-authoring Markdown, scripts and configuration are not published; the static demo bundle intentionally preserves its own README and licence notice. Generated HTML/Markdown, redirect stubs, `llms*.txt`, `robots.txt` and `sitemap.xml` belong exclusively in the output directory and must be removed from source tracking during migration; authored `assets/`, `styles.css` and `CNAME` stay tracked. Actions publishes an already-rendered artifact without Jekyll. It does not need `.nojekyll`, and the official upload action excludes dotfiles, so the builder emits none and rejects hidden artifact files or symlinks rather than silently publishing an incomplete file set.
 
-The landing HTML gives each adapter version its own escaped `<code>` item separated by `<br>`. Its Markdown table remains one physical line per row, followed by a plain per-package list of all eight independently resolved packages; the same list appears in `llms.txt` and `llms-full.txt`. The eight canonical registry identities are `@rig-c/core`, `@rig-c/parts`, `@rig-c/pose`, `@rig-c/review`, `@rig-c/play`, `@rig-c/pixi`, `@rig-c/phaser` and `@rig-c/three`. Core resolves the real scoped manifest; convenience name `rig-c` is not a separate lookup. The adapters heading groups three real packages; there is no `@rig-c/adapters` npm package. Convenience install names are documented separately from canonical identities and executable names. Docs badges and structured docs versions use the same build-time registry map. Recorded demo versions remain pinned to their sources.
+The landing HTML gives each adapter version its own escaped `<code>` item separated by `<br>`. Its Markdown table remains one physical line per row, followed by a plain per-package list of all nine independently resolved packages; the same list appears in `llms.txt` and `llms-full.txt`. The nine canonical registry identities are `@rig-c/create`, `@rig-c/core`, `@rig-c/parts`, `@rig-c/pose`, `@rig-c/review`, `@rig-c/play`, `@rig-c/pixi`, `@rig-c/phaser` and `@rig-c/three`. Core resolves the real scoped manifest; convenience name `rig-c` is not a separate lookup. The adapters heading groups three real packages; there is no `@rig-c/adapters` npm package. Convenience install names are documented separately from canonical identities and executable names. Docs badges and structured docs versions use the same build-time registry map. Recorded demo versions remain pinned to their sources.
 
 ## Link checks
 
@@ -104,7 +104,7 @@ An independent gate uses **authenticated** `gh api repos/rig-c/rig-c.github.io/p
 1. Complete PR review and verification and sign off the exact PR head, including removal of tracked generated outputs and preservation of authored static inputs.
 2. **Immediately before merge**, HQ changes Pages from `legacy` to `workflow` and reads the setting back. The workflow is not on `main` yet, so the previous legacy deployment stays live. Do not merge a source-only tree while legacy publishing is enabled: no legacy build may run against it.
 3. The parent merges the approved head only after that readback. The `main` push can perform the first Actions deployment; a normal dispatch (`failure_fixture=none`) is available if another run is needed. The authenticated build-type gate remains a second guard.
-4. The parent checks the deployment, canonical live routes, CNAME, Markdown/LLM endpoints, all redirect stubs and eight package versions against fresh npm manifests. Observe a no-change run and the deliberate failed run described below. Settings, merge and live acceptance remain separate owner actions.
+4. The parent checks the deployment, canonical live routes, CNAME, Markdown/LLM endpoints, all redirect stubs and nine package versions against fresh npm manifests. Observe a no-change run and the deliberate failed run described below. Settings, merge and live acceptance remain separate owner actions.
 
 ### Deterministic artifact and no-change behavior
 
