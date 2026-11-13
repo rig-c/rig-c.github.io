@@ -133,7 +133,7 @@ Runs under Bun 1.3.0 or later, which must be on `PATH`; `open` prints a loopback
 - **`check` validates the delivery contract and model envelope**, not the upstream compiler gate or visual quality; a raw `skeleton.json` can be inspected but not played (README §"Existing output handoff").
 - **No frame rate is inferred**: without a declared clock the page shows `rate unknown`, and strip PNGs need the report's exact `frameTimes` (README §"Existing output handoff", §"Frame strip export").
 - **Never publishes an issue automatically**; saving or exporting feedback modifies no model (README §"Feedback ownership").
-- **Maturity**: "the CLI is the supported surface, and no importable API is promised yet" (published 0.12.0 README §"Start").
+- **Maturity**: The CLI and `@rig-c/review/job-host` support owner hosting. See [Public API stability](https://github.com/rig-c/review/blob/main/docs/STABILITY.md) for exports and signatures. (Published v4.0.0 README §"Start".)
 
 ## Go deeper
 - [Place in the toolchain](https://github.com/rig-c/review#place-in-the-toolchain)
@@ -187,7 +187,7 @@ Runs under Bun 1.3.0 or later, which must be on `PATH`; `open` prints a loopback
 - compare: two packages, one reference video, one playhead — README.md:58-66
 - install + open commands — README.md:24-27
 - Bun 1.3.0 or later — README.md:29; `npm view @rig-c/review engines`
-- CLI is supported surface, no importable API; README says 0.1.x — README.md:31
+- CLI and @rig-c/review/job-host support owner hosting; Public API stability link for exports/signatures — supplied v4.0.0 README "Start": https://github.com/rig-c/review/blob/main/README.md; https://github.com/rig-c/review/blob/main/docs/STABILITY.md
 - review.json with checkpoints, references, angle axes — README.md:48
 - README anchors exist — README.md headings "Place in the toolchain", "Existing output handoff", "Compare two outputs", "Feedback ownership", "One-command owner handoff", "Chest regions (designate, rebuild, watch)"; docs/REVIEW_PACKAGE.md "Producer handoff", "Two-package comparison"
 - docs files — docs/REVIEW_PACKAGE.md:1, docs/DESIGN.md:1

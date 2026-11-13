@@ -30,6 +30,7 @@ const SOURCES: readonly { file: string; route: string; section: Section }[] = [
   { file: 'docs/index.md', route: '/docs/', section: 'docs' },
   { file: 'docs/capabilities.md', route: '/docs/capabilities/', section: 'docs' },
   { file: 'docs/getting-started.md', route: '/docs/getting-started/', section: 'docs' },
+  { file: 'docs/create.md', route: '/docs/create/', section: 'docs' },
   { file: 'docs/parts.md', route: '/docs/parts/', section: 'docs' },
   { file: 'docs/pose.md', route: '/docs/pose/', section: 'docs' },
   { file: 'docs/core.md', route: '/docs/core/', section: 'docs' },

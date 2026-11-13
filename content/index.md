@@ -2,14 +2,14 @@
 navLabel: Overview
 title: rig-c — AI-Authored 2D Rigging and Animation Toolchain
 description: AI-authored 2D character rigging and animation, verified before a byte is written. Compile Spine 4.3 skeleton data and model documents from one painting with named assertions.
-keywords: rig-c, rigc, 2D rigging, Spine 4.3, AI agent toolchain, @rig-c/parts, @rig-c/pose, @rig-c/play, @rig-c/review, @rig-c/core, @rig-c/pixi, @rig-c/phaser, @rig-c/three
+keywords: rig-c, rigc, 2D rigging, Spine 4.3, AI agent toolchain, @rig-c/create, @rig-c/parts, @rig-c/pose, @rig-c/play, @rig-c/review, @rig-c/core, @rig-c/pixi, @rig-c/phaser, @rig-c/three
 packageName: "@rig-c/core"
 repoUrl: https://github.com/rig-c
 npmUrl: https://www.npmjs.com/package/@rig-c/core
 heroEyebrow: 2D character rigging, authored by agents
 heroTitle: One painting in. A verified rig out.
 heroLede: rig-c turns a character painting, split into layers, into a rigged and animated character — Spine 4.3 skeleton data and a model a web page can play — and writes nothing until its named structural checks pass. How the result looks is still a person's call.
-summaryForLlms: Toolchain overview, package index (parts, pose, core, review, play, adapters), installation commands, AI agent skill setup, and licensing boundaries.
+summaryForLlms: Toolchain overview, package index (create, parts, pose, core, review, play, adapters), installation commands, AI agent skill setup, and licensing boundaries.
 ---
 # rig-c — AI-Authored 2D Rigging and Animation, Verified Before It Is Written
 
@@ -29,11 +29,12 @@ One character painting goes in; a rigged, animated 2D character that plays in th
   <figcaption><span class="media-kind">Recorded video</span> rig-c's mascot — the trailer's painting, built by <code>@rig-c/parts</code> 1.12.0 into 23 parts, a rig and an idle, then the film rig's performance compiled and rendered by <code>rig-c</code> 2.47.1; the labels, the glide and the dissolves are this film's; the placement and the motion are the rig's. From <a href="https://github.com/rig-c/trailer">rig-c/trailer</a>.</figcaption>
 </figure>
 
-1. **[Parts](/docs/parts/)** merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle. Given per-part depth maps from a model you run, it also builds a [depth-driven turn](https://github.com/rig-c/parts/blob/main/docs/DEPTH.md): a head that reads as having volume when its dials move.
-2. **[Pose](/docs/pose/)** cleans a recorded body-18 pose sequence and retargets it onto the rig as an animation.
-3. **[Core](/docs/core/)** compiles the rig and motion specs and gates them by named assertions — nothing is written unless every one passes.
-4. **[Review](/docs/review/)** lets a person look at what an agent built and hand back feedback bound to a frame, bone or slot.
-5. **[Play](/docs/play/)** and the **[adapters](/docs/adapters/)** run the compiled model in a page, PixiJS, Phaser or Three.js, with no Spine runtime.
+1. **[Create](/docs/create/)** sets up the project, the user's direction, the interview and a signed plan.
+2. **[Parts](/docs/parts/)** merges the painting's two See-through layer sets into rig-space parts, then drafts bones, weighted meshes, physics and a looping idle. Given per-part depth maps from a model you run, it also builds a [depth-driven turn](https://github.com/rig-c/parts/blob/main/docs/DEPTH.md): a head that reads as having volume when its dials move.
+3. **[Pose](/docs/pose/)** cleans a recorded body-18 pose sequence and retargets it onto the rig as an animation.
+4. **[Core](/docs/core/)** compiles the rig and motion specs and gates them by named assertions — nothing is written unless every one passes.
+5. **[Review](/docs/review/)** lets a person look at what an agent built and hand back feedback bound to a frame, bone or slot.
+6. **[Play](/docs/play/)** and the **[adapters](/docs/adapters/)** run the compiled model in a page, PixiJS, Phaser or Three.js, with no Spine runtime.
 
 Try the CPU-only, no-Python path from prepared example layers: **[Getting started](/docs/getting-started/)** pins a tested recipe through idle, wave, hello, cloth and browser playback. Its historical Apple M4 runs took 536–571 s for steps 1–10 including 9b/9c, with load average 20–95; the guide separates download/cache scope and its newer Linux reproduction. See what agents do with it on the **[Exam](/exam/)** (2026-10-20: [eight sittings, three families — results](/exam/#2026-10-20-sitting-the-five-task-round)), and rebuild the published rigs from **[Examples](/examples/)**.
 
@@ -41,6 +42,7 @@ Try the CPU-only, no-Python path from prepared example layers: **[Getting starte
 
 | Package | Latest | Install | What it does |
 | --- | --- | --- | --- |
+| [**@rig-c/create**](/docs/create/) | `{{version:create}}` | `bunx rig-create init p1` | Sets up the project, the user's direction, the interview and a signed plan; records human acts made in Review. |
 | [**@rig-c/parts**](/docs/parts/) | `{{version:parts}}` | `npm i -D @rig-c/parts` | Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them. |
 | [**@rig-c/pose**](/docs/pose/) | `{{version:pose}}` | `npm i -D @rig-c/pose` | Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written. |
 | [**@rig-c/core**](/docs/core/) | `{{version:core}}` | `npm i -D @rig-c/core` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and `skeleton.model.json` out — gated by named assertions before a byte is written (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`). |
@@ -71,6 +73,9 @@ rig-c replaces that silence with five rules:
 ## Install
 
 ```sh
+# Start a project
+bunx rig-create init p1
+
 # Run the compiler CLI directly with Bun
 bunx @rig-c/core --help
 
@@ -105,6 +110,7 @@ These short npm names are alternative entry points for the same products. Prefer
 
 | Canonical package | Convenience install name | Executable |
 | --- | --- | --- |
+| `@rig-c/create` | `rig-create` | `rig-create` |
 | `@rig-c/core` | `rig-c` | `rigc` |
 | `@rig-c/parts` | `rig-parts` | `rig-parts` |
 | `@rig-c/pose` | `rig-pose` | `rig-pose` |
@@ -122,6 +128,7 @@ rig-c's code is **MIT**. Which Spine terms apply depends on what plays the outpu
 Sample paintings and layers carry their own licences — Getting Started's example inputs are CC BY-NC 4.0. The full table, with sources: **[Licensing](/docs/licensing/)**.
 
 <!-- SOURCES (not published)
+- Create project/direction/interview/signed plan and install/alias: https://github.com/rig-c/create README supplied for issue #140, introduction and "Install and start"; human acts in Review recorded by create writers: https://github.com/rig-c/rig-c.github.io/issues/140.
 - "From loose parts to a living rig" clip landing-parts-to-rig.mp4 + poster: scripts/landing-film.py --trailer <clone> --crf 23, from rig-c/trailer@2248a13 with its pinned @rig-c/parts 1.12.0 and rig-c 2.47.1 (package.json devDependencies; npm ci). build.sh steps 1-3 as written: `rig-parts build --config inputs/config.json --source inputs/painting.png --full inputs/layers/full --head inputs/layers/head --requirements inputs/requirements.json --out out/parts` -> "check: PASS; 9 of 9 bar(s) measured, 0 skipped"; film/palm.py + film/rig.py -> "bones 83 slots 29 physics 24 animations ['idle', 'show']"; `rigc build --rig out/film/rig.json --motion out/film/motion.json --out out/build --profile spine` (and rig_black.json) -> "53 assertions: 20 measured (20 passed, 0 failed), 17 skipped, 16 not in profile "spine"", "bones=83 slots=29 animations=2 regionAttachments=18 meshAttachments=11 physicsConstraints=24". Step 4 as written: show 321 frames, 16.000 s at 20 fps. Step 5 (compose.py: sky, lights, reveal, captions) not used.
 - Then the script runs, with that rigc: rigc build of out/parts/rig (rig.json + motion.json) and a black-tinted twin (every slot color 000000ff), --profile spine -> "bones=73 slots=23 animations=1"; `rigc render --animation idle --fps 30 --max 599` (121 frames, 4.000 s) and `rigc render --candidate out/build --animation show --fps 30 --max 840` (481 frames, 16.000 s), each also on the black twin; alpha recovered from the pair as compose.py does.
 - One scale for every shot: 0.493636 px per rig unit (the show render's); the idle render is 0.493947 (+0.063 %, not resampled). parts.json placement = rig x - 416, 1216 - y in world units (the skeleton box); assembled (parts.json) vs the idle's frame 0, stage area: mean abs diff 1.878 (0-255).
