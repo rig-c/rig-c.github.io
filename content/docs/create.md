@@ -2,7 +2,7 @@
 navLabel: Create
 title: "@rig-c/create: project direction, interview and signed plan"
 description: Start a rig-c project with the user's direction, an interview and a signed plan, then record human decisions made in Review.
-summaryForLlms: "@rig-c/create scaffolds a rig-c project, records the user's direction and interview, and keeps its signed plan and approvals. The first cycle covers interview, plan, parts, rigging interview, rig, post, direction-review and accepted, with human acts made in Review and recorded by create's writers."
+summaryForLlms: "@rig-c/create scaffolds a rig-c project, records the user's direction and interview, and keeps its signed plan and approvals. A project moves through eleven stages: interview → plan-approved → parts → parts-review → rigging-interview → rigging → rig-review → post-interview → post → direction-review → accepted, with human acts made in Review and recorded by create's writers."
 packageName: "@rig-c/create"
 repoUrl: https://github.com/rig-c/create
 npmUrl: https://www.npmjs.com/package/@rig-c/create
@@ -14,6 +14,14 @@ npmUrl: https://www.npmjs.com/package/@rig-c/create
 ```sh
 bunx rig-create init p1
 ```
+
+Then ask it what to do:
+
+```sh
+bunx rig-create next p1
+```
+
+`next` lists what comes now: which decisions are yours to make in Review, and which commands are the agent's.
 
 Or install the canonical package globally:
 
@@ -28,9 +36,9 @@ Requires [Bun](https://bun.sh) 1.4.0 or newer and Git. Choose one route and a ne
 
 <p class="mod-skip">Skip to <a href="#install">Install</a> · <a href="#inputs-and-outputs">Inputs and outputs</a> · <a href="#limits">Limits</a> · <a href="#go-deeper">Docs</a></p>
 
-Create keeps what the rig is meant to do before an agent starts work: the cut, the bones, what deforms, physics and motion; then camera and timing after the rig is accepted, and the user's feedback after seeing a result. An explicit delegation is recorded as the user's choice. The agent's guide points at the installed packages' own documentation.
+Create is where a rig starts. Before any rigging it interviews you about what the rig should do, turns your answers into a plan you sign, and then keeps the record of every decision after that: which parts you approved, how the rig should bend and move, and what you said when you saw the result. An agent does the work between your decisions. If you hand a decision to the agent, that is recorded as your choice too.
 
-The first cycle moves through **interview → plan → parts → rigging interview → rig → post → direction-review → accepted**. Human acts are made in [Review](/docs/review/) and recorded by create's writers. The project keeps the direction, sign-offs and versions together.
+A project moves through eleven stages: **interview → plan-approved → parts → parts-review → rigging-interview → rigging → rig-review → post-interview → post → direction-review → accepted**. You make your decisions in [Review](/docs/review/), and create's writers record them.
 
 ## Inputs and outputs
 
@@ -46,6 +54,7 @@ The first cycle moves through **interview → plan → parts → rigging intervi
 - **Create defines the project and its direction**: [Parts](/docs/parts/) cuts parts; [Core](/docs/core/) compiles and gates rigs.
 - **A fresh interview is incomplete**: `rig-create interview --check p1 --json` exits nonzero until the stage's requirements are met. Follow the available next actions through Review rather than editing records by hand.
 - **A sign-off does not move the stage**: `signoff` records the user's words and preserves existing answers and delegations.
+- **Not in 1.0 yet: a 2.5D head turn.** The post interview can ask for one, but the direction format has no depth or turn fields, so nothing produces it yet.
 
 ## Go deeper
 
@@ -62,6 +71,8 @@ The first cycle moves through **interview → plan → parts → rigging intervi
 - README "Install and start" — bunx rig-create init p1 alias, bun add -g @rig-c/create, Bun >=1.4.0 and Git, new/empty folder, pinned dependency installation, initial commit, recovery, --no-install, interview check and next actions through Review.
 - README "Why it exists" and "What it provides" — base motion, camera/timing after rig acceptance, feedback, explicit delegation, scaffold, direction/sign-offs/versions and installed-package guide.
 - README "Recording approvals" — signoff records without moving the stage, preserves existing answers/delegations and keeps verbatim input.
-- https://github.com/rig-c/rig-c.github.io/issues/140 — first-cycle scope: interview → plan → parts → rigging interview → rig → post → direction-review → accepted; human acts in Review recorded by create's writers. Publication and alias confirmed by the parent for 1.0.1.
+- https://github.com/rig-c/rig-c.github.io/issues/140 — human acts in Review recorded by create's writers. Publication and alias confirmed by the parent for 1.0.1.
+- https://github.com/rig-c/create/tree/cc94700fef82f177df1692a0236778454367e090 (v1.0.1): src/stages.ts:32-44 — eleven stages; src/next.ts:1485-1488 — next lists each move's role and command or act; templates/project.json:155-157 and src/direction.ts:93-114 — post interview asks about a 2.5D head turn, but the closed direction schema has camera boxes and timing, no depth/turn fields. This limit concerns Create's direction producer; README.md:73-76 keeps depth and turn in Parts.
+- No universal sign-off guarantee is claimed: src/stage-progress.ts:134-148 permits post-interview → accepted when post is not passed; src/check.ts:433-436,733-738 exempts direction-review when every post item is not applicable. Legacy exceptions: src/check.ts:734-736,771-782 and src/stages.ts:146-148.
 - README "Docs" and "Licence" — linked document subjects and MIT licence.
 -->

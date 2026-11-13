@@ -34,7 +34,7 @@ For interactive work, compare [2D, depth-driven 2.5D and full 3D capabilities](/
 
 ## How the pieces fit
 
-1. **[Create](/docs/create/)** sets up the project, the user's direction, the interview and a signed plan.
+1. **[Create](/docs/create/)** starts the project: it interviews you, and you sign the plan before any rigging.
 2. **Parts** turns the painting's layers into rig-space parts and authors a first rig over them.
 3. **Pose** turns a recorded body pose sequence into an animation on that rig.
 4. **Core** (`rigc`) compiles the rig and motion specs, gates them by named assertions, and writes only when every one passes.
