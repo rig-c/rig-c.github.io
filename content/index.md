@@ -42,7 +42,7 @@ Try the CPU-only, no-Python path from prepared example layers: **[Getting starte
 
 | Package | Latest | Install | What it does |
 | --- | --- | --- | --- |
-| [**@rig-c/create**](/docs/create/) | `{{version:create}}` | `bunx rig-create init p1` | Sets up the project, the user's direction, the interview and a signed plan; records human acts made in Review. |
+| [**@rig-c/create**](/docs/create/) | `{{version:create}}` | `bunx rig-create init p1` | Starts the project: interviews you and records the plan you sign and every decision after it. |
 | [**@rig-c/parts**](/docs/parts/) | `{{version:parts}}` | `npm i -D @rig-c/parts` | Assembles one character painting's decomposed See-through layers into rig-ready parts, then authors weighted meshes, bone chains, physics, and a looping idle over them. |
 | [**@rig-c/pose**](/docs/pose/) | `{{version:pose}}` | `npm i -D @rig-c/pose` | Cleans and retargets a body-18 pose sequence (from video, dataset, or hand-placed points) onto a rig that rig-c built, gated before keys are written. |
 | [**@rig-c/core**](/docs/core/) | `{{version:core}}` | `npm i -D @rig-c/core` | The rig compiler: a rig spec and a motion spec in, Spine 4.3 skeleton data (`skeleton.json` + `.atlas`) and `skeleton.model.json` out — gated by named assertions before a byte is written (36 under the default `--profile spine`, all 50 under the opt-in `--profile rig-play`). |
