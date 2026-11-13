@@ -1,7 +1,9 @@
 import { expect, test } from 'bun:test';
 import { renderSite } from './build.ts';
+import { PAGES } from './content.ts';
 
-const versions = new Map(['core', 'parts', 'pose', 'review', 'play', 'pixi', 'phaser', 'three'].map(n => [`@rig-c/${n}`, '100.0.0']));
+const names = [...new Set(PAGES.flatMap((page) => page.packageName?.split(',').map((name) => name.trim()) ?? []))];
+const versions = new Map(names.map((name) => [name, '100.0.0']));
 const CLIPS = ['idle', 'walk', 'run', 'jump', 'shoot', 'aim', 'idle-turn', 'run-to-idle', 'death'] as const;
 
 function assertRigboyClips(rigboy: string): void {
